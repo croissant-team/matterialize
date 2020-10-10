@@ -8,7 +8,7 @@
 #include "FakeCam.h"
 
 // More Formats at: https://linuxtv.org/downloads/v4l-dvb-apis/uapi/v4l/videodev.html
-JNIEXPORT jint JNICALL Java_FakeCamera_open(JNIEnv* env, jobject obj, jstring device, jint width, jint height)
+JNIEXPORT jint JNICALL Java_uk_ac_ic_matterialize_camera_V4L2Lib_open(JNIEnv* env, jobject obj, jstring device, jint width, jint height)
 {
     const char *deviceChar = (*env)->GetStringUTFChars(env, device, 0);
 
@@ -36,20 +36,20 @@ JNIEXPORT jint JNICALL Java_FakeCamera_open(JNIEnv* env, jobject obj, jstring de
     return dev_fd;
 }
 
-JNIEXPORT jboolean JNICALL Java_FakeCamera_writeFrame(JNIEnv* env, jobject obj, jint dev_fd, jbyteArray frame)
+JNIEXPORT jboolean JNICALL Java_uk_ac_ic_matterialize_camera_V4L2Lib_writeFrame(JNIEnv* env, jobject obj, jint dev_fd, jbyteArray frame)
 {
-  int frameSize = (*env)->GetArrayLength(env, frame);
+    int frameSize = (*env)->GetArrayLength(env, frame);
 
-  jbyte* array = (*env)->GetByteArrayElements(env, frame, 0);
-  char* frameBytes = (char*) array;
+    jbyte* array = (*env)->GetByteArrayElements(env, frame, 0);
+    char* frameBytes = (char*) array;
 
-  int result = write(dev_fd, frameBytes, frameSize);
+    int result = write(dev_fd, frameBytes, frameSize);
 
-  (*env)->ReleaseByteArrayElements(env, frame, array, 0);
-  return result == frameSize;
+    (*env)->ReleaseByteArrayElements(env, frame, array, 0);
+    return result == frameSize;
 }
 
-JNIEXPORT jint JNICALL Java_FakeCamera_close(JNIEnv* env, jobject obj, jint dev_fd)
+JNIEXPORT jint JNICALL Java_uk_ac_ic_matterialize_camera_V4L2Lib_close(JNIEnv* env, jobject obj, jint dev_fd)
 {
     return close(dev_fd);
 }

@@ -7,14 +7,11 @@
 extern "C" {
 #endif
 
-JNIEXPORT jint JNICALL Java_FakeCamera_open
-  (JNIEnv *, jobject, jstring, jint, jint);
+JNIEXPORT jint JNICALL Java_uk_ac_ic_matterialize_camera_V4L2Lib_open (JNIEnv *, jobject, jstring, jint, jint);
 
-JNIEXPORT jboolean JNICALL Java_FakeCamera_writeFrame
-  (JNIEnv *, jobject, jint, jbyteArray);
+JNIEXPORT jboolean JNICALL Java_uk_ac_ic_matterialize_camera_V4L2Lib_writeFrame (JNIEnv *, jobject, jint, jbyteArray);
 
-JNIEXPORT jint JNICALL Java_FakeCamera_close
-  (JNIEnv *, jobject, jint);
+JNIEXPORT jint JNICALL Java_uk_ac_ic_matterialize_camera_V4L2Lib_close (JNIEnv *, jobject, jint);
 
 #ifdef __cplusplus
 }

@@ -1,4 +1,6 @@
-class FakeCamera {
+package uk.ac.ic.matterialize.camera
+
+class V4L2Lib {
     companion object {
         init {
             System.loadLibrary("fakecam")
