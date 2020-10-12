@@ -1,0 +1,29 @@
+default:
+  image: gradle:latest
+
+stages:
+  - compile
+  - test
+
+before_script:
+  - export GRADLE_USER_HOME=./.gradle
+  - ./gradlew --refresh-dependencies
+
+cache:
+  key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
+  paths:
+    - .gradle/caches
+    - .gradle/wrapper
+  policy: pull
+
+compile:
+  stage: compile
+  script:
+    - ./gradlew assemble
+  cache:
+    policy: push
+
+test:
+  stage: test
+  script:
+    - ./gradlew check
