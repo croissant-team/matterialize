@@ -1,13 +1,15 @@
 import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
 import tornadofx.launch
-import uk.ac.ic.matterialize.camera.BuilderWindowTestApp
+import uk.ac.ic.matterialize.gui.MatterializeApp
 import uk.ac.ic.matterialize.camera.FakeWebcam
 //import uk.ac.ic.matterialize.camera.HelloWorldApp
 import uk.ac.ic.matterialize.camera.OpenCVWebcam
 import uk.ac.ic.matterialize.camera.V4L2Lib
 
 fun main() {
+    launch<MatterializeApp>()
+
     val INPUT_DEVICE = 0
 
     // might need to change output device depending on configuration
