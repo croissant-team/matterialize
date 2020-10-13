@@ -1,12 +1,22 @@
 package uk.ac.ic.matterialize.camera
 
 import org.bytedeco.javacv.Java2DFrameConverter
+import org.bytedeco.javacv.OpenCVFrameConverter
 import org.bytedeco.javacv.OpenCVFrameGrabber
+import org.opencv.core.Mat
+import org.opencv.core.Core
 import java.awt.image.BufferedImage
 
 class OpenCVWebcam(private val device: Int, private val width: Int, private val height: Int) {
+    companion object {
+        init {
+            System.loadLibrary(Core.NATIVE_LIBRARY_NAME)
+        }
+    }
+
     private lateinit var grabber: OpenCVFrameGrabber
-    private val conv = Java2DFrameConverter()
+    private val bufConv = Java2DFrameConverter()
+    private val matConv = OpenCVFrameConverter.ToOrgOpenCvCoreMat()
 
     fun start() {
         grabber = OpenCVFrameGrabber(device)
@@ -20,8 +30,12 @@ class OpenCVWebcam(private val device: Int, private val width: Int, private val 
         grabber.stop()
     }
 
-    fun grab(): BufferedImage {
-        return conv.getBufferedImage(grabber.grab())
+    fun grabBuf(): BufferedImage {
+        return bufConv.getBufferedImage(grabber.grab())
+    }
+
+    fun grabMat(): Mat {
+        return matConv.convert(grabber.grab())
     }
 
     fun fps(samples: Int): Double {

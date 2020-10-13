@@ -23,7 +23,7 @@ fun main() {
     while (true) {
         val start = System.currentTimeMillis()
 
-        val img = inputCam.grab()
+        val img = inputCam.grabMat()
 
         outputCam.write(V4L2Lib.convertToYUYV(img))
 
