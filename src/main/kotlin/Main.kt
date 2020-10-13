@@ -1,14 +1,13 @@
 import uk.ac.ic.matterialize.camera.FakeWebcam
 import uk.ac.ic.matterialize.camera.OpenCVWebcam
-
-import java.nio.*
+import uk.ac.ic.matterialize.camera.V4L2Lib
 
 fun main() {
     val INPUT_DEVICE = 0
 
     // might need to change output device depending on configuration
     // dummy devices can be seen by by running `v4l2-ctl --list-devices`
-    val OUTPUT_DEVICE = "/dev/video100"
+    val OUTPUT_DEVICE = "/dev/video2"
 
     val WIDTH = 640
     val HEIGHT = 360
@@ -24,22 +23,9 @@ fun main() {
     while (true) {
         val start = System.currentTimeMillis()
 
-        val frame = ByteArray(WIDTH * HEIGHT * 3)
-        val img = inputCam.grab()
+        val img = inputCam.grabMat()
 
-        (0 until WIDTH).forEach { x ->
-            (0 until HEIGHT).forEach { y ->
-                // each pixel is represented as 3 bytes
-                val i = (y * WIDTH + x) * 3
-
-                // img.getRGB gives us ARGB (4 bytes) format, so we take bytes 2, 3 and 4 for our image
-                val buffer = ByteBuffer.allocate(4).putInt(img.getRGB(x, y)).array().drop(1)
-
-                (0..2).forEach { frame[i + it] = buffer[it] }
-            }
-        }
-
-        outputCam.write(frame)
+        outputCam.write(V4L2Lib.convertToYUYV(img))
 
         val end = System.currentTimeMillis()
         println("took ${end - start}ms")

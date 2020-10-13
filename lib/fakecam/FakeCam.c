@@ -24,8 +24,8 @@ JNIEXPORT jint JNICALL Java_uk_ac_ic_matterialize_camera_V4L2Lib_open(JNIEnv* en
     }
     v.fmt.pix.width = width;
     v.fmt.pix.height = height;
-    v.fmt.pix.pixelformat = V4L2_PIX_FMT_RGB24;
-    int frameSize = width * height * 3;
+    v.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
+    int frameSize = width * height * 2;
     v.fmt.pix.sizeimage = frameSize;
 
     if (ioctl(dev_fd, VIDIOC_S_FMT, &v) == -1) {
