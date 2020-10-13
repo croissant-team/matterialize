@@ -9,7 +9,6 @@ before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle
 
 cache:
-  key: "$CI_COMMIT_REF_NAME"
   paths:
     - .gradle/caches
     - .gradle/wrapper
