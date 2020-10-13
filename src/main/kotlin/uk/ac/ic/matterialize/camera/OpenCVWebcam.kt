@@ -1,11 +1,13 @@
 package uk.ac.ic.matterialize.camera
 
-import org.bytedeco.javacv.Java2DFrameConverter
-import org.bytedeco.javacv.OpenCVFrameConverter
-import org.bytedeco.javacv.OpenCVFrameGrabber
-import org.opencv.core.Mat
 import org.opencv.core.Core
+import org.opencv.core.Mat
+import org.opencv.videoio.VideoCapture
+import org.opencv.videoio.Videoio.CAP_V4L
 import java.awt.image.BufferedImage
+import java.io.ByteArrayInputStream
+import javax.imageio.ImageIO
+
 
 class OpenCVWebcam(private val device: Int, private val width: Int, private val height: Int) {
     companion object {
@@ -14,28 +16,32 @@ class OpenCVWebcam(private val device: Int, private val width: Int, private val 
         }
     }
 
-    private lateinit var grabber: OpenCVFrameGrabber
-    private val bufConv = Java2DFrameConverter()
-    private val matConv = OpenCVFrameConverter.ToOrgOpenCvCoreMat()
+    private var capture: VideoCapture? = null
 
     fun start() {
-        grabber = OpenCVFrameGrabber(device)
-        grabber.imageWidth = width
-        grabber.imageHeight = height
-
-        grabber.start()
+        capture = VideoCapture(device, CAP_V4L)
     }
 
     fun stop() {
-        grabber.stop()
+        capture?.release()
+        capture = null
     }
 
+    // TODO convert into utility function and move away
     fun grabBuf(): BufferedImage {
-        return bufConv.getBufferedImage(grabber.grab())
+        val mat = grabMat()
+        val buffer = ByteArray(mat.width() * mat.height() * mat.channels())
+        mat.get(0, 0, buffer)
+        val input = ByteArrayInputStream(buffer)
+
+        return ImageIO.read(input)
     }
 
     fun grabMat(): Mat {
-        return matConv.convert(grabber.grab())
+        val mat = Mat()
+        // TODO add proper error
+        capture!!.read(mat)
+        return mat
     }
 
     fun fps(samples: Int): Double {
@@ -44,7 +50,7 @@ class OpenCVWebcam(private val device: Int, private val width: Int, private val 
 
         (0 until samples).forEach {
             val start = System.currentTimeMillis()
-            grabber.grab()
+            grabMat()
             val end = System.currentTimeMillis()
 
             sum += end - start
