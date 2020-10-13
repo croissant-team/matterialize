@@ -12,14 +12,12 @@ cache:
   paths:
     - .gradle/caches
     - .gradle/wrapper
-  policy: pull
+  policy: pull-push
 
 compile:
   stage: compile
   script:
     - ./gradlew assemble
-  cache:
-    policy: push
 
 test:
   stage: test
