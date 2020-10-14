@@ -1,6 +1,10 @@
 package matting
 
 import org.opencv.core.Mat
+import org.opencv.imgcodecs.Imgcodecs
+import org.opencv.imgproc.Imgproc
+import org.opencv.imgproc.Imgproc.COLOR_BGR2Lab
+import org.opencv.imgproc.Imgproc.COLOR_Lab2BGR
 import smile.clustering.KMeans
 import smile.clustering.kmeans
 import smile.math.MathEx
@@ -10,15 +14,28 @@ class KMeansMatter(background: Mat): Matter {
     private data class ClusteringInfo(val kMeans: KMeans, val clustersInfo: Map<Int, ClusterInfo>)
 
     private val NUM_CLUSTERS = 20
-    private val THRESHOLD = 0.000000025
+    private val THRESHOLD = 0.000003
 
     private val backgroundInfo: ClusteringInfo
     init {
         backgroundInfo = kMeansClustering(background)
     }
 
-    private fun kMeansClustering(image: Mat): ClusteringInfo {
-        assert(image.channels() == 3)
+    private fun BGR2LAB(input: Mat): Mat {
+        val result = Mat()
+        Imgproc.cvtColor(input, result, COLOR_BGR2Lab)
+        return result
+    }
+
+    private fun LAB2BGR(input: Mat): Mat {
+        val result = Mat()
+        Imgproc.cvtColor(input, result, COLOR_Lab2BGR)
+        return result
+    }
+
+    private fun kMeansClustering(input: Mat): ClusteringInfo {
+        val image = BGR2LAB(input)
+        Imgcodecs.imwrite("blurandlab.png", image)
         val dataPoints: MutableList<DoubleArray> = ArrayList()
 
         for (y in 0 until image.height()) {
@@ -27,7 +44,7 @@ class KMeansMatter(background: Mat): Matter {
                 val blue = pixel[0]
                 val green = pixel[1]
                 val red = pixel[2]
-                dataPoints.add(doubleArrayOf(y.toDouble(), x.toDouble(), blue, green, red))
+                dataPoints.add(doubleArrayOf(blue, green, red))
             }
         }
 
@@ -52,7 +69,9 @@ class KMeansMatter(background: Mat): Matter {
     }
 
     // TODO remove or extract
-    fun clusteringPaint(image: Mat) {
+    fun clusteringPaint(input: Mat): Mat {
+        val image = BGR2LAB(input)
+        Imgproc.cvtColor(input, image, COLOR_BGR2Lab)
         val clusteringInfo: ClusteringInfo = kMeansClustering(image)
         for (y in 0 until image.height()) {
             for (x in 0 until image.width()) {
@@ -61,16 +80,18 @@ class KMeansMatter(background: Mat): Matter {
                 val green = pixel[1]
                 val red = pixel[2]
 
-                val belongsTo: Int = clusteringInfo.kMeans.predict(doubleArrayOf(y.toDouble(), x.toDouble(), blue, green, red))
+                val belongsTo: Int = clusteringInfo.kMeans.predict(doubleArrayOf(blue, green, red))
                 val cluster = clusteringInfo.kMeans.centroids[belongsTo]
-                image.put(y, x, cluster[2], cluster[3], cluster[4])
+                image.put(y, x, cluster[0], cluster[1], cluster[2])
             }
         }
+        return LAB2BGR(image)
     }
 
     // TODO Quote the paper properly
     // Used "Video Segmentation into Background and Foreground Using Simplified Mean Shift Filter and K-Means Clustering"
-    override fun backgroundMask(image: Mat): Mat {
+    override fun backgroundMask(input: Mat): Mat {
+        val image = BGR2LAB(input)
         val mask = Mat(image.size(), image.type())
         for (y in 0 until image.height()) {
             for (x in 0 until image.width()) {
@@ -79,11 +100,12 @@ class KMeansMatter(background: Mat): Matter {
                 val green = pixel[1]
                 val red = pixel[2]
 
-                val dataPoint = doubleArrayOf(y.toDouble(), x.toDouble(), blue, green, red)
+                val dataPoint = doubleArrayOf(blue, green, red)
                 val belongsTo: Int = backgroundInfo.kMeans.predict(dataPoint)
                 val cluster = backgroundInfo.kMeans.centroids[belongsTo]
                 val clusterInfo = backgroundInfo.clustersInfo.getValue(belongsTo)
-                val ratio = backgroundInfo.kMeans.distance(cluster, dataPoint) / (clusterInfo.variance * clusterInfo.components.size)
+                val dist = backgroundInfo.kMeans.distance(cluster, dataPoint)
+                val ratio = dist / (clusterInfo.variance * clusterInfo.components.size)
                 if (ratio > THRESHOLD) {
                     mask.put(y, x, 255.0, 255.0, 255.0)
                 } else {
