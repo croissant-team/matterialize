@@ -1,6 +1,7 @@
 package matting
 
 import org.opencv.core.Mat
+import org.opencv.core.Size
 import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
 import org.opencv.imgproc.Imgproc.COLOR_BGR2Lab
@@ -13,12 +14,18 @@ class KMeansMatter(background: Mat): Matter {
     private data class ClusterInfo(val variance: Double, val components: Array<DoubleArray>)
     private data class ClusteringInfo(val kMeans: KMeans, val clustersInfo: Map<Int, ClusterInfo>)
 
-    private val NUM_CLUSTERS = 20
-    private val THRESHOLD = 0.000003
+    private val NUM_CLUSTERS = 50
+    private val THRESHOLD = 0.000007
 
     private val backgroundInfo: ClusteringInfo
     init {
         backgroundInfo = kMeansClustering(background)
+    }
+
+    private fun blur(input: Mat): Mat {
+        val result = Mat()
+        Imgproc.blur(input, result, Size(5.0, 5.0))
+        return input
     }
 
     private fun BGR2LAB(input: Mat): Mat {
@@ -34,17 +41,17 @@ class KMeansMatter(background: Mat): Matter {
     }
 
     private fun kMeansClustering(input: Mat): ClusteringInfo {
-        val image = BGR2LAB(input)
+        val image = blur(BGR2LAB(input))
         Imgcodecs.imwrite("blurandlab.png", image)
         val dataPoints: MutableList<DoubleArray> = ArrayList()
 
         for (y in 0 until image.height()) {
             for (x in 0 until image.width()) {
                 val pixel = image.get(y, x)
-                val blue = pixel[0]
-                val green = pixel[1]
-                val red = pixel[2]
-                dataPoints.add(doubleArrayOf(blue, green, red))
+                val l = pixel[0]
+                val a = pixel[1]
+                val b = pixel[2]
+                dataPoints.add(doubleArrayOf(l, a, b))
             }
         }
 
@@ -70,17 +77,16 @@ class KMeansMatter(background: Mat): Matter {
 
     // TODO remove or extract
     fun clusteringPaint(input: Mat): Mat {
-        val image = BGR2LAB(input)
-        Imgproc.cvtColor(input, image, COLOR_BGR2Lab)
+        val image = blur(BGR2LAB(input))
         val clusteringInfo: ClusteringInfo = kMeansClustering(image)
         for (y in 0 until image.height()) {
             for (x in 0 until image.width()) {
                 val pixel = image.get(y, x)
-                val blue = pixel[0]
-                val green = pixel[1]
-                val red = pixel[2]
+                val l = pixel[0]
+                val a = pixel[1]
+                val b = pixel[2]
 
-                val belongsTo: Int = clusteringInfo.kMeans.predict(doubleArrayOf(blue, green, red))
+                val belongsTo: Int = clusteringInfo.kMeans.predict(doubleArrayOf(l, a, b))
                 val cluster = clusteringInfo.kMeans.centroids[belongsTo]
                 image.put(y, x, cluster[0], cluster[1], cluster[2])
             }
@@ -91,16 +97,16 @@ class KMeansMatter(background: Mat): Matter {
     // TODO Quote the paper properly
     // Used "Video Segmentation into Background and Foreground Using Simplified Mean Shift Filter and K-Means Clustering"
     override fun backgroundMask(input: Mat): Mat {
-        val image = BGR2LAB(input)
+        val image = blur(BGR2LAB(input))
         val mask = Mat(image.size(), image.type())
         for (y in 0 until image.height()) {
             for (x in 0 until image.width()) {
                 val pixel = image.get(y, x)
-                val blue = pixel[0]
-                val green = pixel[1]
-                val red = pixel[2]
+                val l = pixel[0]
+                val a = pixel[1]
+                val b = pixel[2]
 
-                val dataPoint = doubleArrayOf(blue, green, red)
+                val dataPoint = doubleArrayOf(l, a, b)
                 val belongsTo: Int = backgroundInfo.kMeans.predict(dataPoint)
                 val cluster = backgroundInfo.kMeans.centroids[belongsTo]
                 val clusterInfo = backgroundInfo.clustersInfo.getValue(belongsTo)
