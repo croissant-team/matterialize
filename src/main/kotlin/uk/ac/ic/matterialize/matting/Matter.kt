@@ -9,14 +9,18 @@ interface Matter {
     fun foregroundMask(videoFrame: Mat): Mat
 
     fun greenscreen(videoFrame: Mat): Mat {
+        val greenscreen = Mat(videoFrame.size(), videoFrame.type(), Scalar(0.0, 255.0, 0.0))
+        return changeBackground(videoFrame, greenscreen)
+    }
+
+    fun changeBackground(videoFrame: Mat, newBackground: Mat): Mat {
         val fgMask = foregroundMask(videoFrame)
         val bgMask = Mat()
         Core.bitwise_not(fgMask, bgMask)
-        val greenscreen = Mat(videoFrame.size(), videoFrame.type(), Scalar(0.0, 255.0, 0.0))
         val bg = Mat()
         val fg = Mat()
         videoFrame.copyTo(fg, fgMask)
-        greenscreen.copyTo(bg, bgMask)
+        newBackground.copyTo(bg, bgMask)
 
         val result = Mat()
         Core.add(fg, bg, result)

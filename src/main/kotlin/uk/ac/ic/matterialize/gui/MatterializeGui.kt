@@ -4,13 +4,14 @@ import javafx.embed.swing.SwingFXUtils
 import javafx.scene.control.Label
 import javafx.scene.image.ImageView
 import javafx.stage.FileChooser
-import uk.ac.ic.matterialize.matting.OpenCVMatter
 import org.opencv.core.CvType
 import org.opencv.core.Mat
 import tornadofx.*
 import uk.ac.ic.matterialize.camera.FakeWebcam
 import uk.ac.ic.matterialize.camera.OpenCVWebcam
 import uk.ac.ic.matterialize.camera.V4L2Lib
+import uk.ac.ic.matterialize.matting.BackgroundNegationMatter
+import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
 import java.net.URL
 import javax.imageio.ImageIO
@@ -54,17 +55,17 @@ class WebcamViewController: Controller() {
         thread {
 //            println("Average FPS: ${inputCam.fps(100)}")
 
-            val bi = ImageIO.read(URL("https://upload.wikimedia.org/wikipedia/commons/f/fc/EAM_Nuvolari_S1_640x480.jpg"))
-            val m = Mat(bi.height, bi.width, CvType.CV_8UC3)
-            m.put(0, 0, (bi.raster.dataBuffer as DataBufferByte).data)
-            val matter = OpenCVMatter()
+            val backgroundBI: BufferedImage = ImageIO.read(URL("https://upload.wikimedia.org/wikipedia/commons/f/fc/EAM_Nuvolari_S1_640x480.jpg"))
+            val background = Mat(backgroundBI.height, backgroundBI.width, CvType.CV_8UC3)
+            background.put(0, 0, (backgroundBI.raster.dataBuffer as DataBufferByte).data)
+            val matter = BackgroundNegationMatter(inputCam.grab())
 
             while (true) {
                 val start = System.currentTimeMillis()
 
                 val img = inputCam.grab()
 
-                outputCam.write(V4L2Lib.convertToYUYV(matter.greenscreen(img)))
+                outputCam.write(V4L2Lib.convertToYUYV(matter.changeBackground(img, background)))
 
 //                Core.flip(img, img, 1)
 
