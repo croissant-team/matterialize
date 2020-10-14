@@ -4,9 +4,7 @@ import javafx.embed.swing.SwingFXUtils
 import javafx.scene.control.Label
 import javafx.scene.image.ImageView
 import javafx.stage.FileChooser
-import matting.KMeansMatter
-import matting.OpenCVMatter
-import org.opencv.core.Core
+import uk.ac.ic.matterialize.matting.OpenCVMatter
 import org.opencv.core.CvType
 import org.opencv.core.Mat
 import tornadofx.*

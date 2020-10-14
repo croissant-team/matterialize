@@ -1,4 +1,4 @@
-package matting
+package uk.ac.ic.matterialize.matting
 
 import org.opencv.core.Core
 import org.opencv.core.Mat
