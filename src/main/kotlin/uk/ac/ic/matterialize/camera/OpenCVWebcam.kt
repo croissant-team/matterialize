@@ -1,25 +1,32 @@
 package uk.ac.ic.matterialize.camera
 
-import org.opencv.core.Core
 import org.opencv.core.Mat
+import org.opencv.core.MatOfByte
+import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.videoio.VideoCapture
 import org.opencv.videoio.Videoio.CAP_V4L
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import javax.imageio.ImageIO
 
-
 class OpenCVWebcam(private val device: Int, private val width: Int, private val height: Int) {
     companion object {
         init {
-            System.loadLibrary(Core.NATIVE_LIBRARY_NAME)
+            nu.pattern.OpenCV.loadLocally()
+        }
+
+        fun convertToBufferedImage(mat: Mat): BufferedImage {
+            val mob = MatOfByte()
+            Imgcodecs.imencode(".png", mat, mob)
+            return ImageIO.read(ByteArrayInputStream(mob.toArray()))
         }
     }
 
     private var capture: VideoCapture? = null
 
     fun start() {
-        capture = VideoCapture(device, CAP_V4L)
+        capture = VideoCapture()
+        capture!!.open(device, CAP_V4L)
     }
 
     fun stop() {
@@ -27,17 +34,7 @@ class OpenCVWebcam(private val device: Int, private val width: Int, private val 
         capture = null
     }
 
-    // TODO convert into utility function and move away
-    fun grabBuf(): BufferedImage {
-        val mat = grabMat()
-        val buffer = ByteArray(mat.width() * mat.height() * mat.channels())
-        mat.get(0, 0, buffer)
-        val input = ByteArrayInputStream(buffer)
-
-        return ImageIO.read(input)
-    }
-
-    fun grabMat(): Mat {
+    fun grab(): Mat {
         val mat = Mat()
         // TODO add proper error
         capture!!.read(mat)
@@ -50,7 +47,7 @@ class OpenCVWebcam(private val device: Int, private val width: Int, private val 
 
         (0 until samples).forEach {
             val start = System.currentTimeMillis()
-            grabMat()
+            grab()
             val end = System.currentTimeMillis()
 
             sum += end - start
