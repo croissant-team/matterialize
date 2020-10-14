@@ -90,7 +90,7 @@ class KMeansMatter(background: Mat) : Matter {
 
     // TODO Quote the paper properly
     // Used "Video Segmentation into Background and Foreground Using Simplified Mean Shift Filter and K-Means Clustering"
-    override fun backgroundMask(input: Mat): Mat {
+    override fun foregroundMask(input: Mat): Mat {
         val image = BGR2LAB(input)
         val mask = Mat(image.size(), image.type())
         for (y in 0 until image.height()) {

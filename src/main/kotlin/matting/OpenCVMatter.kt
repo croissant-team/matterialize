@@ -15,8 +15,8 @@ import smile.math.MathEx
 class OpenCVMatter(): Matter {
     private val backgroundSubtractor = Video.createBackgroundSubtractorKNN()
 
-    override fun backgroundMask(videoFrame: Mat): Mat {
-        val mask = Mat(videoFrame.height(), videoFrame.width(), CV_8UC1)
+    override fun foregroundMask(videoFrame: Mat): Mat {
+        val mask = Mat()
         backgroundSubtractor.apply(videoFrame, mask)
 
         return mask

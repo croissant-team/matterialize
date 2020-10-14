@@ -34,7 +34,7 @@ class WebcamViewController: Controller() {
 
     // might need to change output device depending on configuration
     // dummy devices can be seen by by running `v4l2-ctl --list-devices`
-    val OUTPUT_DEVICE = "/dev/video100"
+    val OUTPUT_DEVICE = "/dev/video2"
 
     val WIDTH = 640
     val HEIGHT = 480
@@ -66,7 +66,7 @@ class WebcamViewController: Controller() {
 
                 val img = inputCam.grab()
 
-                outputCam.write(V4L2Lib.convertToYUYV(matter.backgroundMask(img)))
+                outputCam.write(V4L2Lib.convertToYUYV(matter.greenscreen(img)))
 
 //                Core.flip(img, img, 1)
 
