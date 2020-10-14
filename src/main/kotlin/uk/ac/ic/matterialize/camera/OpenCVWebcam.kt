@@ -1,6 +1,8 @@
 package uk.ac.ic.matterialize.camera
 
 import org.opencv.core.Mat
+import org.opencv.core.MatOfByte
+import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.videoio.VideoCapture
 import org.opencv.videoio.Videoio.CAP_V4L
 import java.awt.image.BufferedImage
