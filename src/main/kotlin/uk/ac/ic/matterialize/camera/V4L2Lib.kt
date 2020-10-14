@@ -22,7 +22,7 @@ class V4L2Lib {
             val outlineSize = width * 2
 
             (0 until height).forEach { y ->
-                val outoff = y * outlineSize;
+                val outoff = y * outlineSize
                 (0 until width step 2).forEach { x ->
                     val p1 = ByteBuffer.allocate(4).putInt(src.getRGB(x, y)).array()
                     val p2 = ByteBuffer.allocate(4).putInt(src.getRGB(x + 1, y)).array()
@@ -51,8 +51,8 @@ class V4L2Lib {
             val outlineSize = width * 2
 
             (0 until height).forEach { y ->
-                val inoff = y * inlineSize;
-                val outoff = y * outlineSize;
+                val inoff = y * inlineSize
+                val outoff = y * outlineSize
                 (0 until width step 2).forEach { x ->
                     val indexSrc = inoff + x * 3
 
@@ -91,7 +91,6 @@ class V4L2Lib {
                 (0.439F * r2f) - (0.368F * g2f) - (0.071F * b2f) + 128.0F
             ).map { it.toUInt().toUByte() }.toUByteArray()
         }
-
     }
 
     external fun open(device: String, width: Int, height: Int): Int
