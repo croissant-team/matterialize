@@ -1,9 +1,9 @@
 package uk.ac.ic.matterialize.gui
 
-import javafx.application.Platform
 import javafx.embed.swing.SwingFXUtils
 import javafx.scene.control.Label
 import javafx.scene.image.WritableImage
+import javafx.stage.FileChooser
 import org.bytedeco.javacv.Frame
 import org.bytedeco.javacv.Java2DFrameConverter
 import org.bytedeco.javacv.OpenCVFrameConverter
@@ -12,25 +12,18 @@ import org.bytedeco.opencv.global.opencv_core.cvFlip
 import tornadofx.*
 import java.awt.image.BufferedImage
 import java.util.concurrent.Executors
-
-
-import javafx.scene.paint.Color
-import javafx.scene.text.FontWeight
-import javafx.stage.FileChooser
-import javafx.stage.StageStyle.UNDECORATED
 import kotlin.system.exitProcess
 
-
-
 class MatterializeApp : App(WebcamView::class) {
+
     override fun stop() {
         exitProcess(0)
     }
 }
 
 class WebcamView : View("Matterialize") {
-    private val java2DFrameConverter: Java2DFrameConverter = Java2DFrameConverter()
 
+    private val java2DFrameConverter: Java2DFrameConverter = Java2DFrameConverter()
 
     override val root = stackpane {
         val grabber = OpenCVFrameGrabber(0)
@@ -41,7 +34,6 @@ class WebcamView : View("Matterialize") {
 
         vbox {
             imageview {
-
                 val grabberConverter = OpenCVFrameConverter.ToIplImage()
 
                 Executors.newSingleThreadExecutor().execute {
@@ -60,12 +52,12 @@ class WebcamView : View("Matterialize") {
                 }
 
                 center = button("Select a background image") {
-                                action {
-                                    val fileChooser = FileChooser();
-                                    val file = fileChooser.showOpenDialog(null)
-                                    label.text = file?.name ?: label.text
-                                }
-                            }
+                    action {
+                        val fileChooser = FileChooser()
+                        val file = fileChooser.showOpenDialog(null)
+                        label.text = file?.name ?: label.text
+                    }
+                }
             }
             borderpane {
                 top = label {
