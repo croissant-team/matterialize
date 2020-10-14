@@ -12,6 +12,7 @@ repositories {
 dependencies {
     testImplementation(kotlin("test-junit"))
     implementation("org.openpnp:opencv:4.3.0-2")
+    implementation("com.github.haifengl:smile-kotlin:2.5.3")
 }
 tasks.withType<KotlinCompile>() {
     kotlinOptions.jvmTarget = "1.8"

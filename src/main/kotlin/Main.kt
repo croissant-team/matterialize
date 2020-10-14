@@ -1,5 +1,3 @@
-import org.opencv.imgcodecs.Imgcodecs
-import org.opencv.imgproc.Imgproc
 import uk.ac.ic.matterialize.camera.FakeWebcam
 import uk.ac.ic.matterialize.camera.OpenCVWebcam
 import uk.ac.ic.matterialize.camera.V4L2Lib
