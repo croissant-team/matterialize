@@ -6,7 +6,17 @@ import javafx.scene.image.ImageView
 import javafx.stage.FileChooser
 import org.opencv.core.CvType
 import org.opencv.core.Mat
-import tornadofx.*
+import tornadofx.App
+import tornadofx.Controller
+import tornadofx.View
+import tornadofx.action
+import tornadofx.borderpane
+import tornadofx.button
+import tornadofx.imageview
+import tornadofx.label
+import tornadofx.stackpane
+import tornadofx.useMaxWidth
+import tornadofx.vbox
 import uk.ac.ic.matterialize.camera.FakeWebcam
 import uk.ac.ic.matterialize.camera.OpenCVWebcam
 import uk.ac.ic.matterialize.camera.V4L2Lib
@@ -28,7 +38,7 @@ class MatterializeApp : App(WebcamView::class) {
     }
 }
 
-class WebcamViewController: Controller() {
+class WebcamViewController : Controller() {
     val INPUT_DEVICE = 0
 
     // might need to change output device depending on configuration
@@ -55,7 +65,8 @@ class WebcamViewController: Controller() {
         thread {
 //            println("Average FPS: ${inputCam.fps(100)}")
 
-            val backgroundBI: BufferedImage = ImageIO.read(URL("https://upload.wikimedia.org/wikipedia/commons/f/fc/EAM_Nuvolari_S1_640x480.jpg"))
+            val backgroundBI: BufferedImage =
+                ImageIO.read(URL("https://upload.wikimedia.org/wikipedia/commons/f/fc/EAM_Nuvolari_S1_640x480.jpg"))
             val background = Mat(backgroundBI.height, backgroundBI.width, CvType.CV_8UC3)
             background.put(0, 0, (backgroundBI.raster.dataBuffer as DataBufferByte).data)
             val matter = BackgroundNegationMatter(inputCam.grab())
@@ -85,7 +96,6 @@ class WebcamViewController: Controller() {
         inputCam.start()
         outputCam.start()
     }
-
 }
 
 class WebcamView : View("Matterialize") {

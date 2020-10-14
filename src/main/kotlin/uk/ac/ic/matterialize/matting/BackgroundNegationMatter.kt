@@ -4,7 +4,6 @@ import org.opencv.core.Core
 import org.opencv.core.Mat
 import org.opencv.imgproc.Imgproc
 import org.opencv.imgproc.Imgproc.THRESH_BINARY
-import uk.ac.ic.matterialize.matting.Matter
 
 class BackgroundNegationMatter(private val background: Mat) : Matter {
     override fun foregroundMask(videoFrame: Mat): Mat {
@@ -15,6 +14,5 @@ class BackgroundNegationMatter(private val background: Mat) : Matter {
         Imgproc.threshold(mask, mask, threshold, maxval, THRESH_BINARY)
 
         return mask
-
     }
 }

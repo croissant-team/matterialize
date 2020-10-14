@@ -21,7 +21,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.0-M1")
 }
 
-
 javafx {
     modules("javafx.controls", "javafx.fxml", "javafx.swing")
 }
