@@ -13,5 +13,4 @@ class OpenCVMatter() : Matter {
 
         return mask
     }
-
 }

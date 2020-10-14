@@ -2,7 +2,6 @@ package matting
 
 import org.opencv.core.Mat
 import org.opencv.core.Size
-import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
 import org.opencv.imgproc.Imgproc.COLOR_BGR2Lab
 import org.opencv.imgproc.Imgproc.COLOR_Lab2BGR
@@ -10,7 +9,7 @@ import smile.clustering.KMeans
 import smile.clustering.kmeans
 import smile.math.MathEx
 
-class KMeansMatter(background: Mat): Matter {
+class KMeansMatter(background: Mat) : Matter {
     private data class ClusterInfo(val variance: Double, val components: Array<DoubleArray>)
     private data class ClusteringInfo(val kMeans: KMeans, val clustersInfo: Map<Int, ClusterInfo>)
 
@@ -42,7 +41,6 @@ class KMeansMatter(background: Mat): Matter {
 
     private fun kMeansClustering(input: Mat): ClusteringInfo {
         val image = blur(BGR2LAB(input))
-        Imgcodecs.imwrite("blurandlab.png", image)
         val dataPoints: MutableList<DoubleArray> = ArrayList()
 
         for (y in 0 until image.height()) {
