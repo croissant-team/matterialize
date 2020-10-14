@@ -27,7 +27,7 @@ fun main() {
 
         val img = inputCam.grab()
 
-        outputCam.write(V4L2Lib.convertToYUYV(img))
+        outputCam.write(V4L2Lib.convertToYUYV(OpenCVWebcam.convertToBufferedImage(img)))
 
         val end = System.currentTimeMillis()
         println("took ${end - start}ms")

@@ -1,13 +1,24 @@
 package uk.ac.ic.matterialize.camera
 
 import org.opencv.core.Mat
+import org.opencv.core.MatOfByte
+import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.videoio.VideoCapture
 import org.opencv.videoio.Videoio.CAP_V4L
+import java.awt.image.BufferedImage
+import java.io.ByteArrayInputStream
+import javax.imageio.ImageIO
 
 class OpenCVWebcam(private val device: Int, private val width: Int, private val height: Int) {
     companion object {
         init {
             nu.pattern.OpenCV.loadLocally()
+        }
+
+        fun convertToBufferedImage(mat: Mat): BufferedImage {
+            val mob = MatOfByte()
+            Imgcodecs.imencode(".png", mat, mob)
+            return ImageIO.read(ByteArrayInputStream(mob.toArray()))
         }
     }
 
