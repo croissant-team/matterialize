@@ -9,7 +9,7 @@ import smile.clustering.KMeans
 import smile.clustering.kmeans
 import smile.math.MathEx
 
-class KMeansMatter(background: Mat): Matter {
+class KMeansMatter(background: Mat) : Matter {
     private data class ClusterInfo(val variance: Double, val components: Array<DoubleArray>)
     private data class ClusteringInfo(val kMeans: KMeans, val clustersInfo: Map<Int, ClusterInfo>)
 

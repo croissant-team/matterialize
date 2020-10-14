@@ -18,10 +18,10 @@ interface Matter {
         val greenscreen = Mat(videoFrame.size(), videoFrame.type(), Scalar(0.0, 255.0, 0.0))
         val bg = Mat(videoFrame.size(), videoFrame.type())
         val fg = Mat(videoFrame.size(), videoFrame.type())
-        //videoFrame.copyTo(fg, bgMask)
-        //greenscreen.copyTo(bg, fgMask)
+        // videoFrame.copyTo(fg, bgMask)
+        // greenscreen.copyTo(bg, fgMask)
 
-        //Core.add(fg, bg, result)
+        // Core.add(fg, bg, result)
         videoFrame.copyTo(result, bgMask)
 
         return result
