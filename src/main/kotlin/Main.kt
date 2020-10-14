@@ -1,3 +1,5 @@
+import org.opencv.imgcodecs.Imgcodecs
+import org.opencv.imgproc.Imgproc
 import uk.ac.ic.matterialize.camera.FakeWebcam
 import uk.ac.ic.matterialize.camera.OpenCVWebcam
 import uk.ac.ic.matterialize.camera.V4L2Lib
@@ -10,7 +12,7 @@ fun main() {
     val OUTPUT_DEVICE = "/dev/video2"
 
     val WIDTH = 640
-    val HEIGHT = 360
+    val HEIGHT = 480
 
     val inputCam = OpenCVWebcam(INPUT_DEVICE, WIDTH, HEIGHT)
     val outputCam = FakeWebcam(OUTPUT_DEVICE, WIDTH, HEIGHT)
@@ -23,7 +25,7 @@ fun main() {
     while (true) {
         val start = System.currentTimeMillis()
 
-        val img = inputCam.grabMat()
+        val img = inputCam.grab()
 
         outputCam.write(V4L2Lib.convertToYUYV(img))
 

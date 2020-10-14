@@ -11,7 +11,7 @@ repositories {
 }
 dependencies {
     testImplementation(kotlin("test-junit"))
-    api("org.bytedeco:javacv-platform:1.5.4")
+    implementation("org.openpnp:opencv:4.3.0-2")
 }
 tasks.withType<KotlinCompile>() {
     kotlinOptions.jvmTarget = "1.8"
