@@ -4,11 +4,18 @@ import javafx.embed.swing.SwingFXUtils
 import javafx.scene.control.Label
 import javafx.scene.image.ImageView
 import javafx.stage.FileChooser
+import matting.KMeansMatter
+import matting.OpenCVMatter
 import org.opencv.core.Core
+import org.opencv.core.CvType
+import org.opencv.core.Mat
 import tornadofx.*
 import uk.ac.ic.matterialize.camera.FakeWebcam
 import uk.ac.ic.matterialize.camera.OpenCVWebcam
 import uk.ac.ic.matterialize.camera.V4L2Lib
+import java.awt.image.DataBufferByte
+import java.net.URL
+import javax.imageio.ImageIO
 import kotlin.concurrent.thread
 import kotlin.system.exitProcess
 
@@ -42,22 +49,26 @@ class WebcamViewController: Controller() {
     fun joinThreads() {
         inputCam.stop()
         outputCam.stop()
-        println("ded")
         // terminate all threads
     }
 
     fun initialiseWebCamThread(image: ImageView) {
         thread {
-            println("Average FPS: ${inputCam.fps(100)}")
+//            println("Average FPS: ${inputCam.fps(100)}")
+
+            val bi = ImageIO.read(URL("https://upload.wikimedia.org/wikipedia/commons/f/fc/EAM_Nuvolari_S1_640x480.jpg"))
+            val m = Mat(bi.height, bi.width, CvType.CV_8UC3)
+            m.put(0, 0, (bi.raster.dataBuffer as DataBufferByte).data)
+            val matter = OpenCVMatter()
 
             while (true) {
                 val start = System.currentTimeMillis()
 
                 val img = inputCam.grab()
 
-                outputCam.write(V4L2Lib.convertToYUYV(OpenCVWebcam.convertToBufferedImage(img)))
+                outputCam.write(V4L2Lib.convertToYUYV(matter.backgroundMask(img)))
 
-                Core.flip(img, img, 1)
+//                Core.flip(img, img, 1)
 
                 image.image = SwingFXUtils.toFXImage(OpenCVWebcam.convertToBufferedImage(img), null)
 
