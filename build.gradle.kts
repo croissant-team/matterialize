@@ -19,6 +19,10 @@ dependencies {
     implementation("org.openpnp:opencv:4.3.0-2")
     implementation("com.github.haifengl:smile-kotlin:2.5.3")
     implementation("no.tornado:tornadofx:1.7.20")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.0-M1")
+
+
+
 }
 
 

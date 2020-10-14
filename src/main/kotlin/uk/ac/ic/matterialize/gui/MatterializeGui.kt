@@ -13,6 +13,8 @@ import org.bytedeco.opencv.global.opencv_core.cvFlip
 import tornadofx.*
 import java.awt.image.BufferedImage
 import java.util.concurrent.Executors
+import kotlinx.coroutines.*
+import kotlin.concurrent.thread
 import kotlin.system.exitProcess
 
 class MatterializeApp : App(WebcamView::class) {
@@ -40,7 +42,12 @@ class WebcamViewController: Controller() {
     fun initialiseWebCamThread(image: ImageView) {
         val grabberConverter = OpenCVFrameConverter.ToIplImage()
 
-        Executors.newSingleThreadExecutor().execute {
+//        Executors.newSingleThreadExecutor().execute {
+//        GlobalScope.launch {
+//            println("hello")
+//        }
+
+        thread {
             while (true) {
                 val iplImage = grabberConverter.convert(grabber.grabFrame())
                 cvFlip(iplImage, iplImage, 1)
@@ -86,6 +93,7 @@ class WebcamView : View("Matterialize") {
 
                 center = button("Select a background image") {
                     action {
+                        // use tornado file select as it lets you filter by extension
                         val fileChooser = FileChooser()
                         val file = fileChooser.showOpenDialog(null)
                         webcamViewController.applyNewBackground(file?.absolutePath ?: "err")
