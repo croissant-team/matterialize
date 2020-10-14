@@ -1,5 +1,5 @@
-JNI_DIR = /usr/lib/jvm/java-8-openjdk/include/
-JNI_MD_DIR = /usr/lib/jvm/java-8-openjdk/include/linux
+JNI_DIR = $(JAVA_HOME)/include/
+JNI_MD_DIR = $(JAVA_HOME)/include/linux
 
 all: libfakecam.so
 
