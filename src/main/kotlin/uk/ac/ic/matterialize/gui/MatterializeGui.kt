@@ -3,17 +3,12 @@ package uk.ac.ic.matterialize.gui
 import javafx.embed.swing.SwingFXUtils
 import javafx.scene.control.Label
 import javafx.scene.image.ImageView
-import javafx.scene.image.WritableImage
 import javafx.stage.FileChooser
-import org.bytedeco.javacv.Frame
-import org.bytedeco.javacv.Java2DFrameConverter
-import org.bytedeco.javacv.OpenCVFrameConverter
-import org.bytedeco.javacv.OpenCVFrameGrabber
-import org.bytedeco.opencv.global.opencv_core.cvFlip
+import org.opencv.core.Core
 import tornadofx.*
-import java.awt.image.BufferedImage
-import java.util.concurrent.Executors
-import kotlinx.coroutines.*
+import uk.ac.ic.matterialize.camera.FakeWebcam
+import uk.ac.ic.matterialize.camera.OpenCVWebcam
+import uk.ac.ic.matterialize.camera.V4L2Lib
 import kotlin.concurrent.thread
 import kotlin.system.exitProcess
 
@@ -28,46 +23,57 @@ class MatterializeApp : App(WebcamView::class) {
 }
 
 class WebcamViewController: Controller() {
-    private val java2DFrameConverter: Java2DFrameConverter = Java2DFrameConverter()
-    val grabber = OpenCVFrameGrabber(0)
+    val INPUT_DEVICE = 0
+
+    // might need to change output device depending on configuration
+    // dummy devices can be seen by by running `v4l2-ctl --list-devices`
+    val OUTPUT_DEVICE = "/dev/video100"
+
+    val WIDTH = 640
+    val HEIGHT = 480
+
+    val inputCam = OpenCVWebcam(INPUT_DEVICE, WIDTH, HEIGHT)
+    val outputCam = FakeWebcam(OUTPUT_DEVICE, WIDTH, HEIGHT)
 
     fun applyNewBackground(inputValue: String) {
         println("Image '$inputValue' has been selected")
     }
 
     fun joinThreads() {
+        inputCam.stop()
+        outputCam.stop()
+        println("ded")
         // terminate all threads
     }
 
     fun initialiseWebCamThread(image: ImageView) {
-        val grabberConverter = OpenCVFrameConverter.ToIplImage()
-
-//        Executors.newSingleThreadExecutor().execute {
-//        GlobalScope.launch {
-//            println("hello")
-//        }
-
         thread {
+            println("Average FPS: ${inputCam.fps(100)}")
+
             while (true) {
-                val iplImage = grabberConverter.convert(grabber.grabFrame())
-                cvFlip(iplImage, iplImage, 1)
-                val frame = grabberConverter.convert(iplImage)
-                image.image = frameToImage(frame)
+                val start = System.currentTimeMillis()
+
+                val img = inputCam.grab()
+
+                outputCam.write(V4L2Lib.convertToYUYV(OpenCVWebcam.convertToBufferedImage(img)))
+
+                Core.flip(img, img, 1)
+
+                image.image = SwingFXUtils.toFXImage(OpenCVWebcam.convertToBufferedImage(img), null)
+
+                val end = System.currentTimeMillis()
+                println("took ${end - start}ms")
             }
         }
     }
 
     fun getImageWidth(): Double {
-        return grabber.grabFrame().imageWidth.toDouble()
-    }
-
-    private fun frameToImage(frame: Frame): WritableImage {
-        val bufferedImage: BufferedImage = java2DFrameConverter.getBufferedImage(frame)
-        return SwingFXUtils.toFXImage(bufferedImage, null)
+        return WIDTH.toDouble()
     }
 
     init {
-        grabber.start()
+        inputCam.start()
+        outputCam.start()
     }
 
 }

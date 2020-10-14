@@ -4,7 +4,6 @@ plugins {
     kotlin("jvm") version "1.4.10"
     id("org.jlleitschuh.gradle.ktlint") version "9.4.1"
     id("org.openjfx.javafxplugin") version "0.0.9"
-
 }
 
 group = "uk.ic.ac.matterialize"
@@ -20,9 +19,6 @@ dependencies {
     implementation("com.github.haifengl:smile-kotlin:2.5.3")
     implementation("no.tornado:tornadofx:1.7.20")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.0-M1")
-
-
-
 }
 
 
