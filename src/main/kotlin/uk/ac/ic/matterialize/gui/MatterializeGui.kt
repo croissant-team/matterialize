@@ -27,6 +27,7 @@ import uk.ac.ic.matterialize.camera.FakeWebcam
 import uk.ac.ic.matterialize.camera.OpenCVWebcam
 import uk.ac.ic.matterialize.camera.V4L2Lib
 import uk.ac.ic.matterialize.matting.BackgroundNegationMatter
+import uk.ac.ic.matterialize.matting.FloatingHead
 import uk.ac.ic.matterialize.matting.KMeansMatter
 import uk.ac.ic.matterialize.matting.Matter
 import java.awt.image.BufferedImage
@@ -95,6 +96,7 @@ class WebcamViewController : Controller() {
             "opencv" -> OpenCVMatter()
             "kmeans" -> KMeansMatter(inputCam.grab())
             "bgneg" -> BackgroundNegationMatter(inputCam.grab())
+            "face" -> FloatingHead()
             else -> null
         }
     }
@@ -200,7 +202,8 @@ class WebcamView : View("Matterialize") {
                     val buttons = mapOf(
                         "KMeans" to "kmeans",
                         "OpenCV" to "opencv",
-                        "Background Negation" to "bgneg"
+                        "Background Negation" to "bgneg",
+                        "Face Detection" to "face"
                     )
 
                     buttons.forEach { (text, name) ->
