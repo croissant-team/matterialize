@@ -1,8 +1,11 @@
 package uk.ac.ic.matterialize.matting
 
-import org.opencv.core.*
-import org.opencv.imgproc.Imgproc
-import org.opencv.imgproc.Imgproc.*
+import org.opencv.core.Mat
+import org.opencv.core.MatOfRect
+import org.opencv.core.Scalar
+import org.opencv.core.Size
+import org.opencv.imgproc.Imgproc.COLOR_BGR2GRAY
+import org.opencv.imgproc.Imgproc.cvtColor
 import org.opencv.objdetect.CascadeClassifier
 
 class FloatingHead() : Matter {
@@ -25,7 +28,7 @@ class FloatingHead() : Matter {
 
         faces.toArray().forEach {
             ((it.x - it.width / 2) until it.x + (3 * it.width) / 2).forEach { i ->
-                (it.y .. mask.height()).forEach { j ->
+                (it.y..mask.height()).forEach { j ->
                     mask.put(j, i, 255.0, 255.0, 255.0)
                 }
             }
