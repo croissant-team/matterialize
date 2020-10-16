@@ -2,27 +2,23 @@ package uk.ac.ic.matterialize.gui
 
 import javafx.embed.swing.SwingFXUtils
 import javafx.scene.control.Label
+import javafx.scene.control.ToggleGroup
 import javafx.scene.image.ImageView
 import javafx.stage.FileChooser
+import matting.OpenCVMatter
 import org.opencv.core.CvType
 import org.opencv.core.Mat
-import tornadofx.App
-import tornadofx.Controller
-import tornadofx.View
-import tornadofx.action
-import tornadofx.borderpane
-import tornadofx.button
-import tornadofx.imageview
-import tornadofx.label
-import tornadofx.stackpane
-import tornadofx.useMaxWidth
-import tornadofx.vbox
+import org.opencv.core.Scalar
+import tornadofx.*
 import uk.ac.ic.matterialize.camera.FakeWebcam
 import uk.ac.ic.matterialize.camera.OpenCVWebcam
 import uk.ac.ic.matterialize.camera.V4L2Lib
 import uk.ac.ic.matterialize.matting.BackgroundNegationMatter
+import uk.ac.ic.matterialize.matting.KMeansMatter
+import uk.ac.ic.matterialize.matting.Matter
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
+import java.io.File
 import java.net.URL
 import javax.imageio.ImageIO
 import kotlin.concurrent.thread
@@ -43,7 +39,7 @@ class WebcamViewController : Controller() {
 
     // might need to change output device depending on configuration
     // dummy devices can be seen by by running `v4l2-ctl --list-devices`
-    val OUTPUT_DEVICE = "/dev/video2"
+    val OUTPUT_DEVICE = "/dev/video100"
 
     val WIDTH = 640
     val HEIGHT = 480
@@ -51,8 +47,33 @@ class WebcamViewController : Controller() {
     val inputCam = OpenCVWebcam(INPUT_DEVICE, WIDTH, HEIGHT)
     val outputCam = FakeWebcam(OUTPUT_DEVICE, WIDTH, HEIGHT)
 
+    var matter: Matter? = null
+    var background = Mat(WIDTH, HEIGHT, CvType.CV_8UC3, Scalar(0.0, 0.0, 0.0))
+
     fun applyNewBackground(inputValue: String) {
         println("Image '$inputValue' has been selected")
+
+        val rawBackground: BufferedImage = ImageIO.read(File(inputValue))
+
+        val resized = BufferedImage(WIDTH, HEIGHT, rawBackground.type)
+        val graphics = resized.createGraphics()
+        graphics.drawImage(rawBackground, 0, 0, WIDTH, HEIGHT, null)
+        graphics.dispose()
+
+        val background = Mat(resized.height, resized.width, CvType.CV_8UC3)
+        background.put(0, 0, (resized.raster.dataBuffer as DataBufferByte).data)
+
+        this.background = background
+    }
+
+    fun setMatter(mode: String) {
+        println("mode changed to $mode")
+        matter = when (mode) {
+            "opencv" -> OpenCVMatter()
+            "kmeans" -> KMeansMatter(inputCam.grab())
+            "bgneg" -> BackgroundNegationMatter(inputCam.grab())
+            else -> null
+        }
     }
 
     fun joinThreads() {
@@ -65,20 +86,17 @@ class WebcamViewController : Controller() {
         thread {
 //            println("Average FPS: ${inputCam.fps(100)}")
 
-            val backgroundBI: BufferedImage =
-                ImageIO.read(URL("https://upload.wikimedia.org/wikipedia/commons/f/fc/EAM_Nuvolari_S1_640x480.jpg"))
-            val background = Mat(backgroundBI.height, backgroundBI.width, CvType.CV_8UC3)
-            background.put(0, 0, (backgroundBI.raster.dataBuffer as DataBufferByte).data)
-            val matter = BackgroundNegationMatter(inputCam.grab())
-
             while (true) {
                 val start = System.currentTimeMillis()
 
                 val img = inputCam.grab()
 
-                outputCam.write(V4L2Lib.convertToYUYV(matter.changeBackground(img, background)))
+                val mat = when (matter) {
+                    null -> img
+                    else -> matter!!.changeBackground(img, background)
+                }
 
-//                Core.flip(img, img, 1)
+                outputCam.write(V4L2Lib.convertToYUYV(mat))
 
                 image.image = SwingFXUtils.toFXImage(OpenCVWebcam.convertToBufferedImage(img), null)
 
@@ -101,6 +119,7 @@ class WebcamViewController : Controller() {
 class WebcamView : View("Matterialize") {
 
     private val webcamViewController: WebcamViewController by inject()
+    private val matterGroup = ToggleGroup()
 
     override val root = stackpane {
         setPrefSize(webcamViewController.getImageWidth(), 150.0)
@@ -119,14 +138,15 @@ class WebcamView : View("Matterialize") {
 
                 center = button("Select a background image") {
                     action {
-                        // use tornado file select as it lets you filter by extension
-                        val fileChooser = FileChooser()
-                        val file = fileChooser.showOpenDialog(null)
-                        webcamViewController.applyNewBackground(file?.absolutePath ?: "err")
-                        label.text = file?.name ?: label.text
+                        val file = chooseFile("Select a background image", arrayOf(
+                            FileChooser.ExtensionFilter("image", "*.jpg", "*.jpeg", "*.png", "*.gif")
+                        ))
+                        webcamViewController.applyNewBackground(file.firstOrNull()?.absolutePath ?: "err")
+                        label.text = file.firstOrNull()?.name ?: label.text
                     }
                 }
             }
+
             borderpane {
                 top = label {
                     useMaxWidth = true
@@ -137,6 +157,26 @@ class WebcamView : View("Matterialize") {
                 }
 
                 center = label
+            }
+
+            borderpane {
+                top = Label("Select a matter")
+
+                center = vbox {
+                    val buttons = mapOf(
+                        "KMeans" to "kmeans",
+                        "OpenCV" to "opencv",
+                        "Background Negation" to "bgneg"
+                    )
+
+                    buttons.forEach { (text, name) ->
+                        radiobutton(text, matterGroup) {
+                            action {
+                                if (isSelected) webcamViewController.setMatter(name)
+                            }
+                        }
+                    }
+                }
             }
         }
     }
