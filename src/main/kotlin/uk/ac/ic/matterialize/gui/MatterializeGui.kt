@@ -25,11 +25,11 @@ import tornadofx.useMaxWidth
 import tornadofx.vbox
 import uk.ac.ic.matterialize.camera.FakeWebcam
 import uk.ac.ic.matterialize.camera.OpenCVWebcam
-import uk.ac.ic.matterialize.camera.V4L2Lib
 import uk.ac.ic.matterialize.matting.BackgroundNegationMatter
 import uk.ac.ic.matterialize.matting.FloatingHead
 import uk.ac.ic.matterialize.matting.KMeansMatter
 import uk.ac.ic.matterialize.matting.Matter
+import uk.ac.ic.matterialize.util.Converter
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
 import java.io.File
@@ -52,7 +52,7 @@ class WebcamViewController : Controller() {
 
     // might need to change output device depending on configuration
     // dummy devices can be seen by by running `v4l2-ctl --list-devices`
-    val OUTPUT_DEVICE = "/dev/video100"
+    val OUTPUT_DEVICE = "/dev/video2"
 
     val WIDTH = 640
     val HEIGHT = 480
@@ -121,7 +121,7 @@ class WebcamViewController : Controller() {
                     else -> matter!!.changeBackground(img, background!!)
                 }
 
-                outputCam.write(V4L2Lib.convertToYUYV(mat))
+                outputCam.write(Converter.convertToYUYV(mat))
 
                 inputView.image = SwingFXUtils.toFXImage(OpenCVWebcam.convertToBufferedImage(img), null)
                 outputView.image = SwingFXUtils.toFXImage(OpenCVWebcam.convertToBufferedImage(mat), null)
