@@ -1,6 +1,7 @@
 package uk.ac.ic.matterialize.gui
 
 import javafx.embed.swing.SwingFXUtils
+import javafx.geometry.Pos
 import javafx.scene.control.Label
 import javafx.scene.control.ToggleGroup
 import javafx.scene.image.ImageView
@@ -8,8 +9,20 @@ import javafx.stage.FileChooser
 import matting.OpenCVMatter
 import org.opencv.core.CvType
 import org.opencv.core.Mat
-import org.opencv.core.Scalar
-import tornadofx.*
+import tornadofx.App
+import tornadofx.Controller
+import tornadofx.View
+import tornadofx.action
+import tornadofx.borderpane
+import tornadofx.button
+import tornadofx.chooseFile
+import tornadofx.hbox
+import tornadofx.imageview
+import tornadofx.label
+import tornadofx.radiobutton
+import tornadofx.stackpane
+import tornadofx.useMaxWidth
+import tornadofx.vbox
 import uk.ac.ic.matterialize.camera.FakeWebcam
 import uk.ac.ic.matterialize.camera.OpenCVWebcam
 import uk.ac.ic.matterialize.camera.V4L2Lib
@@ -19,7 +32,6 @@ import uk.ac.ic.matterialize.matting.Matter
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
 import java.io.File
-import java.net.URL
 import javax.imageio.ImageIO
 import kotlin.concurrent.thread
 import kotlin.system.exitProcess
@@ -48,7 +60,18 @@ class WebcamViewController : Controller() {
     val outputCam = FakeWebcam(OUTPUT_DEVICE, WIDTH, HEIGHT)
 
     var matter: Matter? = null
-    var background = Mat(WIDTH, HEIGHT, CvType.CV_8UC3, Scalar(0.0, 0.0, 0.0))
+    var background: Mat? = null
+
+    private lateinit var inputView: ImageView
+    private lateinit var outputView: ImageView
+
+    fun setInputImage(image: ImageView) {
+        inputView = image
+    }
+
+    fun setOutputImage(image: ImageView) {
+        outputView = image
+    }
 
     fun applyNewBackground(inputValue: String) {
         println("Image '$inputValue' has been selected")
@@ -82,7 +105,7 @@ class WebcamViewController : Controller() {
         // terminate all threads
     }
 
-    fun initialiseWebCamThread(image: ImageView) {
+    fun initialiseWebCamThread() {
         thread {
 //            println("Average FPS: ${inputCam.fps(100)}")
 
@@ -91,14 +114,15 @@ class WebcamViewController : Controller() {
 
                 val img = inputCam.grab()
 
-                val mat = when (matter) {
-                    null -> img
-                    else -> matter!!.changeBackground(img, background)
+                val mat = when {
+                    matter == null || background == null -> img
+                    else -> matter!!.changeBackground(img, background!!)
                 }
 
                 outputCam.write(V4L2Lib.convertToYUYV(mat))
 
-                image.image = SwingFXUtils.toFXImage(OpenCVWebcam.convertToBufferedImage(img), null)
+                inputView.image = SwingFXUtils.toFXImage(OpenCVWebcam.convertToBufferedImage(img), null)
+                outputView.image = SwingFXUtils.toFXImage(OpenCVWebcam.convertToBufferedImage(mat), null)
 
                 val end = System.currentTimeMillis()
                 println("took ${end - start}ms")
@@ -122,13 +146,19 @@ class WebcamView : View("Matterialize") {
     private val matterGroup = ToggleGroup()
 
     override val root = stackpane {
-        setPrefSize(webcamViewController.getImageWidth(), 150.0)
+        setPrefSize(2 * webcamViewController.getImageWidth(), 150.0)
 
         val label = Label("No image selected")
 
         vbox {
-            imageview {
-                webcamViewController.initialiseWebCamThread(this)
+            hbox {
+                imageview {
+                    webcamViewController.setInputImage(this)
+                }
+                imageview {
+                    webcamViewController.setOutputImage(this)
+                }
+                webcamViewController.initialiseWebCamThread()
             }
 
             borderpane {
@@ -138,9 +168,12 @@ class WebcamView : View("Matterialize") {
 
                 center = button("Select a background image") {
                     action {
-                        val file = chooseFile("Select a background image", arrayOf(
-                            FileChooser.ExtensionFilter("image", "*.jpg", "*.jpeg", "*.png", "*.gif")
-                        ))
+                        val file = chooseFile(
+                            "Select a background image",
+                            arrayOf(
+                                FileChooser.ExtensionFilter("image", "*.jpg", "*.jpeg", "*.png", "*.gif")
+                            )
+                        )
                         webcamViewController.applyNewBackground(file.firstOrNull()?.absolutePath ?: "err")
                         label.text = file.firstOrNull()?.name ?: label.text
                     }
@@ -163,6 +196,7 @@ class WebcamView : View("Matterialize") {
                 top = Label("Select a matter")
 
                 center = vbox {
+                    alignment = Pos.CENTER
                     val buttons = mapOf(
                         "KMeans" to "kmeans",
                         "OpenCV" to "opencv",
@@ -171,11 +205,15 @@ class WebcamView : View("Matterialize") {
 
                     buttons.forEach { (text, name) ->
                         radiobutton(text, matterGroup) {
+                            alignment = Pos.BOTTOM_LEFT
                             action {
                                 if (isSelected) webcamViewController.setMatter(name)
                             }
                         }
                     }
+                }
+
+                bottom = label {
                 }
             }
         }
