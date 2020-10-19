@@ -8,7 +8,7 @@ import org.opencv.imgproc.Imgproc.COLOR_BGR2GRAY
 import org.opencv.imgproc.Imgproc.cvtColor
 import org.opencv.objdetect.CascadeClassifier
 
-class FloatingHead() : Matter {
+class FaceDetectionMatter() : Matter {
     private val classifier = CascadeClassifier("src/main/resources/haarcascade_frontalface_default.xml")
 
     override fun foregroundMask(videoFrame: Mat): Mat {
