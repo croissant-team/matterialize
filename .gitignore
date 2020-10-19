@@ -6,3 +6,4 @@
 /build
 /captures
 *.so
+/src/main/resources/adobe
