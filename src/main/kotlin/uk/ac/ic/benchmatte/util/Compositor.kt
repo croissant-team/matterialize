@@ -9,12 +9,15 @@ import javax.imageio.ImageIO
 
 object Compositor {
     fun compose(backgroundSrc: String, foregroundSrc: String, maskSrc: String): Mat {
+        val background = loadFile(backgroundSrc)
         val foreground = loadFile(foregroundSrc)
         val mask = loadFile(maskSrc, CvType.CV_8U)
 
-        if (foreground.size() == mask.size()) {
-            val background = loadFile(backgroundSrc)
+        return compose(background, foreground, mask)
+    }
 
+    fun compose(background: Mat, foreground: Mat, mask: Mat): Mat {
+        if (foreground.size() == mask.size()) {
             Imgproc.resize(background, background, foreground.size())
 
             (0 until foreground.width()).forEach { x ->
