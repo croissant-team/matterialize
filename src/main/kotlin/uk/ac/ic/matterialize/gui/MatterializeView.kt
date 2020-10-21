@@ -16,7 +16,7 @@ import tornadofx.radiobutton
 import tornadofx.stackpane
 import tornadofx.useMaxWidth
 import tornadofx.vbox
-import uk.ac.ic.matterialize.matting.Matters
+import uk.ac.ic.matterialize.matting.MatterMode
 
 class MatterializeView : View("Matterialize") {
 
@@ -80,10 +80,10 @@ class MatterializeView : View("Matterialize") {
                     alignment = Pos.CENTER
 
                     val buttons = mapOf(
-                        "KMeans" to Matters.KMeans,
-                        "OpenCV" to Matters.OpenCV,
-                        "Background Negation" to Matters.BackgroundNegation,
-                        "Face Detection" to Matters.FaceDetection
+                        "KMeans" to MatterMode.KMeans,
+                        "OpenCV" to MatterMode.OpenCV,
+                        "Background Negation" to MatterMode.BackgroundNegation,
+                        "Face Detection" to MatterMode.FaceDetection
                     )
 
                     buttons.forEach { (text, name) ->

@@ -12,7 +12,7 @@ import uk.ac.ic.matterialize.matting.BackgroundNegationMatter
 import uk.ac.ic.matterialize.matting.FaceDetectionMatter
 import uk.ac.ic.matterialize.matting.KMeansMatter
 import uk.ac.ic.matterialize.matting.Matter
-import uk.ac.ic.matterialize.matting.Matters
+import uk.ac.ic.matterialize.matting.MatterMode
 import uk.ac.ic.matterialize.util.Converter
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
@@ -63,13 +63,13 @@ class MatterializeController : Controller() {
         this.background = background
     }
 
-    fun setMatter(mode: Matters) {
+    fun setMatter(mode: MatterMode) {
         println("mode changed to $mode")
         matter = when (mode) {
-            Matters.KMeans -> KMeansMatter(inputCam.grab())
-            Matters.FaceDetection -> FaceDetectionMatter()
-            Matters.BackgroundNegation -> BackgroundNegationMatter(inputCam.grab())
-            Matters.OpenCV -> OpenCVMatter()
+            MatterMode.KMeans -> KMeansMatter(inputCam.grab())
+            MatterMode.FaceDetection -> FaceDetectionMatter()
+            MatterMode.BackgroundNegation -> BackgroundNegationMatter(inputCam.grab())
+            MatterMode.OpenCV -> OpenCVMatter()
         }
     }
 
