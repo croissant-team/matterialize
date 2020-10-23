@@ -1,5 +1,6 @@
 package uk.ac.ic.matterialize.matting
 
+import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.imgproc.Imgproc
 import org.opencv.imgproc.Imgproc.COLOR_BGR2Lab
@@ -90,7 +91,7 @@ class KMeansMatter(background: Mat) : Matter {
     // Used "Video Segmentation into Background and Foreground Using Simplified Mean Shift Filter and K-Means Clustering"
     override fun foregroundMask(input: Mat): Mat {
         val image = BGR2LAB(input)
-        val mask = Mat(image.size(), image.type())
+        val mask = Mat(image.size(), CvType.CV_8U)
         for (y in 0 until image.height()) {
             for (x in 0 until image.width()) {
                 val pixel = image.get(y, x)
@@ -105,9 +106,9 @@ class KMeansMatter(background: Mat) : Matter {
                 val dist = backgroundInfo.kMeans.distance(cluster, dataPoint)
                 val ratio = dist / (clusterInfo.variance * clusterInfo.components.size)
                 if (ratio > THRESHOLD) {
-                    mask.put(y, x, 255.0, 255.0, 255.0)
+                    mask.put(y, x, 255.0)
                 } else {
-                    mask.put(y, x, 0.0, 0.0, 0.0)
+                    mask.put(y, x, 0.0)
                 }
             }
         }

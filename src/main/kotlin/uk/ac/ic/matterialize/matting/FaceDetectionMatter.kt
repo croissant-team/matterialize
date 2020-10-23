@@ -1,5 +1,6 @@
 package uk.ac.ic.matterialize.matting
 
+import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.core.MatOfRect
 import org.opencv.core.Scalar
@@ -12,7 +13,7 @@ class FaceDetectionMatter() : Matter {
     private val classifier = CascadeClassifier("src/main/resources/haarcascade_frontalface_default.xml")
 
     override fun foregroundMask(videoFrame: Mat): Mat {
-        val mask = Mat(videoFrame.size(), videoFrame.type(), Scalar(0.0, 0.0, 0.0))
+        val mask = Mat(videoFrame.size(), CvType.CV_8U, Scalar(0.0))
         val gray = Mat()
         cvtColor(videoFrame, gray, COLOR_BGR2GRAY)
         val faces = MatOfRect()
@@ -29,7 +30,7 @@ class FaceDetectionMatter() : Matter {
         faces.toArray().forEach {
             ((it.x - it.width / 2) until it.x + (3 * it.width) / 2).forEach { i ->
                 (it.y..mask.height()).forEach { j ->
-                    mask.put(j, i, 255.0, 255.0, 255.0)
+                    mask.put(j, i, 255.0)
                 }
             }
         }

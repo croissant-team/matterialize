@@ -1,6 +1,6 @@
 package uk.ac.ic.matterialize.matting
 
-enum class Matters {
+enum class MatterMode {
     KMeans,
     FaceDetection,
     BackgroundNegation,
