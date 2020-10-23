@@ -8,7 +8,7 @@ class MatterializeApp : App(MatterializeView::class) {
     private val matterializeController: MatterializeController by inject()
 
     override fun stop() {
-        matterializeController.joinThreads()
+        matterializeController.stopCameras()
         exitProcess(0)
     }
 }

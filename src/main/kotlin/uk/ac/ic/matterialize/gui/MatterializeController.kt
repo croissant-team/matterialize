@@ -1,102 +1,43 @@
 package uk.ac.ic.matterialize.gui
 
-import javafx.embed.swing.SwingFXUtils
 import javafx.scene.image.ImageView
-import matting.OpenCVMatter
-import org.opencv.core.CvType
-import org.opencv.core.Mat
 import tornadofx.Controller
-import uk.ac.ic.matterialize.camera.FakeWebcam
-import uk.ac.ic.matterialize.camera.OpenCVWebcam
-import uk.ac.ic.matterialize.matting.BackgroundNegationMatter
-import uk.ac.ic.matterialize.matting.FaceDetectionMatter
-import uk.ac.ic.matterialize.matting.KMeansMatter
-import uk.ac.ic.matterialize.matting.Matter
 import uk.ac.ic.matterialize.matting.MatterMode
-import uk.ac.ic.matterialize.util.Converter
-import java.awt.image.BufferedImage
-import java.awt.image.DataBufferByte
-import java.io.File
-import javax.imageio.ImageIO
 import kotlin.concurrent.thread
 
 class MatterializeController : Controller() {
-    val INPUT_DEVICE = 0
 
-    // might need to change output device depending on configuration
-    // dummy devices can be seen by by running `v4l2-ctl --list-devices`
-    val OUTPUT_DEVICE = "/dev/video100"
+    val imageProcessor = ImageProcessor()
 
-    val WIDTH = 640
-    val HEIGHT = 480
-
-    val inputCam = OpenCVWebcam(INPUT_DEVICE, WIDTH, HEIGHT)
-    val outputCam = FakeWebcam(OUTPUT_DEVICE, WIDTH, HEIGHT)
-
-    var matter: Matter? = null
-    var background: Mat? = null
-
-    private lateinit var inputView: ImageView
-    private lateinit var outputView: ImageView
+    private var running = true
 
     fun setInputImage(image: ImageView) {
-        inputView = image
+        imageProcessor.setInputImage(image)
     }
 
     fun setOutputImage(image: ImageView) {
-        outputView = image
+        imageProcessor.setOutputImage(image)
     }
 
     fun applyNewBackground(inputValue: String) {
-        println("Image '$inputValue' has been selected")
-
-        val rawBackground: BufferedImage = ImageIO.read(File(inputValue))
-
-        val resized = BufferedImage(WIDTH, HEIGHT, rawBackground.type)
-        val graphics = resized.createGraphics()
-        graphics.drawImage(rawBackground, 0, 0, WIDTH, HEIGHT, null)
-        graphics.dispose()
-
-        val background = Mat(resized.height, resized.width, CvType.CV_8UC3)
-        background.put(0, 0, (resized.raster.dataBuffer as DataBufferByte).data)
-
-        this.background = background
+        imageProcessor.applyNewBackground(inputValue)
     }
 
     fun setMatter(mode: MatterMode) {
-        println("mode changed to $mode")
-        matter = when (mode) {
-            MatterMode.KMeans -> KMeansMatter(inputCam.grab())
-            MatterMode.FaceDetection -> FaceDetectionMatter()
-            MatterMode.BackgroundNegation -> BackgroundNegationMatter(inputCam.grab())
-            MatterMode.OpenCV -> OpenCVMatter()
-        }
+        imageProcessor.setMatter(mode)
     }
 
-    fun joinThreads() {
-        inputCam.stop()
-        outputCam.stop()
-        // terminate all threads
+    fun stopCameras() {
+        running = false
+        imageProcessor.stopCameras()
     }
 
     fun initialiseWebCamThread() {
         thread {
-//            println("Average FPS: ${inputCam.fps(100)}")
-
-            while (true) {
+            while (running) {
                 val start = System.currentTimeMillis()
 
-                val img = inputCam.grab()
-
-                val mat = when {
-                    matter == null || background == null -> img
-                    else -> matter!!.changeBackground(img, background!!)
-                }
-
-                outputCam.write(Converter.convertToYUYV(mat))
-
-                inputView.image = SwingFXUtils.toFXImage(OpenCVWebcam.convertToBufferedImage(img), null)
-                outputView.image = SwingFXUtils.toFXImage(OpenCVWebcam.convertToBufferedImage(mat), null)
+                imageProcessor.processImage()
 
                 val end = System.currentTimeMillis()
                 println("took ${end - start}ms")
@@ -105,11 +46,8 @@ class MatterializeController : Controller() {
     }
 
     fun getImageWidth(): Double {
-        return WIDTH.toDouble()
+        return imageProcessor.WIDTH.toDouble()
     }
 
-    init {
-        inputCam.start()
-        outputCam.start()
-    }
+
 }
