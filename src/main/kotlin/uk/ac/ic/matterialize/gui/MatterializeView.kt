@@ -24,7 +24,7 @@ class MatterializeView : View("Matterialize") {
     private val matterGroup = ToggleGroup()
 
     override val root = stackpane {
-        setPrefSize(2 * webcamViewController.getImageWidth(), 150.0)
+        setPrefSize(2 * webcamViewController.getImageWidth(), 720.0)
 
         val label = Label("No image selected")
 
@@ -74,7 +74,18 @@ class MatterializeView : View("Matterialize") {
             }
 
             borderpane {
-                top = Label("Select a matter")
+                top = label {
+                    useMaxWidth = true
+                }
+
+                bottom = label {
+                    useMaxWidth = true
+                }
+
+                center = Label("Select a matter")
+            }
+
+            borderpane {
 
                 center = vbox {
                     alignment = Pos.CENTER
