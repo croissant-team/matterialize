@@ -48,6 +48,4 @@ class MatterializeController : Controller() {
     fun getImageWidth(): Double {
         return imageProcessor.WIDTH.toDouble()
     }
-
-
 }

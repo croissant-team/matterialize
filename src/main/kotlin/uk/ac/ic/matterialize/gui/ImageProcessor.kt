@@ -7,7 +7,11 @@ import org.opencv.core.CvType
 import org.opencv.core.Mat
 import uk.ac.ic.matterialize.camera.FakeWebcam
 import uk.ac.ic.matterialize.camera.OpenCVWebcam
-import uk.ac.ic.matterialize.matting.*
+import uk.ac.ic.matterialize.matting.BackgroundNegationMatter
+import uk.ac.ic.matterialize.matting.FaceDetectionMatter
+import uk.ac.ic.matterialize.matting.KMeansMatter
+import uk.ac.ic.matterialize.matting.Matter
+import uk.ac.ic.matterialize.matting.MatterMode
 import uk.ac.ic.matterialize.util.Converter
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
@@ -21,10 +25,8 @@ class ImageProcessor {
     // dummy devices can be seen by by running `v4l2-ctl --list-devices`
     val OUTPUT_DEVICE = "/dev/video2"
 
-
     val WIDTH = 640
     val HEIGHT = 480
-
 
     val inputCam = OpenCVWebcam(INPUT_DEVICE, WIDTH, HEIGHT)
     val outputCam = FakeWebcam(OUTPUT_DEVICE, WIDTH, HEIGHT)
@@ -34,7 +36,6 @@ class ImageProcessor {
 
     private lateinit var inputView: ImageView
     private lateinit var outputView: ImageView
-
 
     fun setInputImage(image: ImageView) {
         inputView = image
@@ -88,7 +89,6 @@ class ImageProcessor {
         inputCam.stop()
         outputCam.stop()
     }
-
 
     init {
         inputCam.start()
