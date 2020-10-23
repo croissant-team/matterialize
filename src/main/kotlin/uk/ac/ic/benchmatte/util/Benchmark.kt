@@ -47,7 +47,7 @@ class Benchmark(private val maskPath: String, private val backgroundPath: String
         Imgcodecs.imwrite("_mask.png", mask)
     }
 
-    fun run(): List<Triple<MatterMode, Double, Long>> {
+    fun run(): List<Triple<MatterMode, Array<IntArray>, Long>> {
         return matters.map { (mode, matter) ->
             println(mode)
 
@@ -57,9 +57,9 @@ class Benchmark(private val maskPath: String, private val backgroundPath: String
 
             Imgcodecs.imwrite("_$mode.png", result)
 
-            val score = Scorer.percentage(result, mask)
+            val confusion = Scorer.difference(result, mask).first
 
-            Triple(mode, score, end - start)
+            Triple(mode, confusion, end - start)
         }
     }
 }

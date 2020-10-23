@@ -4,28 +4,37 @@ import org.opencv.core.Core
 import org.opencv.core.Mat
 
 object Scorer {
-    fun difference(a: Mat, b: Mat, threshold: Double = 127.0): Pair<Int, Mat> {
-        if (a.size() != b.size()) return Pair(-1, Mat())
+    // a is the actual, b is the result
+    fun difference(a: Mat, b: Mat, threshold: Double = 127.0): Pair<Array<IntArray>, Mat> {
+        if (a.size() != b.size()) return Pair(emptyArray(), Mat())
 
         val c = Mat()
         Core.absdiff(a, b, c)
 
-        var delta = 0
+        /*
+        *      bB bW
+        *   aB
+        *   aW
+        */
+        val confusion = Array(2) { IntArray(2) }
 
-        (0 until a.width()).forEach { x ->
-            (0 until a.height()).forEach { y ->
-                if (c.get(y, x)[0] > threshold) delta++
+        (0 until c.width()).forEach { x ->
+            (0 until c.height()).forEach { y ->
+                val aIndex = if (a.get(y, x)[0] > threshold) 1 else 0
+                val bIndex = if (b.get(y, x)[0] > threshold) 1 else 0
+
+                confusion[aIndex][bIndex]++
             }
         }
 
-        return Pair(delta, c)
+        return Pair(confusion, c)
     }
 
     fun percentage(a: Mat, b: Mat, threshold: Double = 127.0): Double {
-        val (delta, c) = difference(a, b, threshold)
+        val (confusion, c) = difference(a, b, threshold)
 
-        if (delta == -1) return -1.0
+        if (confusion.isEmpty()) return -1.0
 
-        return 1.0 - (delta.toDouble() / (c.width() * c.height()))
+        return 1.0 - ((confusion[0][1] + confusion[1][0]).toDouble() / (c.width() * c.height()))
     }
 }

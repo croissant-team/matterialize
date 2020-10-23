@@ -1,18 +1,15 @@
 package uk.ac.ic.benchmatte
 
-import matting.OpenCVMatter
-import org.opencv.core.Mat
 import uk.ac.ic.benchmatte.util.Benchmark
-import uk.ac.ic.benchmatte.util.Scorer
-import uk.ac.ic.matterialize.matting.BackgroundNegationMatter
-import uk.ac.ic.matterialize.matting.FaceDetectionMatter
-import uk.ac.ic.matterialize.matting.KMeansMatter
-import uk.ac.ic.matterialize.matting.MatterMode
 
 fun main() {
     nu.pattern.OpenCV.loadLocally()
 
-    val benchmark = Benchmark("", "", "");
+    val benchmark = Benchmark(
+        "/home/line/usr/doc/ic/assignments/3xx_60021_segp/adobe/Combined_Dataset/Training_set/Other/alpha/3262986095_2d5afe583c_b.jpg",
+        "/home/line/usr/doc/ic/assignments/3xx_60021_segp/adobe/bgs/train2014/COCO_train2014_000000000762.jpg",
+        "/home/line/usr/doc/ic/assignments/3xx_60021_segp/adobe/Combined_Dataset/Training_set/Other/fg/3262986095_2d5afe583c_b.jpg"
+    )
 
     benchmark.setup()
     benchmark.export()
@@ -20,22 +17,3 @@ fun main() {
     println(benchmark.run())
 }
 
-fun runMatter(mode: MatterMode, clean: Mat?, composed: Mat, expected: Mat): Pair<Double, Long> {
-    val matter = when (mode) {
-        MatterMode.KMeans -> KMeansMatter(clean!!)
-        MatterMode.FaceDetection -> FaceDetectionMatter()
-        MatterMode.BackgroundNegation -> BackgroundNegationMatter(clean!!)
-        MatterMode.OpenCV -> OpenCVMatter()
-    }
-
-    // the initial run is discarded to account for initialisation times
-    matter.foregroundMask(composed)
-
-    val start = System.currentTimeMillis()
-    val result = matter.foregroundMask(composed)
-    val end = System.currentTimeMillis()
-
-    val score = Scorer.percentage(result, expected)
-
-    return Pair(score, end - start)
-}
