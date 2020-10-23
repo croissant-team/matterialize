@@ -17,7 +17,6 @@ class BackgroundNegationMatter(private val background: Mat) : Matter {
         val maxval = 255.0
         Imgproc.threshold(mask, mask, threshold, maxval, THRESH_BINARY)
 
-
         return mask
     }
 }

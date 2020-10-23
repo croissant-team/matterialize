@@ -1,9 +1,8 @@
 package uk.ac.ic.benchmatte
 
 import matting.OpenCVMatter
-import org.opencv.core.CvType
 import org.opencv.core.Mat
-import uk.ac.ic.benchmatte.util.Compositor
+import uk.ac.ic.benchmatte.util.Benchmark
 import uk.ac.ic.benchmatte.util.Scorer
 import uk.ac.ic.matterialize.matting.BackgroundNegationMatter
 import uk.ac.ic.matterialize.matting.FaceDetectionMatter
@@ -13,14 +12,12 @@ import uk.ac.ic.matterialize.matting.MatterMode
 fun main() {
     nu.pattern.OpenCV.loadLocally()
 
-    val targetMask = Compositor.loadFile("", CvType.CV_8U)
-    val background = Compositor.loadFile("")
-    val foreground = Compositor.loadFile("")
+    val benchmark = Benchmark("", "", "");
 
-    val (composed, newMask) = Compositor.compose(background, foreground, targetMask)
+    benchmark.setup()
+    benchmark.export()
 
-    println(runMatter(MatterMode.BackgroundNegation, background, composed, newMask))
-    println(runMatter(MatterMode.FaceDetection, null, composed, newMask))
+    println(benchmark.run())
 }
 
 fun runMatter(mode: MatterMode, clean: Mat?, composed: Mat, expected: Mat): Pair<Double, Long> {

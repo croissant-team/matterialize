@@ -21,7 +21,7 @@ import javax.imageio.ImageIO
 import kotlin.concurrent.thread
 
 class MatterializeController : Controller() {
-    val INPUT_DEVICE = 0
+    val INPUT_DEVICE = 4
 
     // might need to change output device depending on configuration
     // dummy devices can be seen by by running `v4l2-ctl --list-devices`
