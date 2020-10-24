@@ -36,7 +36,7 @@ class Benchmark(private val maskPath: String, private val backgroundPath: String
             }
 
             // the initial run is discarded to account for initialisation times
-            matter.foregroundMask(composed)
+            matter.backgroundMask(composed)
 
             matters.add(Pair(it, matter))
         }
@@ -52,7 +52,7 @@ class Benchmark(private val maskPath: String, private val backgroundPath: String
             println(mode)
 
             val start = System.currentTimeMillis()
-            val result = matter.foregroundMask(composed)
+            val result = matter.backgroundMask(composed)
             val end = System.currentTimeMillis()
 
             Imgcodecs.imwrite("_$mode.png", result)
