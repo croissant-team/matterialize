@@ -24,21 +24,8 @@ private interface Model {
 data class SegmentationResult(val image: Mat, val backgroundMask: Mat)
 
 class BackgroundCut(backgroundImage: Mat) : Matter {
-    private val globalBgModel: Model = BackgroundModel(backgroundImage)
-    private val globalFgModelLearner = GlobalForegroundModelLearner(globalBgModel)
-    private lateinit var prevSegmentationResult: SegmentationResult
-
-    init {
-        // defaults the previous image to a black image with no foreground or background
-        val prevImage = Mat(backgroundImage.size(), backgroundImage.type())
-        // all black mask
-        val mask = Mat(backgroundImage.size(), CV_8UC1)
-        SegmentationResult(prevImage, mask)
-    }
 
     override fun backgroundMask(videoFrame: Mat): Mat {
-        val globalFgModel: Model = globalFgModelLearner.learn(videoFrame, prevSegmentationResult)
-
         TODO("Not yet implemented")
     }
 
@@ -62,6 +49,7 @@ private class ForegroundModel(private val bgModel: BackgroundModel): Matter {
     override fun backgroundMask(videoFrame: Mat): Mat {
         val image: FlatImage = Image(videoFrame).flatten()
         val probs = bgModel.perPixelProbs(image)
+        TODO()
     }
 }
 
@@ -77,6 +65,12 @@ class FlatImage(internal val mat: Mat) {
     }
 }
 
+class PixelVariances(internal val mat: Mat) {
+    fun at(pixelIndex: Int, channel: Int): Double {
+        return mat.get(pixelIndex, channel)[0]
+    }
+}
+
 class Image(internal val mat: Mat) {
     fun flatten(): FlatImage {
         val flatMat = mat.clone().reshape(1, mat.width() * mat.height())
@@ -85,7 +79,7 @@ class Image(internal val mat: Mat) {
 
     // Returns array of per pixel variances, calculated in one the 8-neighborhood
     // of each pixel
-    fun getPerPixelVariances(): Array<DoubleArray> {
+    fun getPerPixelVariances(): PixelVariances {
         val meanOfSquare = Mat()
         val mean = Mat()
         val variances = Mat()
@@ -98,21 +92,9 @@ class Image(internal val mat: Mat) {
         val squareOfMean = mean.mul(mean)
 
         Core.subtract(meanOfSquare, squareOfMean, variances)
-
-
         val numPixels = mat.width() * mat.height()
-        val result = Array<DoubleArray>(numPixels) { DoubleArray(3) }
-        val height = variances.height()
-        val width = variances.width()
-        
-        for (i in 0 until height) {
-            for (j in 0 until width) {
-                val bgrVariances = variances.get(i, j)
-                result[i * width + j] = bgrVariances
-            }
-        }
 
-        return result
+        return PixelVariances(variances.reshape(1, numPixels))
     }
 
     fun resized(rows: Int, cols: Int): Image {
@@ -154,7 +136,7 @@ private class BackgroundModel(private val bgImage: Image) : Model {
     // alpha in equation (4)
     // must be between 0 and 1
     private val mixingFactor = 0.5
-    private val perPixelVariances: Array<DoubleArray>
+    private val perPixelVariances: PixelVariances
 
     init {
         assert(mixingFactor in 0.0..1.0)
@@ -167,7 +149,7 @@ private class BackgroundModel(private val bgImage: Image) : Model {
 
         gmm.clustersNumber = numComponents
         // FIXME requires sample channels to be 1 so might need to convert image
-        gmm.trainEM(bgImage.mat)
+        gmm.trainEM(flatBgImage.mat)
         perPixelVariances = bgImage.getPerPixelVariances()
     }
 
@@ -180,25 +162,26 @@ private class BackgroundModel(private val bgImage: Image) : Model {
         val ROW_SUM = 1
         Core.reduce(distribProbs.mul(gmm.weights), result, ROW_SUM, CV_32FC1)
 
-
         return Probs(result)
     }
 
     fun perPixelProbs(image: FlatImage): Probs {
-        val probs = DoubleArray(image.numPixels())
+        val probs = Mat(Size(1.0, image.numPixels().toDouble()), CV_32FC1)
 
         for (pixel in 0 until image.numPixels()) {
-            val pixelVariance = perPixelVariances[pixel]
-            val d0 = image.get(pixel, 0) - flatBgImage.get(pixel, 0)
-            val d1 = image.get(pixel, 1) - flatBgImage.get(pixel, 1)
-            val d2 = image.get(pixel, 2) - flatBgImage.get(pixel, 2)
-            val l2 = (d0 * d0) / pixelVariance[0] + (d1 * d1) / pixelVariance[1] + (d2 * d2) / pixelVariance[2]
-            val det = pixelVariance[0] * pixelVariance[1] * pixelVariance[2]
+            var l2 = 0.0
+            var det = 1.0
 
-            probs[pixel] = exp(-1 / 2 * l2) / kotlin.math.sqrt(twoPiCubed * det)
+            for (channel in 0 until 3 ) {
+                val delta = image.get(pixel, channel) - flatBgImage.get(pixel, channel)
+                l2 += (delta * delta) / perPixelVariances.at(pixel, channel)
+                det *= perPixelVariances.at(pixel, channel)
+            }
+
+            probs.put(pixel, 0, exp(-1 / 2 * l2) / kotlin.math.sqrt(twoPiCubed * det))
         }
 
-        return Probs()
+        return Probs(probs)
     }
 
     fun mixProbs(image: FlatImage): Probs {
@@ -216,7 +199,7 @@ fun main() {
     // create simple 2x2 picture
 
     val exampleMat = Imgcodecs.imread("examples/COCO_train2014_000000000762.jpg")!!
-    Imgproc.resize(exampleMat, exampleMat, Size(320.0, 240.0))
+    Imgproc.resize(exampleMat, exampleMat, Size(320.0 / 2, 240.0 / 2))
     Imgcodecs.imwrite("cache.png", exampleMat)
 
     val samples = exampleMat.clone().reshape(1, exampleMat.width() * exampleMat.height())
@@ -230,9 +213,10 @@ fun main() {
     println(samples.channels())
 
     val t0 = System.currentTimeMillis()
-    val globalBackgroundModel = BackgroundModel(exampleMat)
+    val image = Image(exampleMat)
+    val globalBackgroundModel = BackgroundModel(image)
     val t1 = System.currentTimeMillis()
-    globalBackgroundModel.perPixelProbs(exampleMat)
+    globalBackgroundModel.perPixelProbs(image.flatten())
     val t2 = System.currentTimeMillis()
 
     println("t1 - t0: ${t1 - t0}ms")
