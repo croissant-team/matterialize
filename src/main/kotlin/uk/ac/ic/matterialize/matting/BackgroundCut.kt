@@ -1,6 +1,8 @@
 package uk.ac.ic.matterialize.matting
 
 import org.opencv.core.Core
+import org.opencv.core.CvType.CV_32FC1
+import org.opencv.core.CvType.CV_32FC3
 import org.opencv.core.CvType.CV_8UC1
 import org.opencv.core.Mat
 import org.opencv.core.Size
@@ -45,71 +47,114 @@ class BackgroundCut(backgroundImage: Mat) : Matter {
     }
 }
 
-private class GlobalForegroundModelLearner(perPixelBgModel: Model) {
 
-    fun learn(videoFrame: Mat, prevSegmentationResult: SegmentationResult): Model {
-        TODO("Not yet implemented")
+
+
+
+val twoPiCubed = (2 * PI).pow(3)
+fun pdf(l2: Double, bppVar: Double): Double {
+    return exp(-1 / 2 * l2) / kotlin.math.sqrt(twoPiCubed * bppVar)
+}
+
+private class ForegroundModel(private val bgModel: BackgroundModel): Matter {
+    private val gmm = EM.create()
+
+    override fun backgroundMask(videoFrame: Mat): Mat {
+        val image: FlatImage = Image(videoFrame).flatten()
+        val probs = bgModel.perPixelProbs(image)
     }
 }
 
-private class PerPixelBackgroundModel(backgroundImage: Mat) : Model {
 
+
+class FlatImage(internal val mat: Mat) {
+    fun get(pixelIndex: Int, channel: Int): Double {
+        return mat.get(pixelIndex, channel)[0]
+    }
+
+    fun numPixels(): Int {
+        return mat.height()
+    }
 }
 
-// TODO find a better place for this
-fun Mat.getPerPixelNeighborhoodVariances(): Array<DoubleArray> {
-    val meanOfSquare = Mat()
-    val mean = Mat()
-    val result = Mat()
-    val eightNeighborhoodSize = Size(3.0, 3.0)
+class Image(internal val mat: Mat) {
+    fun flatten(): FlatImage {
+        val flatMat = mat.clone().reshape(1, mat.width() * mat.height())
+        return FlatImage(flatMat)
+    }
 
-    // blurring is equivalent to finding the mean
-    blur(this.mul(this), meanOfSquare, eightNeighborhoodSize)
+    // Returns array of per pixel variances, calculated in one the 8-neighborhood
+    // of each pixel
+    fun getPerPixelVariances(): Array<DoubleArray> {
+        val meanOfSquare = Mat()
+        val mean = Mat()
+        val variances = Mat()
+        val eightNeighborhoodSize = Size(3.0, 3.0)
 
-    blur(this, mean, eightNeighborhoodSize)
-    val squareOfMean = mean.mul(mean)
+        // blurring is equivalent to finding the mean
+        blur(mat.mul(mat), meanOfSquare, eightNeighborhoodSize)
 
-    Core.subtract(meanOfSquare, squareOfMean, result)
+        blur(mat, mean, eightNeighborhoodSize)
+        val squareOfMean = mean.mul(mean)
 
-    return result.toSamples().toArray()
+        Core.subtract(meanOfSquare, squareOfMean, variances)
+
+
+        val numPixels = mat.width() * mat.height()
+        val result = Array<DoubleArray>(numPixels) { DoubleArray(3) }
+        val height = variances.height()
+        val width = variances.width()
+        
+        for (i in 0 until height) {
+            for (j in 0 until width) {
+                val bgrVariances = variances.get(i, j)
+                result[i * width + j] = bgrVariances
+            }
+        }
+
+        return result
+    }
+
+    fun resized(rows: Int, cols: Int): Image {
+        val result = Mat()
+        Imgproc.resize(this.mat, result, Size(rows.toDouble(), cols.toDouble()))
+        return Image(result)
+    }
+
+    fun downscaled(factor: Int): Image {
+        val width = this.mat.width() / factor
+        val height = this.mat.height() / factor
+
+        return this.resized(width, height)
+    }
+
+    fun upscaled(factor: Int): Image {
+        val width = this.mat.width() * factor
+        val height = this.mat.height() * factor
+
+        return this.resized(width, height)
+    }
 }
 
-fun Mat.toSamples(): Mat {
-    return this.clone().reshape(1, this.width() * this.height())
-}
+// TODO should this be just a DoubleArray?
+class Probs(internal val mat: Mat)
 
-fun Mat.toArray(): Array<DoubleArray> {
-    return (0 until this.height()).map { h ->
-        doubleArrayOf(
-            this.get(h, 0)[0],
-            this.get(h, 1)[0],
-            this.get(h, 2)[0]
-        )
-    }.toTypedArray()
-}
+private class BackgroundModel(private val bgImage: Image) : Model {
 
-typealias PixelPosition = Int
-val twoPiCubed = (2 * PI).pow(3)
-fun pdf(l2: Double, bppVar: Double): Double {
-    // return exp(-1/(2 * bppVar * bppVar) * Core.norm(sample, mean)) / kotlin.math.sqrt(twoPiCubed * bppVar * bppVar * bppVar)
-    return 1 / kotlin.math.sqrt(
-        (twoPiCubed * bppVar * bppVar * exp(2 * bppVar * bppVar * l2))
-    )
-}
+    // shrink image to speed up computation
+    private val downscaleFactor = 4
 
-private class BackgroundModel(backgroundImage: Mat) : Model {
-    private val gmm: EM = EM.create()
 
+    private val gmm = EM.create()
     // K_b in the background cut paper equation (2)
     // typical values in range 10-15
-    private val numComponents = 5
-    private val backgroundImageSamples = backgroundImage.toSamples()
-    private val backgroundImageSamplesArray = backgroundImageSamples.toArray()
+    private val numComponents = 10
 
+    private val flatBgImage = bgImage.flatten()
     // alpha in equation (4)
     // must be between 0 and 1
     private val mixingFactor = 0.5
-    private val perPixelNeighborhoodVariances: Array<DoubleArray>
+    private val perPixelVariances: Array<DoubleArray>
 
     init {
         assert(mixingFactor in 0.0..1.0)
@@ -120,44 +165,48 @@ private class BackgroundModel(backgroundImage: Mat) : Model {
             gmm.termCriteria.epsilon
         )
 
-        gmm.covarianceMatrixType = EM.COV_MAT_SPHERICAL
-
         gmm.clustersNumber = numComponents
         // FIXME requires sample channels to be 1 so might need to convert image
-        gmm.trainEM(backgroundImageSamples)
-        perPixelNeighborhoodVariances = backgroundImage.getPerPixelNeighborhoodVariances()
+        gmm.trainEM(bgImage.mat)
+        perPixelVariances = bgImage.getPerPixelVariances()
     }
 
     // TODO Check if this is incorrect, but I'm pretty sure it does exactly equation (2)
-    fun globalProbs(image: Mat): Mat {
+    fun globalProbs(image: FlatImage): Probs {
+        val distribProbs = Mat()
         val result = Mat()
-        gmm.predict(image.toSamples(), result)
-        return result
+
+        gmm.predict(image.mat, distribProbs)
+        val ROW_SUM = 1
+        Core.reduce(distribProbs.mul(gmm.weights), result, ROW_SUM, CV_32FC1)
+
+
+        return Probs(result)
     }
 
-    fun perPixelProbs(image: Mat): Mat {
-        val samples = image.toSamples()
+    fun perPixelProbs(image: FlatImage): Probs {
+        val probs = DoubleArray(image.numPixels())
 
-        val probs = Mat(samples.size(), samples.type())
-        for (i in 0 until backgroundImageSamples.height()) {
-            val d0 = samples.get(i, 0)[0] - backgroundImageSamplesArray[i][0]
-            val d1 = samples.get(i, 1)[0] - backgroundImageSamplesArray[i][1]
-            val d2 = samples.get(i, 2)[0] - backgroundImageSamplesArray[i][2]
-            val l2 = d0 * d0 + d1 * d1 + d2 * d2
-            val pixelVariance = perPixelNeighborhoodVariances[i][0]
-            val prob = pdf(l2, pixelVariance)
-            probs.put(i, 0, prob)
+        for (pixel in 0 until image.numPixels()) {
+            val pixelVariance = perPixelVariances[pixel]
+            val d0 = image.get(pixel, 0) - flatBgImage.get(pixel, 0)
+            val d1 = image.get(pixel, 1) - flatBgImage.get(pixel, 1)
+            val d2 = image.get(pixel, 2) - flatBgImage.get(pixel, 2)
+            val l2 = (d0 * d0) / pixelVariance[0] + (d1 * d1) / pixelVariance[1] + (d2 * d2) / pixelVariance[2]
+            val det = pixelVariance[0] * pixelVariance[1] * pixelVariance[2]
+
+            probs[pixel] = exp(-1 / 2 * l2) / kotlin.math.sqrt(twoPiCubed * det)
         }
 
-        return probs
+        return Probs()
     }
 
-    fun mixProbs(image: Mat): Mat {
+    fun mixProbs(image: FlatImage): Probs {
         val result = Mat()
 
         // equation (4)
-        Core.addWeighted(globalProbs(image), mixingFactor, perPixelProbs(image), 1 - mixingFactor, 0.0, result)
-        return result
+        Core.addWeighted(globalProbs(image).mat, mixingFactor, perPixelProbs(image).mat, 1 - mixingFactor, 0.0, result)
+        return Probs(result)
     }
 }
 
@@ -166,7 +215,7 @@ fun main() {
     OpenCV.load()
     // create simple 2x2 picture
 
-    val exampleMat = Imgcodecs.imread("/home/line/usr/doc/ic/assignments/3xx_60021_segp/adobe/bgs/train2014/COCO_train2014_000000000762.jpg")!!
+    val exampleMat = Imgcodecs.imread("examples/COCO_train2014_000000000762.jpg")!!
     Imgproc.resize(exampleMat, exampleMat, Size(320.0, 240.0))
     Imgcodecs.imwrite("cache.png", exampleMat)
 
