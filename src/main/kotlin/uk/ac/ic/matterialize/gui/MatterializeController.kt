@@ -9,14 +9,17 @@ class MatterializeController : Controller() {
 
     val imageProcessor = ImageProcessor()
 
+    private lateinit var inputView: ImageView
+    private lateinit var outputView: ImageView
+
     private var running = true
 
     fun setInputImage(image: ImageView) {
-        imageProcessor.setInputImage(image)
+        inputView = image
     }
 
     fun setOutputImage(image: ImageView) {
-        imageProcessor.setOutputImage(image)
+        outputView = image
     }
 
     fun applyNewBackground(inputValue: String) {
@@ -37,7 +40,10 @@ class MatterializeController : Controller() {
             while (running) {
                 val start = System.currentTimeMillis()
 
-                imageProcessor.processImage()
+                val images = imageProcessor.processImage()
+
+                inputView.image = images.first
+                outputView.image = images.second
 
                 val end = System.currentTimeMillis()
                 println("took ${end - start}ms")
