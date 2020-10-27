@@ -2,26 +2,34 @@ package uk.ac.ic.matterialize.matting
 
 import org.opencv.core.Core
 import org.opencv.core.CvType.CV_32FC1
-import org.opencv.core.CvType.CV_32FC3
 import org.opencv.core.CvType.CV_8UC1
+import org.opencv.core.CvType.CV_8UC3
 import org.opencv.core.Mat
+import org.opencv.core.Scalar
 import org.opencv.core.Size
 import org.opencv.core.TermCriteria
 import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
+import org.opencv.imgproc.Imgproc.THRESH_BINARY_INV
 import org.opencv.imgproc.Imgproc.blur
 import org.opencv.ml.EM
+import org.opencv.ml.EM.COV_MAT_DIAGONAL
 import uk.ac.ic.matterialize.util.OpenCV
 import kotlin.math.PI
 import kotlin.math.exp
 import kotlin.math.pow
 
-private interface Model {
 
+class SegmentationResult(val image: Image, val bgMask: FlatMask) {
+    companion object {
+        fun empty(rows: Int, cols: Int): SegmentationResult {
+            return SegmentationResult(
+                Image(Mat.zeros(rows, cols, CV_8UC3)),
+                FlatMask(Mat.zeros(rows * cols, 1, CV_8UC1))
+            )
+        }
+    }
 }
-
-
-data class SegmentationResult(val image: Mat, val backgroundMask: Mat)
 
 class BackgroundCut(backgroundImage: Mat) : Matter {
 
@@ -34,34 +42,50 @@ class BackgroundCut(backgroundImage: Mat) : Matter {
     }
 }
 
-
-
-
-
 val twoPiCubed = (2 * PI).pow(3)
-fun pdf(l2: Double, bppVar: Double): Double {
-    return exp(-1 / 2 * l2) / kotlin.math.sqrt(twoPiCubed * bppVar)
-}
 
-private class ForegroundModel(private val bgModel: BackgroundModel): Matter {
-    private val gmm = EM.create()
-
-    override fun backgroundMask(videoFrame: Mat): Mat {
-        val image: FlatImage = Image(videoFrame).flatten()
-        val probs = bgModel.perPixelProbs(image)
-        TODO()
-    }
-}
-
-
+// Might wanna use DoubleArrays everywhere instead of Mat for performance issue
 
 class FlatImage(internal val mat: Mat) {
-    fun get(pixelIndex: Int, channel: Int): Double {
-        return mat.get(pixelIndex, channel)[0]
+    private val data: UByteArray
+    private val numChannels = 3
+
+    init {
+        assert(mat.width() == numChannels)
+        val tempData = ByteArray(mat.width() * numChannels)
+        mat.get(0, 0, tempData)
+        data = tempData.toUByteArray()
+    }
+
+    fun get(pixelIndex: Int, channel: Int): UByte {
+        return data[pixelIndex * numChannels + channel]
     }
 
     fun numPixels(): Int {
         return mat.height()
+    }
+
+    fun toSamples(): Mat {
+        val result = Mat()
+        mat.convertTo(result, CV_32FC1)
+        return result
+    }
+}
+
+class FlatMask(internal val mat: Mat) {
+    private val data: UByteArray
+    private val numChannels = 1
+
+
+    init {
+        assert(mat.width() == numChannels)
+        val tempData = ByteArray(mat.width() * numChannels)
+        mat.get(0, 0, tempData)
+        data = tempData.toUByteArray()
+    }
+
+    fun get(pixelIndex: Int): UByte {
+        return data[pixelIndex]
     }
 }
 
@@ -71,10 +95,18 @@ class PixelVariances(internal val mat: Mat) {
     }
 }
 
+class Probs(internal val mat: Mat) {
+    fun at(pixelIndex: Int): Double {
+        return mat.get(pixelIndex, 0)[0]
+    }
+}
+
 class Image(internal val mat: Mat) {
-    fun flatten(): FlatImage {
-        val flatMat = mat.clone().reshape(1, mat.width() * mat.height())
-        return FlatImage(flatMat)
+     val flattened: FlatImage by lazy {
+         val flatMat = mat.clone().reshape(1, mat.width() * mat.height())
+         println(mat.type())
+         println(flatMat.type())
+         return@lazy FlatImage(flatMat)
     }
 
     // Returns array of per pixel variances, calculated in one the 8-neighborhood
@@ -118,29 +150,108 @@ class Image(internal val mat: Mat) {
     }
 }
 
-// TODO should this be just a DoubleArray?
-class Probs(internal val mat: Mat)
 
-private class BackgroundModel(private val bgImage: Image) : Model {
+object GMMGlobalColorModel {
+    // TODO Check if this is incorrect, but I'm pretty sure it does exactly equation (2)
+    fun globalProbs(trainedGMM: EM, image: FlatImage): Probs {
+        val distribProbs = Mat()
+        val result = Mat()
+        val samples = image.toSamples()
+        println("samples: ${samples.size()}")
+        trainedGMM.predict(samples, distribProbs)
+        val ROW_SUM = 1
+        println("distribProps: ${distribProbs.size()}")
+        println("weights: ${trainedGMM.weights.size()}")
+        val weights = Mat()
+        Core.transpose(trainedGMM.weights, weights)
+        Core.reduce(distribProbs.mul(weights), result, ROW_SUM, CV_32FC1)
 
-    // shrink image to speed up computation
-    private val downscaleFactor = 4
+        return Probs(result)
+    }
+}
+
+private class ForegroundModel(private val bgModel: PixelBgModel) {
+    val gmm: EM = EM.create()
+    private val bgThreshold = 0.95
+    private val fgThreshold = 0.05
+    private val numComponents = 5
+
+    init {
+        gmm.termCriteria = TermCriteria(
+            gmm.termCriteria.type,
+            10,
+            gmm.termCriteria.epsilon
+        )
+        gmm.covarianceMatrixType = COV_MAT_DIAGONAL
+        gmm.clustersNumber = numComponents
+    }
+
+    private fun findFgSamples(currentImage: FlatImage, prevSegmentationResult: SegmentationResult): Mat {
+        val probs = bgModel.perPixelProbs(currentImage)
+        val numChannels = 3
+
+        // times 2 since we are taking samples from 2 videoframes
+        val samples = UByteArray(currentImage.numPixels() * numChannels * 2)
+        var numSamples = 0
+
+        val prevBgMask = prevSegmentationResult.bgMask
+        val prevBgImage: FlatImage = prevSegmentationResult.image.flattened
+
+        for (pixel in 0 until currentImage.numPixels()) {
+            if (probs.at(pixel) < fgThreshold) { // pixel is in F
+                // sample pixel from current image
+                val currIndex = numSamples * numChannels
+                for (channel in 0 until numChannels) {
+                    samples[currIndex + channel] = currentImage.get(pixel, channel)
+                }
+                numSamples++
+                val prevIndex = numSamples * numChannels
+
+                // if pixel is in the intersection of F and the previous segmented foreground,
+                // sample pixel from previous image to enforce temporal coherence
+                if (prevBgMask.get(pixel) != 0.toUByte()) {
+                    // sample pixel from previous image
+                    for (channel in 0 until numChannels) {
+                        samples[prevIndex + channel] = prevBgImage.get(pixel, channel)
+                    }
+                    numSamples++
+                }
+            }
+        }
+
+        val samplesMat = Mat(Size(numSamples.toDouble(), numChannels.toDouble()), currentImage.mat.type())
+        samplesMat.put(0, 0, samples.toByteArray(), 0, numSamples)
+
+        return samplesMat
+    }
+
+    fun globalProbs(image: FlatImage, prevSegmentationResult: SegmentationResult): Probs {
+        val sample: Mat = findFgSamples(image, prevSegmentationResult)
+        gmm.trainEM(sample)
+        return GMMGlobalColorModel.globalProbs(gmm, image)
+    }
 
 
+    fun backgroundMask(videoFrame: Mat, prevSegmentationResult: SegmentationResult): Mat {
+        val image: FlatImage = Image(videoFrame).flattened
+        val probs = bgModel.perPixelProbs(image)
+        val bgGmmMask = Mat() // F in the paper
+        Imgproc.threshold(probs.mat, bgGmmMask, fgThreshold, 255.0, THRESH_BINARY_INV) // equation(5)
+        val result = Mat()
+        videoFrame.copyTo(result, bgGmmMask)
+
+        return result
+    }
+
+}
+
+private class GlobalBgModel(private val bgImage: FlatImage) {
     private val gmm = EM.create()
     // K_b in the background cut paper equation (2)
     // typical values in range 10-15
     private val numComponents = 10
 
-    private val flatBgImage = bgImage.flatten()
-    // alpha in equation (4)
-    // must be between 0 and 1
-    private val mixingFactor = 0.5
-    private val perPixelVariances: PixelVariances
-
     init {
-        assert(mixingFactor in 0.0..1.0)
-
         gmm.termCriteria = TermCriteria(
             gmm.termCriteria.type,
             10,
@@ -149,21 +260,22 @@ private class BackgroundModel(private val bgImage: Image) : Model {
 
         gmm.clustersNumber = numComponents
         // FIXME requires sample channels to be 1 so might need to convert image
-        gmm.trainEM(flatBgImage.mat)
-        perPixelVariances = bgImage.getPerPixelVariances()
+        gmm.trainEM(bgImage.toSamples())
     }
 
-    // TODO Check if this is incorrect, but I'm pretty sure it does exactly equation (2)
     fun globalProbs(image: FlatImage): Probs {
-        val distribProbs = Mat()
-        val result = Mat()
-
-        gmm.predict(image.mat, distribProbs)
-        val ROW_SUM = 1
-        Core.reduce(distribProbs.mul(gmm.weights), result, ROW_SUM, CV_32FC1)
-
-        return Probs(result)
+        return GMMGlobalColorModel.globalProbs(gmm, image)
     }
+}
+
+@ExperimentalUnsignedTypes
+private class PixelBgModel(bgImage: Image) {
+    // alpha in equation (4)
+    // must be between 0 and 1
+    private val mixingFactor = 0.5
+    private val perPixelVariances = bgImage.getPerPixelVariances()
+    private val flatBgImage = bgImage.flattened
+
 
     fun perPixelProbs(image: FlatImage): Probs {
         val probs = Mat(Size(1.0, image.numPixels().toDouble()), CV_32FC1)
@@ -171,9 +283,8 @@ private class BackgroundModel(private val bgImage: Image) : Model {
         for (pixel in 0 until image.numPixels()) {
             var l2 = 0.0
             var det = 1.0
-
-            for (channel in 0 until 3 ) {
-                val delta = image.get(pixel, channel) - flatBgImage.get(pixel, channel)
+            for (channel in 0 until 3) {
+                val delta = (image.get(pixel, channel) - flatBgImage.get(pixel, channel)).toDouble()
                 l2 += (delta * delta) / perPixelVariances.at(pixel, channel)
                 det *= perPixelVariances.at(pixel, channel)
             }
@@ -184,12 +295,54 @@ private class BackgroundModel(private val bgImage: Image) : Model {
         return Probs(probs)
     }
 
+}
+
+private class ColorTerm(bgEnergies: DoubleArray, fgEnergies: DoubleArray)
+
+
+private class ColorModel(private val bgImage: Image) {
+    private val globalBgModel = GlobalBgModel(bgImage.flattened)
+    private val pixelBgModel = PixelBgModel(bgImage)
+    private val fgModel = ForegroundModel(pixelBgModel)
+    private var prevSegResult: SegmentationResult = SegmentationResult.empty(bgImage.mat.rows(), bgImage.mat.cols())
+
+    // alpha in equation (4)
+    // must be between 0 and 1
+    private val mixingFactor = 0.5
+
+    init {
+        assert(mixingFactor in 0.0..1.0)
+    }
+
+    fun updatePrevSegResult(prevSegmentationResult: SegmentationResult) {
+        prevSegResult = prevSegmentationResult
+    }
+
     fun mixProbs(image: FlatImage): Probs {
         val result = Mat()
 
         // equation (4)
-        Core.addWeighted(globalProbs(image).mat, mixingFactor, perPixelProbs(image).mat, 1 - mixingFactor, 0.0, result)
+        Core.addWeighted(
+            globalBgModel.globalProbs(image).mat, mixingFactor,
+            pixelBgModel.perPixelProbs(image).mat, 1 - mixingFactor, 0.0, result)
         return Probs(result)
+    }
+
+    fun colorTerms(image: FlatImage): ColorTerm {
+        val bgEnergiesMat = Mat()
+        Core.log(mixProbs(image).mat, bgEnergiesMat)
+        Core.multiply(bgEnergiesMat, Scalar(-1.0), bgEnergiesMat)
+
+        val fgEnergiesMat = Mat()
+        Core.log(fgModel.globalProbs(image, prevSegResult).mat, fgEnergiesMat)
+        Core.multiply(fgEnergiesMat, Scalar(-1.0), fgEnergiesMat)
+
+        val bgEnergies = DoubleArray(image.numPixels())
+        val fgEnergies = DoubleArray(image.numPixels())
+        bgEnergiesMat.get(0, 0, bgEnergies)
+        fgEnergiesMat.get(0, 0, fgEnergies)
+
+        return ColorTerm(bgEnergies, fgEnergies)
     }
 }
 
@@ -214,9 +367,9 @@ fun main() {
 
     val t0 = System.currentTimeMillis()
     val image = Image(exampleMat)
-    val globalBackgroundModel = BackgroundModel(image)
+    val colorModel = ColorModel(image)
     val t1 = System.currentTimeMillis()
-    globalBackgroundModel.perPixelProbs(image.flatten())
+    colorModel.mixProbs(image.flattened)
     val t2 = System.currentTimeMillis()
 
     println("t1 - t0: ${t1 - t0}ms")
