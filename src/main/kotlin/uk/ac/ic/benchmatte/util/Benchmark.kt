@@ -4,6 +4,7 @@ import matting.OpenCVMatter
 import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.imgcodecs.Imgcodecs
+import uk.ac.ic.matterialize.matting.backgroundcut.BackgroundCut
 import uk.ac.ic.matterialize.matting.BackgroundNegationMatter
 import uk.ac.ic.matterialize.matting.FaceDetectionMatter
 import uk.ac.ic.matterialize.matting.KMeansMatter
@@ -33,6 +34,7 @@ class Benchmark(private val maskPath: String, private val backgroundPath: String
                 MatterMode.FaceDetection -> FaceDetectionMatter()
                 MatterMode.BackgroundNegation -> BackgroundNegationMatter(background)
                 MatterMode.OpenCV -> OpenCVMatter()
+                MatterMode.BackgroundCut -> BackgroundCut(background)
             }
 
             // the initial run is discarded to account for initialisation times

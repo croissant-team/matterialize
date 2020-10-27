@@ -7,6 +7,7 @@ import org.opencv.core.CvType
 import org.opencv.core.Mat
 import uk.ac.ic.matterialize.camera.FakeWebcam
 import uk.ac.ic.matterialize.camera.OpenCVWebcam
+import uk.ac.ic.matterialize.matting.backgroundcut.BackgroundCut
 import uk.ac.ic.matterialize.matting.BackgroundNegationMatter
 import uk.ac.ic.matterialize.matting.FaceDetectionMatter
 import uk.ac.ic.matterialize.matting.KMeansMatter
@@ -41,6 +42,7 @@ class ImageProcessor {
             MatterMode.FaceDetection -> FaceDetectionMatter()
             MatterMode.BackgroundNegation -> BackgroundNegationMatter(inputCam.grab())
             MatterMode.OpenCV -> OpenCVMatter()
+            MatterMode.BackgroundCut -> BackgroundCut(inputCam.grab())
         }
     }
 
