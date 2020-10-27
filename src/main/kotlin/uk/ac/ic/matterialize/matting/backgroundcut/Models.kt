@@ -18,7 +18,6 @@ object GMMGlobalColorModel {
         val distribProbs = Mat()
         val result = Mat()
         val samples = image.toSamples()
-        println("samples: ${samples.size()}")
         trainedGMM.predict(samples, distribProbs)
         val ROW_SUM = 1
         val weights = Mat()
@@ -101,13 +100,8 @@ class ForegroundModel(private val bgModel: PixelBgModel): Matter {
         val bgGmmFlatMask = Mat() // F in the paper
         Imgproc.threshold(probs.mat, bgGmmFlatMask, fgThreshold * 255, 255.0, Imgproc.THRESH_BINARY_INV) // equation(5)
         bgGmmFlatMask.convertTo(bgGmmFlatMask, CvType.CV_8UC1)
-        val bgGmmMask = bgGmmFlatMask.reshape(1, videoFrame.rows())
-        Imgcodecs.imwrite("mask.png", bgGmmMask)
-        println("type: "+ bgGmmMask.type() + "; size: " + bgGmmMask.size())
-        val result = Mat()
-        videoFrame.copyTo(result, bgGmmMask)
 
-        return result
+        return bgGmmFlatMask.reshape(1, videoFrame.rows())
     }
 
 }
@@ -143,6 +137,10 @@ class PixelBgModel(bgImage: Image) {
     private val perPixelVariances = bgImage.getPerPixelVariances()
     private val flatBgImage = bgImage.flattened
 
+    fun pdf(l2: Double, det: Double): Double {
+        val x = -1 * l2 / 2
+        return exp(x) / kotlin.math.sqrt(twoPiCubed * det)
+    }
 
     fun perPixelProbs(image: FlatImage): Probs {
         val probs = Mat(Size(1.0, image.numPixels().toDouble()), CvType.CV_32FC1)
@@ -153,27 +151,12 @@ class PixelBgModel(bgImage: Image) {
             var det = 1.0
             for (channel in 0 until 3) {
                 val delta = image.get(pixel, channel).toDouble() - (flatBgImage.get(pixel, channel)).toDouble()
-                println("delta: " + delta)
-                println("channel: " + channel)
-                println("channel variance: " + perPixelVariances.at(pixel, channel))
                 l2_debug += delta * delta
                 l2 += (delta * delta) / perPixelVariances.at(pixel, channel)
                 det *= perPixelVariances.at(pixel, channel)
-                println("det: " + det)
             }
 
-            val prob = if (det == 0.0) {
-                if (l2_debug == 0.0) {
-                    1.0
-                } else {
-                    0.0
-                }
-            } else {
-                exp(-1 / 2 * l2) / kotlin.math.sqrt(twoPiCubed * det)
-            }
-
-            println("prob: " + prob)
-            probs.put(pixel, 0, prob)
+            probs.put(pixel, 0, pdf(l2, det))
         }
 
         return Probs(probs)

@@ -87,13 +87,17 @@ class Image(internal val mat: Mat) {
         val variances = Mat()
         val eightNeighborhoodSize = Size(3.0, 3.0)
 
+        val floatMat = Mat()
+
+        mat.convertTo(floatMat, CvType.CV_32FC3, 1 / 255.0)
+
         // blurring is equivalent to finding the mean
-        Imgproc.blur(mat.mul(mat), meanOfSquare, eightNeighborhoodSize)
+        Imgproc.blur(floatMat.mul(floatMat), meanOfSquare, eightNeighborhoodSize)
         Imgcodecs.imwrite("meanOfSquare.png", meanOfSquare)
 
-        Imgproc.blur(mat, mean, eightNeighborhoodSize)
+        Imgproc.blur(floatMat, mean, eightNeighborhoodSize)
         val squareOfMean = mean.mul(mean)
-        Imgcodecs.imwrite("squareOfMean", squareOfMean)
+        Imgcodecs.imwrite("squareOfMean.png", squareOfMean)
 
         Core.subtract(meanOfSquare, squareOfMean, variances)
         val numPixels = mat.width() * mat.height()
