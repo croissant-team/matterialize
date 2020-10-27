@@ -2,6 +2,7 @@ package uk.ac.ic.matterialize.matting
 
 import org.opencv.core.Core
 import org.opencv.core.CvType.CV_32FC1
+import org.opencv.core.CvType.CV_64FC1
 import org.opencv.core.CvType.CV_8UC1
 import org.opencv.core.CvType.CV_8UC3
 import org.opencv.core.Mat
@@ -52,7 +53,7 @@ class FlatImage(internal val mat: Mat) {
 
     init {
         assert(mat.width() == numChannels)
-        val tempData = ByteArray(mat.width() * numChannels)
+        val tempData = ByteArray(numPixels() * numChannels)
         mat.get(0, 0, tempData)
         data = tempData.toUByteArray()
     }
@@ -104,8 +105,6 @@ class Probs(internal val mat: Mat) {
 class Image(internal val mat: Mat) {
      val flattened: FlatImage by lazy {
          val flatMat = mat.clone().reshape(1, mat.width() * mat.height())
-         println(mat.type())
-         println(flatMat.type())
          return@lazy FlatImage(flatMat)
     }
 
@@ -160,13 +159,14 @@ object GMMGlobalColorModel {
         println("samples: ${samples.size()}")
         trainedGMM.predict(samples, distribProbs)
         val ROW_SUM = 1
-        println("distribProps: ${distribProbs.size()}")
-        println("weights: ${trainedGMM.weights.size()}")
         val weights = Mat()
         Core.transpose(trainedGMM.weights, weights)
-        Core.reduce(distribProbs.mul(weights), result, ROW_SUM, CV_32FC1)
+        val results = Mat()
 
-        return Probs(result)
+        Core.gemm(distribProbs, weights, 1.0, Mat(), 0.0, results, 0)
+        Core.reduce(results, result, ROW_SUM, Core.REDUCE_SUM)
+
+        return Probs(results)
     }
 }
 
@@ -324,7 +324,7 @@ private class ColorModel(private val bgImage: Image) {
         // equation (4)
         Core.addWeighted(
             globalBgModel.globalProbs(image).mat, mixingFactor,
-            pixelBgModel.perPixelProbs(image).mat, 1 - mixingFactor, 0.0, result)
+            pixelBgModel.perPixelProbs(image).mat, 1 - mixingFactor, 0.0, result, CV_64FC1)
         return Probs(result)
     }
 
@@ -356,13 +356,6 @@ fun main() {
     Imgcodecs.imwrite("cache.png", exampleMat)
 
     val samples = exampleMat.clone().reshape(1, exampleMat.width() * exampleMat.height())
-    //for (y in 0 until samples.rows()) {
-    //    print("[")
-    //    for (x in 0 until samples.cols()) {
-    //        print(samples.get(y, x).contentToString())
-    //    }
-    //    println("]")
-    //}
     println(samples.channels())
 
     val t0 = System.currentTimeMillis()
