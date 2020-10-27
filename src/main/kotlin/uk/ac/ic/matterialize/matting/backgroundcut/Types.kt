@@ -4,8 +4,8 @@ import org.opencv.core.Core
 import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.core.Size
-import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
+import uk.ac.ic.matterialize.util.OpenCV.asDoubleArray
 
 class SegmentationResult(val image: Image, val bgMask: FlatMask) {
     companion object {
@@ -39,7 +39,8 @@ class FlatImage(internal val mat: Mat) {
 
     fun toSamples(): Mat {
         val result = Mat()
-        mat.convertTo(result, CvType.CV_32FC1)
+        // Note the CV_32_FC1 type is required by OpenCV to train GMMs
+        mat.reshape(1, numPixels()).convertTo(result, CvType.CV_32FC1)
         return result
     }
 }
@@ -47,7 +48,6 @@ class FlatImage(internal val mat: Mat) {
 class FlatMask(internal val mat: Mat) {
     private val data: UByteArray
     private val numChannels = 1
-
 
     init {
         assert(mat.width() == numChannels)
@@ -62,14 +62,19 @@ class FlatMask(internal val mat: Mat) {
 }
 
 class PixelVariances(internal val mat: Mat) {
+    private val data = mat.asDoubleArray()
+    private val numChannels = mat.channels()
+
     fun at(pixelIndex: Int, channel: Int): Double {
-        return mat.get(pixelIndex, channel)[0]
+        return data[pixelIndex * numChannels + channel]
     }
 }
 
 class Probs(internal val mat: Mat) {
+    private val data: DoubleArray = mat.asDoubleArray()
+
     fun at(pixelIndex: Int): Double {
-        return mat.get(pixelIndex, 0)[0]
+        return data[pixelIndex]
     }
 }
 
@@ -81,28 +86,28 @@ class Image(internal val mat: Mat) {
 
     // Returns array of per pixel variances, calculated in one the 8-neighborhood
     // of each pixel
-    fun getPerPixelVariances(): PixelVariances {
+    fun getPixelVariances(): PixelVariances {
         val meanOfSquare = Mat()
         val mean = Mat()
         val variances = Mat()
         val eightNeighborhoodSize = Size(3.0, 3.0)
 
-        val floatMat = Mat()
+        val matOfDoubles = Mat()
 
-        mat.convertTo(floatMat, CvType.CV_32FC3, 1 / 255.0)
+        // conver to double (CV_64FC3) to avoid overflowing ubytes (CV_8UC3)
+        mat.convertTo(matOfDoubles, CvType.CV_64FC3)
 
         // blurring is equivalent to finding the mean
-        Imgproc.blur(floatMat.mul(floatMat), meanOfSquare, eightNeighborhoodSize)
-        Imgcodecs.imwrite("meanOfSquare.png", meanOfSquare)
+        Imgproc.blur(matOfDoubles.mul(matOfDoubles), meanOfSquare, eightNeighborhoodSize)
+        Imgproc.blur(matOfDoubles, mean, eightNeighborhoodSize)
 
-        Imgproc.blur(floatMat, mean, eightNeighborhoodSize)
         val squareOfMean = mean.mul(mean)
-        Imgcodecs.imwrite("squareOfMean.png", squareOfMean)
-
         Core.subtract(meanOfSquare, squareOfMean, variances)
         val numPixels = mat.width() * mat.height()
+        val flatVariances= variances.reshape(3, numPixels)
 
-        return PixelVariances(variances.reshape(1, numPixels))
+
+        return PixelVariances(flatVariances)
     }
 
     fun resized(rows: Int, cols: Int): Image {

@@ -40,7 +40,7 @@ fun main() {
 
 class BackgroundCut(backgroundImage: Mat) : Matter {
     private val bgPixelModel = PixelBgModel(Image(backgroundImage))
-    private val fgModel = ForegroundModel(bgPixelModel)
+    private val fgModel = FgModel(bgPixelModel)
 
     override fun backgroundMask(videoFrame: Mat): Mat {
         return fgModel.backgroundMask(videoFrame)
