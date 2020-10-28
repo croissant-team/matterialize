@@ -4,8 +4,14 @@ import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.core.Scalar
 import org.opencv.core.Size
+import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
+import java.awt.Color
+import java.awt.color.ColorSpace.TYPE_RGB
+import java.awt.image.BufferedImage
+import java.awt.image.BufferedImage.TYPE_INT_RGB
 import java.awt.image.DataBufferByte
+import java.awt.image.DataBufferInt
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.roundToInt
@@ -75,9 +81,21 @@ object Compositor {
     }
 
     fun loadFile(src: String, type: Int = CvType.CV_8UC3): Mat {
-        val buffer = ImageIO.read(File(src))
+        var buffer = ImageIO.read(File(src))
+
+        if (buffer.type == 6) {
+            val img = BufferedImage(buffer.width, buffer.height, TYPE_RGB)
+
+            val g2d = img.createGraphics()
+            g2d.setColor(Color.WHITE)
+            g2d.fillRect(0, 0, img.getWidth(), img.getHeight())
+            g2d.drawImage(buffer, 0, 0, null)
+            g2d.dispose()
+            buffer = img
+        }
 
         val mat = Mat(buffer.height, buffer.width, type)
+
         mat.put(0, 0, (buffer.raster.dataBuffer as DataBufferByte).data)
 
         return mat
