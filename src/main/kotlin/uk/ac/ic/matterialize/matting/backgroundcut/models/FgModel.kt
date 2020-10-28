@@ -27,16 +27,20 @@ class FgModel(private val bgModel: PixelBgModel) : Matter {
     override fun backgroundMask(videoFrame: Mat): Mat {
         val image: FlatImage = Image(videoFrame).flattened
         val probs = bgModel.perPixelProbs(image)
-        for (i in 0 until 100) {
-            print(probs.at(i).toString() + ", ")
-        }
-        println("")
 
         val bgGmmFlatMask = Mat() // F in the paper
         Imgproc.threshold(probs.mat, bgGmmFlatMask, fgThreshold, 255.0, Imgproc.THRESH_BINARY_INV) // equation(5)
         bgGmmFlatMask.convertTo(bgGmmFlatMask, CvType.CV_8UC1)
 
-        return bgGmmFlatMask.reshape(1, videoFrame.rows())
+        val reshaped = bgGmmFlatMask.reshape(1, videoFrame.rows())
+
+        val result = Mat()
+
+        Imgproc.medianBlur(reshaped, result, 25)
+
+
+
+        return result
     }
 
     fun globalProbs(image: FlatImage, prevSegmentationResult: SegmentationResult): Probs {

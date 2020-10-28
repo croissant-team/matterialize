@@ -7,6 +7,7 @@ import kotlin.math.exp
 
 class PixelBgModel(bgImage: Image) {
     private val perPixelVariances = bgImage.getPixelVariances()
+
     private val flatBgImage = bgImage.flattened
 
     fun pdf(l2: Double, det: Double): Double {
