@@ -84,6 +84,56 @@ class Image(internal val mat: Mat) {
          return@lazy FlatImage(flatMat)
     }
 
+    private val numChannels = mat.channels()
+    private val width = mat.width()
+    private val height = mat.height()
+    private val numPixels = width * height
+    private val data: UByteArray
+
+    init {
+        val tempData = ByteArray(numPixels * numChannels)
+        mat.get(0, 0, tempData)
+        data = tempData.toUByteArray()
+    }
+
+    fun get(x: Int, y: Int, channel: Int): UByte {
+        return data[(y * width + x) * numChannels + channel]
+    }
+
+    fun getPixelVariances_(): PixelVariances {
+        val vars = DoubleArray(numPixels * numChannels)
+
+        for (y in 0 until height) {
+            for (x in 0 until width) {
+                val meanOfSquare = DoubleArray(numChannels)
+                val squareOfMean = DoubleArray(numChannels)
+                for (j in -1..1) {
+                    for (i in -1..1) {
+                        if (x + i < 0 || x + i >= width || y + j < 0 || y + j >= height) {
+                            continue
+                        }
+
+                        for (channel in 0 until numChannels) {
+                            val value = get(x + i, y + j, channel).toDouble()
+                            meanOfSquare[channel] += value * value
+                            squareOfMean[channel] += value
+                        }
+                    }
+                }
+
+                for (channel in 0 until numChannels) {
+                    meanOfSquare[channel] /= 9.0
+                    squareOfMean[channel] /= 9.0
+                    squareOfMean[channel] = squareOfMean[channel] * squareOfMean[channel]
+                    vars[(y * width + x) * numChannels + channel] = meanOfSquare[channel] - squareOfMean[channel]
+                }
+            }
+        }
+        val mat = Mat(numPixels, 1, CvType.CV_64FC3)
+        mat.put(0, 0, *vars)
+        return PixelVariances(mat)
+    }
+
     // Returns array of per pixel variances, calculated in one the 8-neighborhood
     // of each pixel
     fun getPixelVariances(): PixelVariances {

@@ -11,7 +11,7 @@ import uk.ac.ic.matterialize.matting.Matter
 class FgModel(private val bgModel: PixelBgModel) : Matter {
     val gmm: EM = EM.create()
     private val bgThreshold = 0.95
-    private val fgThreshold = 0.05
+    private val fgThreshold = 1E-20
     private val numComponents = 5
 
     init {

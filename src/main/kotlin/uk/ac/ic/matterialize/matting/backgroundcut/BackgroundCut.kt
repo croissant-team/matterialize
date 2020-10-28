@@ -34,8 +34,6 @@ fun main() {
 
     println("t1 - t0: ${t1 - t0}ms")
     println("t2 - t1: ${t2 - t1}ms")
-
-
 }
 
 class BackgroundCut(backgroundImage: Mat) : Matter {
