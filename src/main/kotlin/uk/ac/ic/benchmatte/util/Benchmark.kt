@@ -10,7 +10,7 @@ import uk.ac.ic.matterialize.matting.KMeansMatter
 import uk.ac.ic.matterialize.matting.Matter
 import uk.ac.ic.matterialize.matting.MatterMode
 import java.io.File
-import uk.ac.ic.matterialize.matting.backgroundcut.BackgroundCut
+import uk.ac.ic.matterialize.matting.backgroundcut.BackgroundCutMatter
 
 class Benchmark(private val masksPath: String, private val backgroundsPath: String, private val foregroundsPath: String) {
     val backgrounds = mutableListOf<Mat>()
@@ -45,7 +45,7 @@ class Benchmark(private val masksPath: String, private val backgroundsPath: Stri
                     MatterMode.FaceDetection -> FaceDetectionMatter()
                     MatterMode.BackgroundNegation -> BackgroundNegationMatter(bgMat)
                     MatterMode.OpenCV -> OpenCVMatter()
-                    MatterMode.BackgroundCut -> BackgroundCut(bgMat)
+                    MatterMode.BackgroundCut -> BackgroundCutMatter(bgMat)
                 }
 
                 // the initial run is discarded to account for initialisation times
