@@ -1,7 +1,6 @@
 package uk.ac.ic.matterialize.gui
 
 import javafx.embed.swing.SwingFXUtils
-import javafx.scene.image.ImageView
 import javafx.scene.image.WritableImage
 import matting.OpenCVMatter
 import org.opencv.core.CvType
@@ -61,7 +60,7 @@ class ImageProcessor {
         this.background = background
     }
 
-    fun processImage() : Pair<WritableImage, WritableImage> {
+    fun processImage(): Pair<WritableImage, WritableImage> {
         val img = inputCam.grab()
 
         val mat = when {
