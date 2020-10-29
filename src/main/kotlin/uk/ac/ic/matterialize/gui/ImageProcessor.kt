@@ -7,6 +7,7 @@ import org.opencv.core.CvType
 import org.opencv.core.Mat
 import uk.ac.ic.matterialize.camera.FakeWebcam
 import uk.ac.ic.matterialize.camera.OpenCVWebcam
+import uk.ac.ic.matterialize.camera.WebcamControls
 import uk.ac.ic.matterialize.matting.BackgroundNegationMatter
 import uk.ac.ic.matterialize.matting.FaceDetectionMatter
 import uk.ac.ic.matterialize.matting.KMeansMatter
@@ -21,6 +22,7 @@ import javax.imageio.ImageIO
 
 class ImageProcessor {
     val INPUT_DEVICE = 0
+    val webcamControls = WebcamControls(INPUT_DEVICE)
 
     // might need to change output device depending on configuration
     // dummy devices can be seen by by running `v4l2-ctl --list-devices`
@@ -36,6 +38,10 @@ class ImageProcessor {
     var background: Mat? = null
 
     fun setMatter(mode: MatterMode) {
+        webcamControls.enableAutomaticControls()
+        Thread.sleep(200)
+        webcamControls.disableAutomaticControls()
+
         println("mode changed to $mode")
         matter = when (mode) {
             MatterMode.KMeans -> KMeansMatter(inputCam.grab())

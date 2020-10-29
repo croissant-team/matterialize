@@ -6,7 +6,6 @@ import java.nio.ByteBuffer
 
 object Converter {
     @JvmStatic
-    @ExperimentalUnsignedTypes
     fun convertToYUYV(src: BufferedImage): ByteArray {
         val height = src.height
         val width = src.width
@@ -31,8 +30,8 @@ object Converter {
         return outputData.toByteArray()
     }
 
+    // roughly reproduces for Kotlin the C++ code found at http://jevois.org/doc/RawImageOps_8C_source.html#l01038
     @JvmStatic
-    @ExperimentalUnsignedTypes
     fun convertToYUYV(src: Mat): ByteArray {
         val height = src.height()
         val width = src.width()

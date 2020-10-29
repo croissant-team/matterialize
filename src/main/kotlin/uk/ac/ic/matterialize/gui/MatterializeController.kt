@@ -33,6 +33,7 @@ class MatterializeController : Controller() {
     fun stopCameras() {
         running = false
         imageProcessor.stopCameras()
+        imageProcessor.webcamControls.enableAutomaticControls()
     }
 
     fun initialiseWebCamThread() {
