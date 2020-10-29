@@ -7,12 +7,12 @@ import org.opencv.core.CvType
 import org.opencv.core.Mat
 import uk.ac.ic.matterialize.camera.FakeWebcam
 import uk.ac.ic.matterialize.camera.OpenCVWebcam
-import uk.ac.ic.matterialize.matting.backgroundcut.BackgroundCut
 import uk.ac.ic.matterialize.matting.BackgroundNegationMatter
 import uk.ac.ic.matterialize.matting.FaceDetectionMatter
 import uk.ac.ic.matterialize.matting.KMeansMatter
 import uk.ac.ic.matterialize.matting.Matter
 import uk.ac.ic.matterialize.matting.MatterMode
+import uk.ac.ic.matterialize.matting.backgroundcut.BackgroundCut
 import uk.ac.ic.matterialize.util.Converter
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte

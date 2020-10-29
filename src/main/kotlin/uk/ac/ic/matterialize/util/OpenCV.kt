@@ -1,6 +1,5 @@
 package uk.ac.ic.matterialize.util
 
-import org.opencv.core.CvType
 import org.opencv.core.Mat
 
 object OpenCV {

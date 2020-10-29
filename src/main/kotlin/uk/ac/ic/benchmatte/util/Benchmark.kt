@@ -4,12 +4,12 @@ import matting.OpenCVMatter
 import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.imgcodecs.Imgcodecs
-import uk.ac.ic.matterialize.matting.backgroundcut.BackgroundCut
 import uk.ac.ic.matterialize.matting.BackgroundNegationMatter
 import uk.ac.ic.matterialize.matting.FaceDetectionMatter
 import uk.ac.ic.matterialize.matting.KMeansMatter
 import uk.ac.ic.matterialize.matting.Matter
 import uk.ac.ic.matterialize.matting.MatterMode
+import uk.ac.ic.matterialize.matting.backgroundcut.BackgroundCut
 
 class Benchmark(private val maskPath: String, private val backgroundPath: String, private val foregroundPath: String) {
     lateinit var background: Mat

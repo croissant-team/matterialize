@@ -7,11 +7,13 @@ import org.opencv.core.TermCriteria
 import org.opencv.imgproc.Imgproc
 import org.opencv.ml.EM
 import uk.ac.ic.matterialize.matting.Matter
+import uk.ac.ic.matterialize.matting.backgroundcut.models.GMMGlobalColorModel
 
 class FgModel(private val bgModel: PixelBgModel) : Matter {
     val gmm: EM = EM.create()
     private val bgThreshold = 0.95
     private val fgThreshold = 1E-20
+    private val blurKernelSize = 25
     private val numComponents = 5
 
     init {
@@ -36,9 +38,7 @@ class FgModel(private val bgModel: PixelBgModel) : Matter {
 
         val result = Mat()
 
-        Imgproc.medianBlur(reshaped, result, 25)
-
-
+        Imgproc.medianBlur(reshaped, result, blurKernelSize)
 
         return result
     }

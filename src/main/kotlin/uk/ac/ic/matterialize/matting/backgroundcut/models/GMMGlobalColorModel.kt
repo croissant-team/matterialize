@@ -1,8 +1,10 @@
-package uk.ac.ic.matterialize.matting.backgroundcut
+package uk.ac.ic.matterialize.matting.backgroundcut.models
 
 import org.opencv.core.Core
 import org.opencv.core.Mat
 import org.opencv.ml.EM
+import uk.ac.ic.matterialize.matting.backgroundcut.FlatImage
+import uk.ac.ic.matterialize.matting.backgroundcut.Probs
 
 object GMMGlobalColorModel {
     // TODO Check if this is incorrect, but I'm pretty sure it does exactly equation (2)
@@ -21,4 +23,3 @@ object GMMGlobalColorModel {
         return Probs(probs)
     }
 }
-

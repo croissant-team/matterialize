@@ -79,9 +79,9 @@ class Probs(internal val mat: Mat) {
 }
 
 class Image(internal val mat: Mat) {
-     val flattened: FlatImage by lazy {
-         val flatMat = mat.clone().reshape(1, mat.width() * mat.height())
-         return@lazy FlatImage(flatMat)
+    val flattened: FlatImage by lazy {
+        val flatMat = mat.clone().reshape(1, mat.width() * mat.height())
+        return@lazy FlatImage(flatMat)
     }
 
     private val numChannels = mat.channels()
@@ -154,8 +154,7 @@ class Image(internal val mat: Mat) {
         val squareOfMean = mean.mul(mean)
         Core.subtract(meanOfSquare, squareOfMean, variances)
         val numPixels = mat.width() * mat.height()
-        val flatVariances= variances.reshape(3, numPixels)
-
+        val flatVariances = variances.reshape(3, numPixels)
 
         return PixelVariances(flatVariances)
     }

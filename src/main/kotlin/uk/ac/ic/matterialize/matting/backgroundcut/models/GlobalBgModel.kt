@@ -2,6 +2,7 @@ package uk.ac.ic.matterialize.matting.backgroundcut
 
 import org.opencv.core.TermCriteria
 import org.opencv.ml.EM
+import uk.ac.ic.matterialize.matting.backgroundcut.models.GMMGlobalColorModel
 
 class GlobalBgModel(private val bgImage: FlatImage) {
     private val gmm = EM.create()

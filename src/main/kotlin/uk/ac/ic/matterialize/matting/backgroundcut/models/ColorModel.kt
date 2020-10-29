@@ -28,8 +28,13 @@ class ColorModel(private val bgImage: Image) {
 
         // equation (4)
         Core.addWeighted(
-            globalBgModel.globalProbs(image).mat, mixingFactor,
-            pixelBgModel.perPixelProbs(image).mat, 1 - mixingFactor, 0.0, result, CvType.CV_64FC1
+            globalBgModel.globalProbs(image).mat,
+            mixingFactor,
+            pixelBgModel.perPixelProbs(image).mat,
+            1 - mixingFactor,
+            0.0,
+            result,
+            CvType.CV_64FC1
         )
         return Probs(result)
     }
