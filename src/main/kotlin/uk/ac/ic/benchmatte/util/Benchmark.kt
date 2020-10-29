@@ -9,8 +9,8 @@ import uk.ac.ic.matterialize.matting.FaceDetectionMatter
 import uk.ac.ic.matterialize.matting.KMeansMatter
 import uk.ac.ic.matterialize.matting.Matter
 import uk.ac.ic.matterialize.matting.MatterMode
-import java.io.File
 import uk.ac.ic.matterialize.matting.backgroundcut.BackgroundCutMatter
+import java.io.File
 
 class Benchmark(private val masksPath: String, private val backgroundsPath: String, private val foregroundsPath: String) {
     val backgrounds = mutableListOf<Mat>()

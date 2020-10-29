@@ -36,7 +36,7 @@ fun main() {
     println("t2 - t1: ${t2 - t1}ms")
 }
 
-class BackgroundCutMatter(backgroundImage: Mat): Matter {
+class BackgroundCutMatter(backgroundImage: Mat) : Matter {
     private val bgPixelModel = PixelBgModel(Image(backgroundImage))
     private val fgModel = FgModel(bgPixelModel)
 

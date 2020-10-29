@@ -42,7 +42,7 @@ fun main() {
                             +--------+--------+
                             
 
-            """.trimIndent()
+                """.trimIndent()
             )
         }
     }

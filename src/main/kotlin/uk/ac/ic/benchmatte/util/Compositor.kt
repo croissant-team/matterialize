@@ -4,14 +4,11 @@ import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.core.Scalar
 import org.opencv.core.Size
-import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
 import java.awt.Color
 import java.awt.color.ColorSpace.TYPE_RGB
 import java.awt.image.BufferedImage
-import java.awt.image.BufferedImage.TYPE_INT_RGB
 import java.awt.image.DataBufferByte
-import java.awt.image.DataBufferInt
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.roundToInt
