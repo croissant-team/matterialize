@@ -9,6 +9,7 @@ import uk.ac.ic.matterialize.matting.FaceDetectionMatter
 import uk.ac.ic.matterialize.matting.KMeansMatter
 import uk.ac.ic.matterialize.matting.Matter
 import uk.ac.ic.matterialize.matting.MatterMode
+import uk.ac.ic.matterialize.matting.backgroundcut.BackgroundCut
 
 class Benchmark(private val maskPath: String, private val backgroundPath: String, private val foregroundPath: String) {
     lateinit var background: Mat
@@ -33,10 +34,11 @@ class Benchmark(private val maskPath: String, private val backgroundPath: String
                 MatterMode.FaceDetection -> FaceDetectionMatter()
                 MatterMode.BackgroundNegation -> BackgroundNegationMatter(background)
                 MatterMode.OpenCV -> OpenCVMatter()
+                MatterMode.BackgroundCut -> BackgroundCut(background)
             }
 
             // the initial run is discarded to account for initialisation times
-            matter.foregroundMask(composed)
+            matter.backgroundMask(composed)
 
             matters.add(Pair(it, matter))
         }
@@ -52,7 +54,7 @@ class Benchmark(private val maskPath: String, private val backgroundPath: String
             println(mode)
 
             val start = System.currentTimeMillis()
-            val result = matter.foregroundMask(composed)
+            val result = matter.backgroundMask(composed)
             val end = System.currentTimeMillis()
 
             Imgcodecs.imwrite("_$mode.png", result)

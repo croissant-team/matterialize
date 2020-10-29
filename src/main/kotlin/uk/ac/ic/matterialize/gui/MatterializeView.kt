@@ -94,7 +94,8 @@ class MatterializeView : View("Matterialize") {
                         "KMeans" to MatterMode.KMeans,
                         "OpenCV" to MatterMode.OpenCV,
                         "Background Negation" to MatterMode.BackgroundNegation,
-                        "Face Detection" to MatterMode.FaceDetection
+                        "Face Detection" to MatterMode.FaceDetection,
+                        "Background Cut" to MatterMode.BackgroundCut
                     )
 
                     buttons.forEach { (text, name) ->

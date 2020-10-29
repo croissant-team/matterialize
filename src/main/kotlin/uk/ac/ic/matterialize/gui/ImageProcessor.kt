@@ -12,6 +12,7 @@ import uk.ac.ic.matterialize.matting.FaceDetectionMatter
 import uk.ac.ic.matterialize.matting.KMeansMatter
 import uk.ac.ic.matterialize.matting.Matter
 import uk.ac.ic.matterialize.matting.MatterMode
+import uk.ac.ic.matterialize.matting.backgroundcut.BackgroundCut
 import uk.ac.ic.matterialize.util.Converter
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
@@ -41,6 +42,7 @@ class ImageProcessor {
             MatterMode.FaceDetection -> FaceDetectionMatter()
             MatterMode.BackgroundNegation -> BackgroundNegationMatter(inputCam.grab())
             MatterMode.OpenCV -> OpenCVMatter()
+            MatterMode.BackgroundCut -> BackgroundCut(inputCam.grab())
         }
     }
 

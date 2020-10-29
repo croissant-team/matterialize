@@ -7,7 +7,7 @@ import uk.ac.ic.matterialize.matting.Matter
 class OpenCVMatter() : Matter {
     private val backgroundSubtractor = Video.createBackgroundSubtractorKNN()
 
-    override fun foregroundMask(videoFrame: Mat): Mat {
+    override fun backgroundMask(videoFrame: Mat): Mat {
         val mask = Mat()
         backgroundSubtractor.apply(videoFrame, mask)
 

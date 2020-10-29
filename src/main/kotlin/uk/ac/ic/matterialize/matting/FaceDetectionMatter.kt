@@ -12,7 +12,7 @@ import org.opencv.objdetect.CascadeClassifier
 class FaceDetectionMatter() : Matter {
     private val classifier = CascadeClassifier("src/main/resources/haarcascade_frontalface_default.xml")
 
-    override fun foregroundMask(videoFrame: Mat): Mat {
+    override fun backgroundMask(videoFrame: Mat): Mat {
         val mask = Mat(videoFrame.size(), CvType.CV_8U, Scalar(0.0))
         val gray = Mat()
         cvtColor(videoFrame, gray, COLOR_BGR2GRAY)

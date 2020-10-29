@@ -7,3 +7,5 @@
 /captures
 *.so
 /src/main/resources/adobe
+cache.png
+.attach_pid*

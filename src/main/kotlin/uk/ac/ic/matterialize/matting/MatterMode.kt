@@ -4,5 +4,6 @@ enum class MatterMode {
     KMeans,
     FaceDetection,
     BackgroundNegation,
-    OpenCV
+    OpenCV,
+    BackgroundCut
 }
