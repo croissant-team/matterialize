@@ -1,7 +1,7 @@
 package uk.ac.ic.matterialize.gui
 
 import javafx.embed.swing.SwingFXUtils
-import javafx.scene.image.ImageView
+import javafx.scene.image.WritableImage
 import matting.OpenCVMatter
 import org.opencv.core.CvType
 import org.opencv.core.Mat
@@ -34,17 +34,6 @@ class ImageProcessor {
     var matter: Matter? = null
     var background: Mat? = null
 
-    private lateinit var inputView: ImageView
-    private lateinit var outputView: ImageView
-
-    fun setInputImage(image: ImageView) {
-        inputView = image
-    }
-
-    fun setOutputImage(image: ImageView) {
-        outputView = image
-    }
-
     fun setMatter(mode: MatterMode) {
         println("mode changed to $mode")
         matter = when (mode) {
@@ -71,7 +60,7 @@ class ImageProcessor {
         this.background = background
     }
 
-    fun processImage() {
+    fun processImage(): Pair<WritableImage, WritableImage> {
         val img = inputCam.grab()
 
         val mat = when {
@@ -81,8 +70,10 @@ class ImageProcessor {
 
         outputCam.write(Converter.convertToYUYV(mat))
 
-        inputView.image = SwingFXUtils.toFXImage(OpenCVWebcam.convertToBufferedImage(img), null)
-        outputView.image = SwingFXUtils.toFXImage(OpenCVWebcam.convertToBufferedImage(mat), null)
+        val inputImage = SwingFXUtils.toFXImage(OpenCVWebcam.convertToBufferedImage(img), null)
+        val outputImage = SwingFXUtils.toFXImage(OpenCVWebcam.convertToBufferedImage(mat), null)
+
+        return Pair(inputImage, outputImage)
     }
 
     fun stopCameras() {
