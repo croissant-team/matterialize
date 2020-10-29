@@ -25,6 +25,8 @@ class Benchmark(private val masksPath: String, private val backgroundsPath: Stri
 
         File(backgroundsPath).listFiles().zip(File(foregroundsPath).listFiles()).forEach { (bg, fg) ->
 
+            println("Composing (bg) $bg with (fg) $fg")
+
             val bgMat = Compositor.loadFile(bg.path)
             val fgMat = Compositor.loadFile(fg.path)
 
@@ -58,19 +60,21 @@ class Benchmark(private val masksPath: String, private val backgroundsPath: Stri
 
     fun export() {
         (0 until composeds.size).forEach { i ->
-            Imgcodecs.imwrite(i.toString() + "_composed.png", composeds[i])
-            Imgcodecs.imwrite(i.toString() + "_mask.png", masks[i])
+            Imgcodecs.imwrite("images/output/${i}_composed.png", composeds[i])
+            Imgcodecs.imwrite("images/output/${i}_mask.png", masks[i])
         }
     }
 
     fun run(): List<List<Triple<MatterMode, Array<IntArray>, Long>>> {
+        var i = 0
         return matters.map { (imgMatter, composed, mask) ->
+            i++
             imgMatter.map { (mode, matter) ->
                 val start = System.currentTimeMillis()
                 val result = matter.backgroundMask(composed)
                 val end = System.currentTimeMillis()
 
-                Imgcodecs.imwrite("_$mode.png", result)
+                Imgcodecs.imwrite("images/output/${i - 1}_$mode.png", result)
 
                 val confusion = Scorer.difference(result, mask).first
 

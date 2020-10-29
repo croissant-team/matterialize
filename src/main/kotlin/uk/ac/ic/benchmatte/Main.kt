@@ -5,27 +5,49 @@ import uk.ac.ic.benchmatte.util.Benchmark
 fun main() {
     nu.pattern.OpenCV.loadLocally()
 
-    val benchmark = Benchmark("masks", "bg", "fg")
+    val benchmark = Benchmark("images/masks", "images/bg", "images/fg")
 
     benchmark.setup()
     benchmark.export()
 
     val results = benchmark.run()
 
-    results.forEach { imgResults ->
+    for (i in results.indices) {
+        val imgResults = results[i]
+        println("----------------------------------------------------------------")
         imgResults.forEach { (mode, matrix, time) ->
-            println(mode)
-            println("Confusion matrix:")
-            println("                  Predicted")
-            println("               bg     |     fg")
-            println("            ---------------------")
-            println("         bg | ${matrix[0][0]}    ${matrix[0][1]}  |")
-            println("Actual      |                   |")
-            println("         fg | ${matrix[1][0]}    ${matrix[1][1]}  |")
-            println("            ---------------------")
-            println("Time taken: ${time}ms\n")
-        }
+            val truePositives = matrix[1][1]
+            val falseNegatives = matrix[0][1]
+            val falsePositives = matrix[1][0]
+            val trueNegatives = matrix[0][0]
+            val precision = truePositives.toDouble() / (truePositives + falsePositives).toDouble()
+            val recall = truePositives.toDouble() / (truePositives + falseNegatives).toDouble()
+            val f1 = (2.0 * precision * recall) / (precision + recall)
+            val accuracy = (truePositives + trueNegatives).toDouble() /
+                (truePositives + trueNegatives + falsePositives + falseNegatives).toDouble()
+            println(
+                """
+                Confusion Matrix ($mode took ${time}ms for image $i)
+                  precision:  $precision
+                  recall:     $recall
+                  f1:         $f1
+                  accuracy:   $accuracy
 
-        println("\n")
+                                [Predicted]
+                                fg   |   bg
+                            +--------+--------+
+                         fg | ${pad(truePositives)} | ${pad(falseNegatives)} |
+                [Actual] ---+--------+--------+
+                         bg | ${pad(falsePositives)} | ${pad(trueNegatives)} |
+                            +--------+--------+
+                            
+
+            """.trimIndent()
+            )
+        }
     }
+}
+
+fun pad(count: Int, len: Int = 6): String {
+    return count.toString().padStart(len, ' ')
 }
