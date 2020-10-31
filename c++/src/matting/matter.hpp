@@ -13,6 +13,8 @@ enum class MatterMode {
 
 class IMatter {
 public:
+  virtual ~IMatter() = default;
+
   virtual cv::Mat background_mask(const cv::Mat &video_frame) = 0;
 
   cv::Mat
