@@ -3,6 +3,14 @@
 
 #include <opencv2/core.hpp>
 
+enum class MatterMode {
+  K_MEANS,
+  FACE_DETECTION,
+  BACKGROUND_NEGATION,
+  OPENCV,
+  BACKGROUND_CUT,
+};
+
 class IMatter {
 public:
   virtual cv::Mat background_mask(const cv::Mat &video_frame) = 0;
@@ -11,7 +19,7 @@ public:
 
   cv::Mat remove_background(const cv::Mat &video_frame);
 
-  cv::Mat greenscreen(const cv::Mat &video_frame);
+  cv::Mat green_screen(const cv::Mat &video_frame);
 };
 
 #endif

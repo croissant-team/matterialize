@@ -30,9 +30,9 @@ cv::Mat IMatter::remove_background(const cv::Mat &video_frame) {
   return result;
 }
 
-cv::Mat IMatter::greenscreen(const cv::Mat &video_frame) {
+cv::Mat IMatter::green_screen(const cv::Mat &video_frame) {
   const cv::Scalar scalar(0.0, 255.0, 0.0);
-  const cv::Mat greenscreen(video_frame.size(), video_frame.type(), scalar);
+  const cv::Mat green_screen(video_frame.size(), video_frame.type(), scalar);
 
-  return change_background(video_frame, greenscreen);
+  return change_background(video_frame, green_screen);
 }
