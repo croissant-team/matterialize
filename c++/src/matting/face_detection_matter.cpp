@@ -14,7 +14,8 @@ cv::Mat FaceDetectionMatter::background_mask(const cv::Mat &video_frame) {
   std::vector<cv::Rect> faces{};
 
   classifier.detectMultiScale(
-      gray, faces, 1.05, 8, 0, cv::Size(50.0, 50.0), cv::Size(150.0, 150.0));
+      gray, faces, 1.05, 8, 0, cv::Size2d(50.0, 50.0),
+      cv::Size2d(150.0, 150.0));
 
   for (cv::Rect &rect : faces) {
     for (int j{rect.y}; j <= mask.size().height; ++j) {

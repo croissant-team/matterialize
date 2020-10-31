@@ -9,12 +9,10 @@ class PixelVariance {
 private:
   const cv::Mat mat;
   const int num_channels;
-  const double *data;
 
 public:
   explicit PixelVariance(cv::Mat &&t_mat) noexcept
-      : mat{std::move(t_mat)},
-        num_channels{mat.channels()}, data{mat.ptr<double>()} {}
+      : mat{std::move(t_mat)}, num_channels{mat.channels()} {}
 
   double get(int pixel_index, int channel);
 };

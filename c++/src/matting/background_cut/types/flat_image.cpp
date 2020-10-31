@@ -3,7 +3,7 @@
 #include <opencv2/core.hpp>
 
 uchar FlatImage::get(int pixel_index, int channel) {
-  return data[pixel_index * num_channels + channel];
+  return mat.ptr<uchar>(0, 0)[pixel_index * num_channels + channel];
 }
 
 int FlatImage::num_pixels() {

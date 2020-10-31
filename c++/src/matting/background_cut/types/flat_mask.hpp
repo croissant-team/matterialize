@@ -7,11 +7,10 @@ class FlatMask {
 private:
   const cv::Mat mat;
   const int num_channels;
-  const uchar *data;
 
 public:
   explicit FlatMask(cv::Mat &&t_mat) noexcept
-      : mat{std::move(t_mat)}, num_channels{1}, data{mat.ptr<uchar>(0, 0)} {}
+      : mat{std::move(t_mat)}, num_channels{1} {}
 
   uchar get(int pixel_index);
 

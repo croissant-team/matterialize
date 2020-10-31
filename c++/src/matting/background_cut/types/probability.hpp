@@ -7,11 +7,9 @@
 
 class Probability {
   const cv::Mat mat;
-  const double *data;
 
 public:
-  explicit Probability(cv::Mat &&t_mat) noexcept
-      : mat{t_mat}, data{mat.ptr<double>()} {}
+  explicit Probability(cv::Mat &&t_mat) noexcept : mat{std::move(t_mat)} {}
 
   double get(int pixel_index);
 };
