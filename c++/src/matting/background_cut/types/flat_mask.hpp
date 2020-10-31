@@ -1,6 +1,8 @@
 #ifndef MATTERIALIZE_FLAT_MASK_HPP
 #define MATTERIALIZE_FLAT_MASK_HPP
 
+#include <utility>
+
 #include <opencv2/core.hpp>
 
 class FlatMask {
@@ -12,9 +14,9 @@ public:
   explicit FlatMask(cv::Mat &&t_mat) noexcept
       : mat{std::move(t_mat)}, num_channels{1} {}
 
-  uchar get(int pixel_index);
+  [[nodiscard]] uchar get(int pixel_index) const;
 
-  int num_pixels();
+  [[nodiscard]] int num_pixels() const;
 };
 
 #endif

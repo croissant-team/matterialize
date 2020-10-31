@@ -11,7 +11,7 @@ class Probability {
 public:
   explicit Probability(cv::Mat &&t_mat) noexcept : mat{std::move(t_mat)} {}
 
-  double get(int pixel_index);
+  [[nodiscard]] double get(int pixel_index) const;
 };
 
 #endif

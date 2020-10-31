@@ -14,11 +14,11 @@ public:
   explicit FlatImage(cv::Mat &&t_mat) noexcept
       : mat{std::move(t_mat)}, num_channels{3} {}
 
-  uchar get(int pixel_index, int channel);
+  [[nodiscard]] uchar get(int pixel_index, int channel) const;
 
-  int num_pixels();
+  [[nodiscard]] int num_pixels() const;
 
-  cv::Mat to_samples();
+  [[nodiscard]] cv::Mat to_samples() const;
 };
 
 #endif

@@ -9,7 +9,7 @@
 class FaceDetectionMatter : public IMatter {
 private:
   cv::CascadeClassifier classifier{
-      cv::CascadeClassifier("resources/haarcascade_frontalface_default.xml")};
+      "resources/haarcascade_frontalface_default.xml"};
 
 public:
   cv::Mat background_mask(const cv::Mat &video_frame) override;

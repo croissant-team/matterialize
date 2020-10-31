@@ -1,6 +1,7 @@
 #ifndef MATTERIALIZE_IMAGE_HPP
 #define MATTERIALIZE_IMAGE_HPP
 
+#include "flat_image.hpp"
 #include "pixel_variances.hpp"
 
 #include <utility>
@@ -10,27 +11,31 @@
 class Image {
 private:
   const cv::Mat mat;
+  const FlatImage flat;
 
-  int num_channels();
+  [[nodiscard]] int num_channels() const;
 
-  int height();
+  [[nodiscard]] int height() const;
 
-  int width();
+  [[nodiscard]] int width() const;
 
-  int num_pixels();
+  [[nodiscard]] int num_pixels() const;
 
 public:
-  explicit Image(cv::Mat &&t_mat) noexcept : mat{std::move(t_mat)} {}
+  explicit Image(cv::Mat &&t_mat) noexcept
+      : mat{std::move(t_mat)}, flat{mat.clone().reshape(1, num_pixels())} {}
 
-  uchar get(int x, int y, int channel);
+  [[nodiscard]] uchar get(int x, int y, int channel) const;
 
-  PixelVariance get_pixel_variances();
+  [[nodiscard]] PixelVariance get_pixel_variances() const;
 
-  Image resized(int rows, int cols);
+  [[nodiscard]] FlatImage flattened() const;
 
-  Image downscaled(int factor);
+  [[nodiscard]] Image resized(int rows, int cols) const;
 
-  Image upscaled(int factor);
+  [[nodiscard]] Image downscaled(int factor) const;
+
+  [[nodiscard]] Image upscaled(int factor) const;
 };
 
 #endif

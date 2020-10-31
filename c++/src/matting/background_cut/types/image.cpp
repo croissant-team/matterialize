@@ -5,27 +5,27 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 
-int Image::num_channels() {
+int Image::num_channels() const {
   return mat.channels();
 }
 
-int Image::height() {
+int Image::height() const {
   return mat.size().height;
 }
 
-int Image::width() {
+int Image::width() const {
   return mat.size().width;
 }
 
-int Image::num_pixels() {
+int Image::num_pixels() const {
   return mat.total();
 }
 
-uchar Image::get(int x, int y, int channel) {
+uchar Image::get(int x, int y, int channel) const {
   return mat.ptr<uchar>()[(y * width() + x) * num_channels() + channel];
 }
 
-PixelVariance Image::get_pixel_variances() {
+PixelVariance Image::get_pixel_variances() const {
   const cv::Size2d eight_neighborhood_size(3.0, 3.0);
   const cv::Mat mat_of_doubles{};
   cv::Mat mean_of_square{};
@@ -48,19 +48,24 @@ PixelVariance Image::get_pixel_variances() {
   return PixelVariance(std::move(flat_variances));
 }
 
-Image Image::resized(int rows, int cols) {
-  cv::Mat result{};
-  const cv::Size2d size(static_cast<double>(rows), static_cast<double>(cols));
+FlatImage Image::flattened() const {
+  return flat;
+}
 
-  cv::resize(mat, result, size);
+Image Image::resized(int rows, int cols) const {
+  cv::Mat result{};
+
+  cv::resize(
+      mat, result,
+      cv::Size2d(static_cast<double>(rows), static_cast<double>(cols)));
 
   return Image(std::move(result));
 }
 
-Image Image::downscaled(int factor) {
+Image Image::downscaled(int factor) const {
   return resized(width() / factor, height() / factor);
 }
 
-Image Image::upscaled(int factor) {
+Image Image::upscaled(int factor) const {
   return resized(width() * factor, height() * factor);
 }
