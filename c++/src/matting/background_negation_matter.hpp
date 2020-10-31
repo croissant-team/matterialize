@@ -3,15 +3,17 @@
 
 #include "matter.hpp"
 
+#include <utility>
+
 #include <opencv2/core.hpp>
 
 class BackgroundNegationMatter : public IMatter {
 private:
-  const cv::Mat &background;
+  const cv::Mat background;
 
 public:
-  explicit BackgroundNegationMatter(const cv::Mat &background)
-      : background{background} {}
+  explicit BackgroundNegationMatter(cv::Mat &&background) noexcept
+      : background{std::move(background)} {}
 
   cv::Mat background_mask(const cv::Mat &video_frame) override;
 };
