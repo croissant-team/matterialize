@@ -1,6 +1,8 @@
 #ifndef MATTERIALIZE_PIXEL_VARIANCES_HPP
 #define MATTERIALIZE_PIXEL_VARIANCES_HPP
 
+#include <utility>
+
 #include <opencv2/core.hpp>
 
 class PixelVariance {
@@ -10,9 +12,9 @@ private:
   const double *data;
 
 public:
-  explicit PixelVariance(cv::Mat &&t_mat)
-      : mat{t_mat}, num_channels{mat.channels()},
-        data{reinterpret_cast<double *>(mat.data)} {}
+  explicit PixelVariance(cv::Mat &&t_mat) noexcept
+      : mat{std::move(t_mat)},
+        num_channels{mat.channels()}, data{mat.ptr<double>()} {}
 
   double get(int pixel_index, int channel);
 };
