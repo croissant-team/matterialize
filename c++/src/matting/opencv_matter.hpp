@@ -8,7 +8,8 @@
 
 class OpenCVMatter : public IMatter {
 private:
-  cv::Ptr<cv::BackgroundSubtractor> background_subtractor{cv::createBackgroundSubtractorKNN()};
+  cv::Ptr<cv::BackgroundSubtractor> background_subtractor{
+      cv::createBackgroundSubtractorKNN()};
 
 public:
   cv::Mat background_mask(const cv::Mat &video_frame) override;

@@ -12,7 +12,9 @@ private:
   cv::VideoCapture capture;
 
 public:
-  OpenCVWebcam(int device, int width, int height) : device{device}, width{width}, height{height}, capture{cv::VideoCapture{}} {}
+  OpenCVWebcam(int device, int width, int height)
+      : device{device}, width{width}, height{height}, capture{
+                                                          cv::VideoCapture{}} {}
 
   void start();
 

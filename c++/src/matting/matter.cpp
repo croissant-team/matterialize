@@ -2,7 +2,8 @@
 
 #include <opencv2/core.hpp>
 
-cv::Mat IMatter::change_background(const cv::Mat &video_frame, const cv::Mat &new_background) {
+cv::Mat IMatter::change_background(
+    const cv::Mat &video_frame, const cv::Mat &new_background) {
   const cv::Mat &bg_mask{background_mask(video_frame)};
   cv::Mat fg_mask(bg_mask.size(), bg_mask.type());
 

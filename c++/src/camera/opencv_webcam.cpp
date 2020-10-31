@@ -37,7 +37,8 @@ long double OpenCVWebcam::fps(int samples) {
 
     auto end{std::chrono::system_clock::now()};
 
-    sum += std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    sum += std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
+               .count();
   }
 
   return 1000 / (sum / static_cast<long double>(samples));

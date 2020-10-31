@@ -10,7 +10,8 @@ private:
   const cv::Mat &background;
 
 public:
-  explicit BackgroundNegationMatter(const cv::Mat &background) : background{background} {}
+  explicit BackgroundNegationMatter(const cv::Mat &background)
+      : background{background} {}
 
   cv::Mat background_mask(const cv::Mat &video_frame) override;
 };

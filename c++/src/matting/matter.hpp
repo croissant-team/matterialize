@@ -15,7 +15,8 @@ class IMatter {
 public:
   virtual cv::Mat background_mask(const cv::Mat &video_frame) = 0;
 
-  cv::Mat change_background(const cv::Mat &video_frame, const cv::Mat &new_background);
+  cv::Mat
+  change_background(const cv::Mat &video_frame, const cv::Mat &new_background);
 
   cv::Mat remove_background(const cv::Mat &video_frame);
 
