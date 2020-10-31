@@ -17,10 +17,12 @@ cv::Mat FaceDetectionMatter::background_mask(const cv::Mat &video_frame) {
       gray, faces, 1.05, 8, 0, cv::Size(50.0, 50.0), cv::Size(150.0, 150.0));
 
   for (cv::Rect &rect : faces) {
-    for (int i{rect.x - rect.width / 2}; i < rect.x + (3 * rect.width) / 2;
-         ++i) {
-      for (int j{rect.y}; j <= mask.size().height; ++j) {
-        mask.at<cv::Vec2d>(j, i) = 255.0;
+    for (int j{rect.y}; j <= mask.size().height; ++j) {
+      auto *row{mask.ptr<cv::Vec2d>(j)};
+
+      for (int i{rect.x - rect.width / 2}; i < rect.x + (3 * rect.width) / 2;
+           ++i) {
+        row[i] = 255.0;
       }
     }
   }
