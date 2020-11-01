@@ -6,6 +6,7 @@
 
 #include <utility>
 
+#include <iostream>
 #include <opencv2/core.hpp>
 
 class Image {
@@ -23,7 +24,8 @@ private:
 
 public:
   explicit Image(cv::Mat &&t_mat) noexcept
-      : mat{std::move(t_mat)}, flat{mat.clone().reshape(1, num_pixels())} {}
+      : mat{std::move(t_mat)}, flat{mat.clone().reshape(1, num_pixels())} {
+    std::cout << "hey\n";}
 
   [[nodiscard]] uchar get(int x, int y, int channel) const;
 

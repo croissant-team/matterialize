@@ -17,7 +17,7 @@ Probability PixelBGModel::get_pixel_probability(const FlatImage &image) const {
 
   for (int pixel{}; pixel < image.num_pixels(); ++pixel) {
     double l2{};
-    double det{};
+    double det{1.0};
 
     for (int channel{}; channel < 3; ++channel) {
       const double delta{

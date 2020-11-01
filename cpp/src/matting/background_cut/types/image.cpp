@@ -26,12 +26,15 @@ uchar Image::get(int x, int y, int channel) const {
 }
 
 PixelVariance Image::get_pixel_variances() const {
+  std::cout << "hey3\n";
   const cv::Size2d eight_neighborhood_size(3.0, 3.0);
-  const cv::Mat mat_of_doubles{};
+  cv::Mat mat_of_doubles{};
   cv::Mat mean_of_square{};
   cv::Mat mean{};
+  std::cout << "hey7\n";
 
   mat.convertTo(mat_of_doubles, CV_64FC3);
+  std::cout << "hey6\n";
 
   cv::blur(
       mat_of_doubles.mul(mat_of_doubles), mean_of_square,
@@ -49,6 +52,7 @@ PixelVariance Image::get_pixel_variances() const {
 }
 
 FlatImage Image::flattened() const {
+  std::cout << "hey4\n";
   return flat;
 }
 

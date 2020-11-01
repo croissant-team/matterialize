@@ -16,7 +16,8 @@ private:
 public:
   explicit PixelBGModel(const Image &bg_image)
       : per_pixel_variance{bg_image.get_pixel_variances()},
-        flat_bg_image{bg_image.flattened()} {}
+        flat_bg_image{bg_image.flattened()} {
+    std::cout << "hey2\n";}
 
   [[nodiscard]] double pdf(double l2, double det) const;
 
