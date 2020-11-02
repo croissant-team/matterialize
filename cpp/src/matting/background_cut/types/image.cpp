@@ -21,20 +21,17 @@ int Image::num_pixels() const {
   return mat.total();
 }
 
-uchar Image::get(int x, int y, int channel) const {
-  return mat.ptr<uchar>()[(y * width() + x) * num_channels() + channel];
+uchar Image::get(int pixel_index, int channel) const {
+  return mat.ptr<uchar>()[pixel_index * num_channels() + channel];
 }
 
 PixelVariance Image::get_pixel_variances() const {
-  std::cout << "hey3\n";
   const cv::Size2d eight_neighborhood_size(3.0, 3.0);
   cv::Mat mat_of_doubles{};
   cv::Mat mean_of_square{};
   cv::Mat mean{};
-  std::cout << "hey7\n";
 
   mat.convertTo(mat_of_doubles, CV_64FC3);
-  std::cout << "hey6\n";
 
   cv::blur(
       mat_of_doubles.mul(mat_of_doubles), mean_of_square,
@@ -46,30 +43,11 @@ PixelVariance Image::get_pixel_variances() const {
 
   cv::subtract(mean_of_square, square_of_mean, variances);
 
-  cv::Mat flat_variances{variances.reshape(3, num_pixels())};
-
-  return PixelVariance(std::move(flat_variances));
+  return PixelVariance(std::move(variances));
 }
 
-FlatImage Image::flattened() const {
-  std::cout << "hey4\n";
-  return flat;
-}
-
-Image Image::resized(int rows, int cols) const {
+cv::Mat Image::to_samples() const {
   cv::Mat result{};
-
-  cv::resize(
-      mat, result,
-      cv::Size2d(static_cast<double>(rows), static_cast<double>(cols)));
-
-  return Image(std::move(result));
-}
-
-Image Image::downscaled(int factor) const {
-  return resized(width() / factor, height() / factor);
-}
-
-Image Image::upscaled(int factor) const {
-  return resized(width() * factor, height() * factor);
+  mat.clone().reshape(1, num_pixels()).convertTo(result, CV_32FC1);
+  return result;
 }

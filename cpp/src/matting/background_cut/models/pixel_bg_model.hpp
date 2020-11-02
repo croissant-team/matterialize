@@ -1,7 +1,6 @@
 #ifndef MATTERIALIZE_PIXEL_BG_MODEL_HPP
 #define MATTERIALIZE_PIXEL_BG_MODEL_HPP
 
-#include "../types/flat_image.hpp"
 #include "../types/image.hpp"
 #include "../types/pixel_variances.hpp"
 #include "../types/probability.hpp"
@@ -11,17 +10,16 @@
 class PixelBGModel {
 private:
   const PixelVariance per_pixel_variance;
-  const FlatImage flat_bg_image;
+  const Image bg_image;
 
 public:
   explicit PixelBGModel(const Image &bg_image)
       : per_pixel_variance{bg_image.get_pixel_variances()},
-        flat_bg_image{bg_image.flattened()} {
-    std::cout << "hey2\n";}
+        bg_image(bg_image) {}
 
   [[nodiscard]] double pdf(double l2, double det) const;
 
-  [[nodiscard]] Probability get_pixel_probability(const FlatImage &image) const;
+  [[nodiscard]] Probability get_pixel_probability(const Image &image) const;
 };
 
 #endif

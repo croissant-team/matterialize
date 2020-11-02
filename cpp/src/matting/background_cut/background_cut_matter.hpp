@@ -5,18 +5,20 @@
 #include "models/pixel_bg_model.hpp"
 #include "types/image.hpp"
 
-#include <utility>
 #include <iostream>
+#include <utility>
 
 #include <opencv2/core.hpp>
 
 class BackgroundCutMatter : public IMatter {
 public:
-  const PixelBGModel bgModel;
+  const PixelBGModel bg_model;
+  const double fg_thresh;
+  const int median_blur_kernel_size;
 
   explicit BackgroundCutMatter(const cv::Mat &&background) noexcept
-      : bgModel{PixelBGModel(Image(cv::Mat(background)))} {
-  }
+      : bg_model{PixelBGModel(Image(cv::Mat(background)))}, fg_thresh{1E-15},
+        median_blur_kernel_size{21} {}
 
   cv::Mat background_mask(const cv::Mat &video_frame) override;
 };

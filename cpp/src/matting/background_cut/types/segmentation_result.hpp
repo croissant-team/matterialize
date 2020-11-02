@@ -1,8 +1,8 @@
 #ifndef MATTERIALIZE_SEGMENTATION_RESULT_HPP
 #define MATTERIALIZE_SEGMENTATION_RESULT_HPP
 
-#include "flat_mask.hpp"
 #include "image.hpp"
+#include "mask.hpp"
 
 #include <utility>
 
@@ -11,9 +11,9 @@
 class SegmentationResult {
 private:
   const Image image;
-  const FlatMask bg_mask;
+  const Mask bg_mask;
 
-  SegmentationResult(Image &&image, FlatMask &&bg_mask) noexcept
+  SegmentationResult(Image &&image, Mask &&bg_mask) noexcept
       : image{std::move(image)}, bg_mask{std::move(bg_mask)} {}
 
 public:

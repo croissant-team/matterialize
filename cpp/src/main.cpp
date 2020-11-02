@@ -1,36 +1,37 @@
-#include "camera/fake_webcam.hpp"
 #include "camera/opencv_webcam.hpp"
-#include "camera/opencv_webcam_controls.hpp"
-#include "util/converter.hpp"
+#include "matting/background_cut/background_cut_matter.hpp"
+#include "opencv2/imgproc.hpp"
 
 #include <iostream>
-#include <v4l2cpp/V4l2Capture.h>
 
-using namespace std;
+#include <opencv2/highgui.hpp>
 
 int main() {
   std::cout << "Matterialize\n";
 
-  OpenCVWebcam webcam(0, 640, 480);
+  OpenCVWebcam webcam(0, 640, 360);
+
   webcam.start();
-  // The webcam must be started before the webcam controls are initialised
-  OpenCVWebcamControls opencv_controls(webcam);
-  // The webcam must be started before the fake webcam is initialised
-  FakeWebcam output(2, webcam);
-  output.start();
-  // The automatic controls should be disabled after the fake cam is initialised to give time for the automatic values to settle
-  opencv_controls.disable_automatic();
+
+  cv::namedWindow("Webcam", cv::WINDOW_NORMAL);
+  cv::resizeWindow("Webcam", 1280, 720);
+
+  const cv::Mat &clean{webcam.grab()};
+  auto matter = BackgroundCutMatter((const cv::Mat &&) clean);
 
   while (true) {
     const cv::Mat &frame{webcam.grab()};
+
+    const cv::Mat &mask{matter.green_screen(frame)};
 
     if (frame.empty()) {
       break;
     }
 
-    output.write(frame);
-  }
+    cv::imshow("Webcam", mask);
 
-  webcam.stop();
-  output.stop();
+    if (cv::waitKey(10) == 27) {
+      break;
+    }
+  }
 }
