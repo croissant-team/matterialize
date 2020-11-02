@@ -3,7 +3,7 @@
 using namespace std;
 
 vector<double>
-Converter::BGR_to_YUYV(vector<byte_t> bgr1, vector<byte_t> bgr2) {
+Converter::BGR_to_YUYV(const vector<byte_t> &bgr1, const vector<byte_t> &bgr2) {
   double y1 = (0.257 * bgr1[2]) + (0.504 * bgr1[1]) + (0.098 * bgr1[0]) + 16.0;
   double u = -(0.148 * bgr1[2]) - (0.291 * bgr1[1]) + (0.439 * bgr1[0]) + 128.0;
   double y2 = (0.257 * bgr2[2]) + (0.504 * bgr2[1]) + (0.098 * bgr2[0]) + 16.0;
@@ -12,7 +12,7 @@ Converter::BGR_to_YUYV(vector<byte_t> bgr1, vector<byte_t> bgr2) {
   return vector<double>(yuyv, yuyv + 4);
 }
 
-vector<byte_t> Converter::to_YUYV(cv::Mat src) {
+vector<byte_t> Converter::to_YUYV(const cv::Mat &src) {
   vector<byte_t> output_data{};
   vector<byte_t> input_data{};
   src.copyTo(input_data);

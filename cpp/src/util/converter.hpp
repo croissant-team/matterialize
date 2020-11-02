@@ -11,10 +11,11 @@ typedef uint8_t byte_t;
 
 class Converter {
 private:
-  static vector<double> BGR_to_YUYV(vector<byte_t> bgr1, vector<byte_t> bgr2);
+  static vector<double>
+  BGR_to_YUYV(const vector<byte_t> &bgr1, const vector<byte_t> &bgr2);
 
 public:
-  static vector<byte_t> to_YUYV(cv::Mat src);
+  static vector<byte_t> to_YUYV(const cv::Mat &src);
 };
 
 #endif
