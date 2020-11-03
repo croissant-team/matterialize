@@ -5,6 +5,8 @@
 #include <opencv2/videoio.hpp>
 
 class OpenCVWebcam {
+  friend class FakeWebcam;
+
 private:
   const int device;
   const int width;
