@@ -11,6 +11,7 @@ vector<double> Converter::BGR_to_YUYV(byte_t *bgr1, byte_t *bgr2) {
   return vector<double>(yuyv, yuyv + 4);
 }
 
+// Inspired by the open source code found at http://jevois.org/doc/RawImageOps_8C_source.html#l01038
 vector<byte_t> Converter::to_YUYV(const cv::Mat &src) {
   vector<byte_t> output_data{};
 
