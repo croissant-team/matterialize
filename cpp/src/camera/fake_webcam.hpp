@@ -28,7 +28,9 @@ public:
   }
 
   void start();
+
   void stop();
+
   void write(const cv::Mat &);
 };
 
