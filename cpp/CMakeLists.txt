@@ -17,7 +17,6 @@ add_executable(matterialize
         src/matting/opencv_matter.cpp src/matting/opencv_matter.hpp
         src/matting/background_negation_matter.cpp src/matting/background_negation_matter.hpp
         src/camera/opencv_webcam.cpp src/camera/opencv_webcam.hpp
-        src/matting/face_detection_matter.cpp src/matting/face_detection_matter.hpp
         src/matting/background_cut/background_cut_matter.cpp src/matting/background_cut/background_cut_matter.hpp
         src/matting/background_cut/models/pixel_bg_model.cpp src/matting/background_cut/models/pixel_bg_model.hpp
         src/matting/background_cut/types/mask.cpp src/matting/background_cut/types/mask.hpp

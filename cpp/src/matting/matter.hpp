@@ -5,7 +5,6 @@
 
 enum class MatterMode {
   K_MEANS,
-  FACE_DETECTION,
   BACKGROUND_NEGATION,
   OPENCV,
   BACKGROUND_CUT,
