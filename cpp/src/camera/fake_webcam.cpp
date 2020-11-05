@@ -4,7 +4,7 @@
 using namespace std;
 
 void FakeWebcam::write(const cv::Mat &frame) {
-  vector<byte_t> converted = Converter::to_YUYV(frame);
+  vector<uchar> converted = Converter::to_YUYV(frame);
   output->write((char *) &converted[0], converted.size());
 }
 

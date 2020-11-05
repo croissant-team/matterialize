@@ -1,48 +1,48 @@
+#include "camera/fake_webcam.hpp"
 #include "camera/opencv_webcam.hpp"
-#include "matting/background_cut/background_cut_matter.hpp"
-#include "opencv2/imgproc.hpp"
+#include "camera/opencv_webcam_controls.hpp"
+#include "util/converter.hpp"
 
 #include <iostream>
+#include <v4l2cpp/V4l2Capture.h>
 
-#include <opencv2/highgui.hpp>
+using namespace std;
+
+#define WIDTH 640
+#define HEIGHT 480
+#define INPUT_DEVICE 0
+#define OUTPUT_DEVICE 2
 
 int main() {
   std::cout << "Matterialize\n";
 
-  OpenCVWebcam webcam(0, 640, 360);
-
+  OpenCVWebcam webcam(INPUT_DEVICE, WIDTH, HEIGHT);
   webcam.start();
+  // The webcam must be started before the webcam controls are initialised
+  OpenCVWebcamControls opencv_controls(webcam);
+  // The webcam must be started before the fake webcam is initialised
+  FakeWebcam output(OUTPUT_DEVICE, WIDTH, HEIGHT);
+  output.start();
 
-  cv::namedWindow("Webcam", cv::WINDOW_NORMAL);
-  cv::resizeWindow("Webcam", 1280, 720);
-
-  system("v4l2-ctl -d /dev/video0 --set-ctrl=exposure_auto=3");
-  system("v4l2-ctl -d /dev/video0 --set-ctrl=white_balance_temperature_auto=1");
-
-  for (int i = 0; i < 100; i++) {
+  // Grab some frames to ensure exposure/white balance are setup correctly
+  int num_void_frames{60};
+  for (int i{0}; i < num_void_frames; ++i) {
     webcam.grab();
   }
 
-  system("v4l2-ctl -d /dev/video0 --set-ctrl=exposure_auto=1");
-  system("v4l2-ctl -d /dev/video0 --set-ctrl=white_balance_temperature_auto=0");
-
-  const cv::Mat &clean{webcam.grab()};
-  auto matter = BackgroundCutMatter((const cv::Mat &&) clean);
+  // The automatic controls should be disabled after the fake cam is initialised to give time for the automatic values to settle
+  opencv_controls.disable_automatic();
 
   while (true) {
-    auto start = std::chrono::high_resolution_clock::now();
     const cv::Mat &frame{webcam.grab()};
-    const cv::Mat &mask{matter.green_screen(frame)};
 
     if (frame.empty()) {
       break;
     }
-    auto end = std::chrono::high_resolution_clock::now();
-    std::cout << "Took " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms" << "\n";
-    
-    cv::imshow("Webcam", mask);
-    if (cv::waitKey(10) == 27) {
-      break;
-    }
+
+    output.write(frame);
   }
+
+  webcam.stop();
+  output.stop();
 }

@@ -7,14 +7,9 @@
 
 using namespace std;
 
-typedef uint8_t byte_t;
-
 class Converter {
-private:
-  static vector<double> BGR_to_YUYV(byte_t *bgr1, byte_t *bgr2);
-
 public:
-  static vector<byte_t> to_YUYV(const cv::Mat &src);
+  static vector<uchar> to_YUYV(const cv::Mat &src);
 };
 
 #endif
