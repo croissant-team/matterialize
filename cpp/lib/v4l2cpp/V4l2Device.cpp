@@ -141,9 +141,8 @@ int V4l2Device::checkCapabilities(int fd, unsigned int mandatoryCapabilities) {
     LOG(NOTICE) << m_params.m_devName << " support timeperframe";
 
   if ((cap.capabilities & mandatoryCapabilities) != mandatoryCapabilities) {
-    LOG(ERROR) << "Mandatory capability not available for device:"
+    LOG(WARN) << "Mandatory capability not available for device:"
                << m_params.m_devName;
-    return -1;
   }
 
   return 0;
