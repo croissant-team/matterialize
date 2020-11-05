@@ -6,6 +6,7 @@
 
 class OpenCVWebcam {
   friend class FakeWebcam;
+  friend class OpenCVWebcamControls;
 
 private:
   const int device;
