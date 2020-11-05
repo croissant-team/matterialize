@@ -25,6 +25,24 @@ uchar Image::get(int pixel_index, int channel) const {
   return mat.ptr<uchar>()[pixel_index * num_channels() + channel];
 }
 
+Image Image::resized(int rows, int cols) const {
+  cv::Mat result{};
+
+  cv::resize(
+      mat, result,
+      cv::Size2d(static_cast<double>(rows), static_cast<double>(cols)));
+
+  return Image(std::move(result));
+}
+
+Image Image::downscaled(int factor) const {
+  return resized(width() / factor, height() / factor);
+}
+
+Image Image::upscaled(int factor) const {
+  return resized(width() * factor, height() * factor);
+}
+
 PixelVariance Image::get_pixel_variances() const {
   const cv::Size2d eight_neighborhood_size(3.0, 3.0);
   cv::Mat mat_of_doubles{};

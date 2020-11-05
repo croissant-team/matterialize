@@ -11,7 +11,7 @@ public:
   const cv::Mat mat;
   explicit Probability(cv::Mat &&t_mat) noexcept : mat{std::move(t_mat)} {}
 
-  [[nodiscard]] double get(int pixel_index) const;
+  [[nodiscard]] double at(int pixel_index) const;
 };
 
 #endif

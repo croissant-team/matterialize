@@ -7,11 +7,11 @@
 
 constexpr auto PI{3.14159265358979323846};
 
-double PixelBGModel::pdf(double l2, double det) const {
+double PixelBgModel::pdf(double l2, double det) const {
   return std::exp(-(1 * l2) / 2) / std::sqrt(8 * PI * PI * PI * det);
 }
 
-Probability PixelBGModel::get_pixel_probability(const Image &image) const {
+Probability PixelBgModel::get_pixel_probability(const Image &image) const {
   cv::Mat probabilities(
       cv::Size2d(1.0, static_cast<double>(image.num_pixels())), CV_64FC1);
 
@@ -23,7 +23,7 @@ Probability PixelBGModel::get_pixel_probability(const Image &image) const {
       const double delta{
           static_cast<double>(image.get(pixel, channel)) -
           static_cast<double>(bg_image.get(pixel, channel))};
-      const double variance{per_pixel_variance.get(pixel, channel)};
+      const double variance{per_pixel_variance.at(pixel, channel)};
       // delta / variance can cause rounding issues to 0, hence brackets
       // required for safety with high variance values
       l2 += (delta * delta) / variance;

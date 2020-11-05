@@ -10,8 +10,6 @@
 
 class Image {
 private:
-  const cv::Mat mat;
-
   [[nodiscard]] int num_channels() const;
 
   [[nodiscard]] int height() const;
@@ -22,7 +20,7 @@ public:
   explicit Image(const cv::Mat &&t_mat) noexcept
       : mat{std::move(t_mat)} {}
 
-  //[[nodiscard]] uchar get(int x, int y, int channel) const;
+  //[[nodiscard]] uchar at(int x, int y, int channel) const;
   [[nodiscard]] uchar get(int pixel_index, int channel) const;
 
   [[nodiscard]] PixelVariance get_pixel_variances() const;
@@ -30,6 +28,13 @@ public:
   [[nodiscard]] int num_pixels() const;
 
   [[nodiscard]] cv::Mat to_samples() const;
+
+  [[nodiscard]] Image resized(int rows, int cols) const;
+
+  [[nodiscard]] Image downscaled(int factor) const;
+
+  [[nodiscard]] Image upscaled(int factor) const;
+  const cv::Mat mat;
 };
 
 #endif

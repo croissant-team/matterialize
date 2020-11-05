@@ -14,7 +14,7 @@ public:
   explicit PixelVariance(cv::Mat &&t_mat) noexcept
       : mat{std::move(t_mat)}, num_channels{mat.channels()} {}
 
-  [[nodiscard]] double get(int pixel_index, int channel) const;
+  [[nodiscard]] double at(int pixel_index, int channel) const;
 };
 
 #endif
