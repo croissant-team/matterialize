@@ -5,12 +5,22 @@
 
 #include <opencv2/core.hpp>
 
+namespace mask {
+  enum Label {
+    BACKGROUND = 0,
+    FOREGROUND = 1,
+  };
+}
+
+
 class Mask {
 private:
   const cv::Mat mat;
   const int num_channels;
 
 public:
+
+
   explicit Mask(cv::Mat &&t_mat) noexcept
       : mat{std::move(t_mat)}, num_channels{1} {}
 

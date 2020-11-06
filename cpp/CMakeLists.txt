@@ -32,7 +32,7 @@ add_executable(matterialize
         ${lib_src}
         src/camera/fake_webcam.hpp src/camera/fake_webcam.cpp
         src/camera/opencv_webcam_controls.cpp src/camera/opencv_webcam_controls.hpp
-        )
+        src/matting/background_cut/models/contrast_model.cpp src/matting/background_cut/models/contrast_model.hpp src/matting/background_cut/types/contrast_term.hpp src/matting/background_cut/types/contrast_term.cpp)
 
 target_link_libraries(matterialize ${OpenCV_LIBS})
 
