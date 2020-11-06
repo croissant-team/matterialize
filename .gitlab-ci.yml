@@ -2,12 +2,18 @@ default:
   image: openjdk:latest
 
 stages:
-  - hello_world
+  - check-cpp-formatting
 
 cache:
   policy: pull-push
 
-hello_world:
-  stage: hello_world
+check-cpp-formatting:
+  stage: check-cpp-formatting
   script:
-    - echo "Hello world!"
+    - cd cpp
+    - mkdir build
+    - cd build
+    - cmake ..
+    - cmake --build . --target clang-format-check-formatting
+    - cd ..
+    - rm -rf build
