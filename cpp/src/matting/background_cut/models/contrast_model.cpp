@@ -36,7 +36,8 @@ ContrastTerm ContrastModel::contrast_term(const Image &img) const {
           }
 
           int pixel_index{y * img_mat.cols + x};
-          int contrast_index{pixel_index * neighborhood_size + j * neighborhood_cols + i};
+          int contrast_offs{j * neighborhood_cols + i};
+          int contrast_index{pixel_index * neighborhood_size + contrast_offs};
 
           contrast.ptr<double>()[contrast_index] = _contrast;
         }
@@ -50,10 +51,9 @@ ContrastTerm ContrastModel::contrast_term(const Image &img) const {
   // beta in equation (7) of the paper
   const double robust_parameter = 1 / (2 * expected_contrast);
 
+  // No need to allocate another Mat
   Mat contrast_term = contrast;
   exp((- robust_parameter) * contrast, contrast_term);
 
-  // TODO not finished
-
-  return ContrastTerm();
+  return ContrastTerm(contrast, img_mat.cols);
 }
