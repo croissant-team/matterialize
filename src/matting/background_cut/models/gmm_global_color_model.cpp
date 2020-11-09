@@ -1,7 +1,7 @@
 #include "gmm_global_color_model.hpp"
 
 Probability
-GMMGlobalColorModel::global_probs(const Ptr<EM>& trainedGMM, const Image &img) {
+GMMGlobalColorModel::global_probs(const Ptr<EM> &trainedGMM, const Image &img) {
   Mat distribProbs{};
   Mat samples{img.to_samples()};
   trainedGMM->predict(samples, distribProbs);

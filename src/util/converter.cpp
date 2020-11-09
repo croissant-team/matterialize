@@ -23,10 +23,14 @@ vector<uchar> Converter::to_YUYV(const cv::Mat &src) {
           src.data[index_src + 3], src.data[index_src + 4],
           src.data[index_src + 5]};
 
-      double y1 = (0.257 * bgr1[2]) + (0.504 * bgr1[1]) + (0.098 * bgr1[0]) + 16.0;
-      double u = -(0.148 * bgr1[2]) - (0.291 * bgr1[1]) + (0.439 * bgr1[0]) + 128.0;
-      double y2 = (0.257 * bgr2[2]) + (0.504 * bgr2[1]) + (0.098 * bgr2[0]) + 16.0;
-      double v = (0.439 * bgr2[2]) - (0.368F * bgr2[1]) - (0.071 * bgr2[0]) + 128.0;
+      double y1 =
+          (0.257 * bgr1[2]) + (0.504 * bgr1[1]) + (0.098 * bgr1[0]) + 16.0;
+      double u =
+          -(0.148 * bgr1[2]) - (0.291 * bgr1[1]) + (0.439 * bgr1[0]) + 128.0;
+      double y2 =
+          (0.257 * bgr2[2]) + (0.504 * bgr2[1]) + (0.098 * bgr2[0]) + 16.0;
+      double v =
+          (0.439 * bgr2[2]) - (0.368F * bgr2[1]) - (0.071 * bgr2[0]) + 128.0;
 
       double yuyv[] = {y1, u, y2, v};
       for (int i{0}; i < 4; ++i) {

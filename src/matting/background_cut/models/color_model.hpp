@@ -16,10 +16,10 @@ private:
   // the global foreground model is learnt frame-by-frame and thus shouldn't be const
   GlobalFgModel global_fg_model;
 
-
 public:
   explicit ColorModel(const Image &bg_image)
-      : mix_factor{0.5}, global_bg_model{bg_image}, pixel_bg_model{bg_image}, global_fg_model{global_bg_model} {
+      : mix_factor{0.5}, global_bg_model{bg_image}, pixel_bg_model{bg_image},
+        global_fg_model{global_bg_model} {
     assert(0 <= mix_factor && mix_factor <= 1);
   }
 

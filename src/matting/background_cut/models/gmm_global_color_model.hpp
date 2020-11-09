@@ -10,7 +10,8 @@ using namespace cv::ml;
 using namespace cv;
 
 namespace GMMGlobalColorModel {
-  [[nodiscard]] Probability global_probs(const Ptr<EM>& trainedGMM, const Image &img);
+  [[nodiscard]] Probability
+  global_probs(const Ptr<EM> &trainedGMM, const Image &img);
 }
 
 #endif//MATTERIALIZE_GMM_GLOBAL_COLOR_MODEL_HPP

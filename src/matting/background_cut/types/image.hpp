@@ -17,8 +17,7 @@ private:
   [[nodiscard]] int width() const;
 
 public:
-  explicit Image(const cv::Mat &&t_mat) noexcept
-      : mat{std::move(t_mat)} {}
+  explicit Image(const cv::Mat &&t_mat) noexcept : mat{std::move(t_mat)} {}
 
   //[[nodiscard]] uchar at(int x, int y, int channel) const;
   [[nodiscard]] uchar get(int pixel_index, int channel) const;
