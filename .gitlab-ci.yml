@@ -3,6 +3,7 @@ default:
   before_script:
     - pacman -Syyu --noconfirm
     - pacman -S --noconfirm -y cmake clang jdk-openjdk
+    - archlinux-java set java-14-openjdk
     - export GRADLE_USER_HOME=`pwd`/.gradle
 
 stages:
