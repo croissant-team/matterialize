@@ -1,8 +1,8 @@
 default:
   image: archlinux:latest
   before_script:
-    - sudo pacman -Syyu
-    - sudo pacman -S --noconfirm -y cmake clang
+    - pacman -Syyu
+    - pacman -S --noconfirm -y cmake clang
     - export GRADLE_USER_HOME=`pwd`/.gradle
 
 stages:
