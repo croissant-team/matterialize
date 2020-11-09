@@ -1,0 +1,7 @@
+/home/andreas/Documents/university/year_3/SEGP/matterialize/cpp/build/CMakeFiles/rebuild_cache.dir
+/home/andreas/Documents/university/year_3/SEGP/matterialize/cpp/build/CMakeFiles/edit_cache.dir
+/home/andreas/Documents/university/year_3/SEGP/matterialize/cpp/build/CMakeFiles/clang-format-project-files.dir
+/home/andreas/Documents/university/year_3/SEGP/matterialize/cpp/build/CMakeFiles/clang-format-check-formatting.dir
+/home/andreas/Documents/university/year_3/SEGP/matterialize/cpp/build/CMakeFiles/googletest.dir
+/home/andreas/Documents/university/year_3/SEGP/matterialize/cpp/build/CMakeFiles/matterialize_tests.dir
+/home/andreas/Documents/university/year_3/SEGP/matterialize/cpp/build/CMakeFiles/matterialize.dir

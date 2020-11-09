@@ -1,11 +1,6 @@
-*.iml
-.gradle
-/local.properties
-/.idea
-.DS_Store
-/build
-/captures
-*.so
-/src/main/resources/adobe
-cache.png
-.attach_pid*
+*.swp
+
+cmake-build-debug/
+cmake-build-release/
+
+.idea/

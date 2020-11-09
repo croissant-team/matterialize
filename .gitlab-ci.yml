@@ -2,24 +2,12 @@ default:
   image: openjdk:latest
 
 stages:
-  - compile
-  - test
-
-before_script:
-  - export GRADLE_USER_HOME=`pwd`/.gradle
+  - hello_world
 
 cache:
-  paths:
-    - .gradle/caches
-    - .gradle/wrapper
   policy: pull-push
 
-compile:
-  stage: compile
+hello_world:
+  stage: hello_world
   script:
-    - ./gradlew assemble
-
-test:
-  stage: test
-  script:
-    - ./gradlew check
+    - echo "Hello world!"
