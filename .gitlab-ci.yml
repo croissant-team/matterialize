@@ -2,7 +2,7 @@ default:
   image: archlinux:latest
   before_script:
     - pacman -Syyu --noconfirm
-    - pacman -S --noconfirm -y cmake clang gcc g++
+    - pacman -S --noconfirm -y cmake clang gcc
 
 stages:
   - check-cpp-formatting
