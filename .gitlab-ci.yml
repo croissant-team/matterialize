@@ -1,9 +1,8 @@
 default:
-  image: ubuntu:latest
+  image: archlinux:latest
   before_script:
-    - sudo add-apt-repository ppa:openjdk-r/ppa
-    - sudo apt-get update
-    - apt-get install -y cmake clang-format openjdk-15
+    - sudo pacman -Syyu
+    - sudo pacman -S --noconfirm -y cmake clang
     - export GRADLE_USER_HOME=`pwd`/.gradle
 
 stages:
