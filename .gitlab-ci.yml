@@ -4,7 +4,9 @@ default:
     - pacman -Syyu --noconfirm
     - pacman -S --noconfirm -y cmake clang jdk-openjdk
     - archlinux-java set java-14-openjdk
+    - export PATH="/usr/lib/jvm/default/bin:$PATH"
     - export GRADLE_USER_HOME=`pwd`/.gradle
+    - source ~/.bashrc
 
 stages:
   - check-cpp-formatting
