@@ -13,10 +13,8 @@ cache:
 check-cpp-formatting:
   stage: check-cpp-formatting
   script:
-    - cd cpp
     - mkdir build
     - cd build
     - cmake ..
     - cmake --build . --target clang-format-check-formatting
-    - cd ..
     - rm -rf build
