@@ -2,7 +2,7 @@ default:
   image: ubuntu:latest
   before_script:
     - apt-get update
-    - apt-get install -y cmake clang-format openjdk
+    - apt-get install -y cmake clang-format openjdk-8-jdk
     - export GRADLE_USER_HOME=`pwd`/.gradle
 
 stages:
