@@ -3,6 +3,7 @@ default:
   before_script:
     - apt-get update
     - apt-get install -y cmake clang-format
+    - export GRADLE_USER_HOME=`pwd`/.gradle
 
 stages:
   - check-cpp-formatting
