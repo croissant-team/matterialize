@@ -14,6 +14,8 @@ else ()
 endif ()
 include_directories(${OpenCV_INCLUDE_DIRS} lib/)
 
+find_package(Pistache REQUIRED)
+include_directories(${Pistache_INCLUDE_DIRS} lib)
 
 file(GLOB_RECURSE lib
         ${PROJECT_SOURCE_DIR}/lib/*.hpp

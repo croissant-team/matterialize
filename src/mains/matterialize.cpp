@@ -3,10 +3,7 @@
 #include "../files/camera/opencv_webcam_controls.hpp"
 #include "../files/matting/background_cut/background_cut_matter.hpp"
 #include "../files/util/converter.hpp"
-
-#include <chrono>
-#include <iostream>
-#include <v4l2cpp/V4l2Capture.h>
+#include "../files/server/camera_endpoint.hpp"
 
 constexpr int width{640};
 constexpr int height{480};
@@ -31,6 +28,17 @@ int main() {
   // The automatic controls should be disabled after the fake cam is initialised
   // to give time for the automatic values to settle
   opencv_controls.disable_automatic();
+
+  // Begin REST server to allow for frontend communication
+  Pistache::Port port(9000);
+  int thr = 2;
+  Pistache::Address addr(Pistache::Ipv4::any(), port);
+
+  CameraEndpoint camEndpoint(addr);
+
+  camEndpoint.init(thr);
+  camEndpoint.start();
+
   while (true) {
     auto start{std::chrono::system_clock::now()};
     const cv::Mat frame{webcam.grab()};
