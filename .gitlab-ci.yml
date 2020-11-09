@@ -1,25 +1,6 @@
 default:
   image: openjdk:latest
 
-stages:
-  - compile
-  - test
-
-before_script:
-  - export GRADLE_USER_HOME=`pwd`/.gradle
-
 cache:
-  paths:
-    - .gradle/caches
-    - .gradle/wrapper
   policy: pull-push
 
-compile:
-  stage: compile
-  script:
-    - ./gradlew assemble
-
-test:
-  stage: test
-  script:
-    - ./gradlew check
