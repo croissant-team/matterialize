@@ -1,6 +1,13 @@
 default:
   image: openjdk:latest
 
+stages:
+  - hello_world
+
 cache:
   policy: pull-push
 
+hello_world:
+  stage: hello_world
+  script:
+    - echo "Hello world!"
