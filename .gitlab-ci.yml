@@ -1,5 +1,8 @@
 default:
   image: openjdk:latest
+  before_script:
+    - apt-get update
+    - apt-get install -y cmake clang-format
 
 stages:
   - check-cpp-formatting
