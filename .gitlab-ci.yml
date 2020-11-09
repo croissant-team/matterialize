@@ -1,8 +1,8 @@
 default:
-  image: ubuntu:latest
+  image: openjdk:16-jdk-slim-buster
   before_script:
     - apt-get update
-    - apt-get install -y cmake clang-format openjdk-8-jdk
+    - apt-get install -y cmake clang-format
     - export GRADLE_USER_HOME=`pwd`/.gradle
 
 stages:
