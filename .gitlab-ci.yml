@@ -1,13 +1,20 @@
 default:
-  image: openjdk:latest
+  image: archlinux:latest
+  before_script:
+    - pacman -Syyu --noconfirm
+    - pacman -S --noconfirm -y make cmake clang gcc opencv
 
 stages:
-  - hello_world
+  - check-cpp-formatting
 
 cache:
   policy: pull-push
 
-hello_world:
-  stage: hello_world
+check-cpp-formatting:
+  stage: check-cpp-formatting
   script:
-    - echo "Hello world!"
+    - mkdir build
+    - cd build
+    - cmake ..
+    - cmake --build . --target clang-format-check-formatting
+    - rm -rf build

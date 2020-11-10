@@ -142,7 +142,7 @@ int V4l2Device::checkCapabilities(int fd, unsigned int mandatoryCapabilities) {
 
   if ((cap.capabilities & mandatoryCapabilities) != mandatoryCapabilities) {
     LOG(WARN) << "Mandatory capability not available for device:"
-               << m_params.m_devName;
+              << m_params.m_devName;
   }
 
   return 0;

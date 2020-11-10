@@ -14,8 +14,8 @@ private:
 
 public:
   explicit PixelBgModel(const Image &bg_image)
-      : per_pixel_variance{bg_image.get_pixel_variances()},
-        bg_image{bg_image} {}
+      : per_pixel_variance{bg_image.get_pixel_variances()}, bg_image{bg_image} {
+  }
 
   [[nodiscard]] double pdf(double l2, double det) const;
 

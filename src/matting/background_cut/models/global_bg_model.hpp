@@ -22,19 +22,21 @@ public:
   explicit GlobalBgModel(const Image &bg_image)
       : gmm{EM::create()}, num_components{10}, max_iter_count{10} {
     TermCriteria term_criteria = gmm->getTermCriteria();
-    gmm->setTermCriteria(
-        TermCriteria(term_criteria.type, max_iter_count, term_criteria.epsilon));
+    gmm->setTermCriteria(TermCriteria(
+        term_criteria.type, max_iter_count, term_criteria.epsilon));
     gmm->setClustersNumber(num_components);
-    
+
     // Speeds up training though not necessary for training background model as
     // is only done once
     //gmm->setCovarianceMatrixType(EM::COV_MAT_SPHERICAL);
 
-    std::cout << "StartedTraining global background model" << "\n";
+    std::cout << "StartedTraining global background model"
+              << "\n";
     gmm->trainEM(bg_image.to_samples());
-    std::cout << "Finishing training global background model" << "\n";
+    std::cout << "Finishing training global background model"
+              << "\n";
   }
-  
+
   [[nodiscard]] Probability global_probs(const Image &img) const;
 };
 
