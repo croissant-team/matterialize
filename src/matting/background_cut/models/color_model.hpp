@@ -9,7 +9,7 @@
 
 class ColorModel {
 private:
-  const double mix_factor;
+  constexpr static double mix_factor{0};
   const GlobalBgModel global_bg_model;
   const PixelBgModel pixel_bg_model;
 
@@ -18,7 +18,7 @@ private:
 
 public:
   explicit ColorModel(const Image &bg_image)
-      : mix_factor{0.5}, global_bg_model{bg_image}, pixel_bg_model{bg_image},
+      : global_bg_model{bg_image}, pixel_bg_model{bg_image},
         global_fg_model{global_bg_model} {
     assert(0 <= mix_factor && mix_factor <= 1);
   }

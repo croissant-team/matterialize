@@ -5,7 +5,8 @@
 #include "../types/image.hpp"
 
 class ContrastModel {
-  [[nodiscard]] ContrastTerm contrast_term(const Image &img) const;
+public:
+  [[nodiscard]] static ContrastTerm contrast_term(const Image &img, double scale) ;
 };
 
 #endif//MATTERIALIZE_CONTRAST_MODEL_HPP

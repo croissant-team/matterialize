@@ -9,12 +9,12 @@ using namespace cv;
 
 class ContrastTerm {
 private:
-  int image_width;
-  Mat contrasts;
-
   [[nodiscard]] int offset_in_contrasts(int p1, int p2) const;
 
 public:
+  int image_width;
+  Mat contrasts;
+
   ContrastTerm(Mat contrasts, int image_width)
       : contrasts{std::move(contrasts)}, image_width{image_width} {};
 

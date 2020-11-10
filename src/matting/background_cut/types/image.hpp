@@ -12,10 +12,6 @@ class Image {
 private:
   [[nodiscard]] int num_channels() const;
 
-  [[nodiscard]] int height() const;
-
-  [[nodiscard]] int width() const;
-
 public:
   explicit Image(const cv::Mat &&t_mat) noexcept : mat{std::move(t_mat)} {}
 
@@ -34,6 +30,8 @@ public:
 
   [[nodiscard]] Image upscaled(int factor) const;
   const cv::Mat mat;
+  [[nodiscard]] int height() const;
+  [[nodiscard]] int width() const;
 };
 
 #endif

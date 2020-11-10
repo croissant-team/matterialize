@@ -10,13 +10,13 @@ double ContrastTerm::at(
 
 // TODO Ask andreas if we need rows (i.e. height) for anything
 int ContrastTerm::offset_in_contrasts(int p1, int p2) const {
-  int y1 = p1 / image_width;
-  int x1 = p1 % image_width;
-  int y2 = p2 / image_width;
-  int x2 = p2 % image_width;
+  const int y1 = p1 / image_width;
+  const int x1 = p1 % image_width;
+  const int y2 = p2 / image_width;
+  const int x2 = p2 % image_width;
 
   // clang-format off
-  int offsets[3][3] = {
+  const int offsets[3][3] = {
       {0, 1, 2},
       {3, INT_MAX, 5},
       {6, 7, 8}

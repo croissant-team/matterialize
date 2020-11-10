@@ -10,11 +10,11 @@ int Image::num_channels() const {
 }
 
 int Image::height() const {
-  return mat.size().height;
+  return mat.rows;
 }
 
 int Image::width() const {
-  return mat.size().width;
+  return mat.cols;
 }
 
 int Image::num_pixels() const {
@@ -30,17 +30,17 @@ Image Image::resized(int rows, int cols) const {
 
   cv::resize(
       mat, result,
-      cv::Size2d(static_cast<double>(rows), static_cast<double>(cols)));
+      cv::Size2d(static_cast<double>(cols), static_cast<double>(rows)));
 
   return Image(std::move(result));
 }
 
 Image Image::downscaled(int factor) const {
-  return resized(width() / factor, height() / factor);
+  return resized(height() / factor, width() / factor);
 }
 
 Image Image::upscaled(int factor) const {
-  return resized(width() * factor, height() * factor);
+  return resized(height() * factor, width() * factor);
 }
 
 PixelVariance Image::get_pixel_variances() const {
