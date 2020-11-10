@@ -17,6 +17,9 @@ include_directories(${OpenCV_INCLUDE_DIRS} lib/)
 find_package(Pistache REQUIRED)
 include_directories(${Pistache_INCLUDE_DIRS} lib)
 
+find_package(RapidJSON REQUIRED)
+include_directories(${RapidJSON_INCLUDE_DIRS} lib)
+
 file(GLOB_RECURSE lib
         ${PROJECT_SOURCE_DIR}/lib/*.hpp
         ${PROJECT_SOURCE_DIR}/lib/*.cpp
@@ -30,7 +33,7 @@ file(GLOB_RECURSE src
 set(MATTERIALIZE_SRC_FILES ${src} ${lib})
 
 add_executable(matterialize ${MATTERIALIZE_SRC_FILES} ${PROJECT_SOURCE_DIR}/src/mains/matterialize.cpp)
-target_link_libraries(matterialize ${OpenCV_LIBS})
+target_link_libraries(matterialize pistache_static ${RapidJSON_LIBS} ${OpenCV_LIBS})
 
 add_executable(benchmatte ${MATTERIALIZE_SRC_FILES} ${PROJECT_SOURCE_DIR}/src/mains/benchmatte.cpp)
 target_link_libraries(benchmatte ${OpenCV_LIBS})
