@@ -25,7 +25,7 @@ file(GLOB_RECURSE src
         ${PROJECT_SOURCE_DIR}/src/*.cpp
         )
 
-set(MATTERIALIZE_SRC_FILES ${src} ${lib})
+set(MATTERIALIZE_SRC_FILES ${src} ${lib} src/benchmatte/benchmark.cpp src/benchmatte/benchmark.hpp src/benchmatte/compositor.cpp src/benchmatte/compositor.hpp src/benchmatte/confusion_matrix.cpp src/benchmatte/confusion_matrix.hpp src/benchmatte/benchmark_result.hpp src/benchmatte/scorer.cpp src/benchmatte/scorer.hpp)
 
 add_executable(matterialize ${MATTERIALIZE_SRC_FILES})
 

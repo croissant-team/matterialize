@@ -12,7 +12,7 @@ private:
   const cv::Mat background;
 
 public:
-  explicit BackgroundNegationMatter(cv::Mat &&background) noexcept
+  explicit BackgroundNegationMatter(cv::Mat &background) noexcept
       : background{std::move(background)} {}
 
   cv::Mat background_mask(const cv::Mat &video_frame) override;
