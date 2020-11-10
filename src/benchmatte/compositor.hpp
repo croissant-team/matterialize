@@ -15,11 +15,13 @@ private:
     Size size;
   };
 
-  ForegroundTransform calculate_foreground_transform(Mat &background, Mat &foreground);
-  vector<double> lerp(double *background_values, double *foreground_values, double alpha);
+  ForegroundTransform
+  calculate_foreground_transform(Mat &background, Mat &foreground);
+  vector<double>
+  lerp(double *background_values, double *foreground_values, double alpha);
+
 public:
-  pair<Mat, Mat>
-  compose(Mat &background, Mat &foreground, Mat &mask);
+  pair<Mat, Mat> compose(Mat &background, Mat &foreground, Mat &mask);
 };
 
 #endif

@@ -2,9 +2,9 @@
 #define MATTERIALIZE_SRC_BENCHMATTE_BENCHMARK_HPP
 
 #include "../matting/matter.hpp"
+#include "benchmark_result.hpp"
 #include "compositor.hpp"
 #include "confusion_matrix.hpp"
-#include "benchmark_result.hpp"
 #include <filesystem>
 #include <iostream>
 #include <opencv2/opencv.hpp>

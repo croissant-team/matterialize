@@ -14,6 +14,7 @@ private:
   int *falsePositives = &matrix[1][0];
   static string pad(int number, int length);
   string to_string();
+
 public:
   void increment(int a, int b);
   double calculate_precision();

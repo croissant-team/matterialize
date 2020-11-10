@@ -1,8 +1,10 @@
 #include "compositor.hpp"
 
-pair<Mat, Mat> Compositor::compose(Mat &background, Mat &foreground, Mat &mask) {
+pair<Mat, Mat>
+Compositor::compose(Mat &background, Mat &foreground, Mat &mask) {
   if (foreground.size() == mask.size()) {
-    ForegroundTransform transform = calculate_foreground_transform(background, foreground);
+    ForegroundTransform transform =
+        calculate_foreground_transform(background, foreground);
     resize(foreground, foreground, transform.size);
     resize(mask, mask, transform.size);
     Mat result_mask = Mat(background.size(), CV_8U, Scalar(0.0, 0.0, 0.0));
@@ -13,7 +15,9 @@ pair<Mat, Mat> Compositor::compose(Mat &background, Mat &foreground, Mat &mask) 
         double alpha = mask.ptr<double>(y, x)[0] / 255.0;
         int new_x = x + transform.x_offset;
         int new_y = y + transform.y_offset;
-        vector<double> blend = lerp(background.ptr<double>(new_y, new_x), foreground.ptr<double>(new_y, new_x), alpha);
+        vector<double> blend = lerp(
+            background.ptr<double>(new_y, new_x),
+            foreground.ptr<double>(new_y, new_x), alpha);
         for (int i = 0; i < 3; i++) {
           new_image.ptr<double>(new_y, new_x)[i] = blend[i];
         }
@@ -25,7 +29,8 @@ pair<Mat, Mat> Compositor::compose(Mat &background, Mat &foreground, Mat &mask) 
   return make_pair(background, mask);
 }
 
-Compositor::ForegroundTransform Compositor::calculate_foreground_transform(Mat &background, Mat &foreground) {
+Compositor::ForegroundTransform
+Compositor::calculate_foreground_transform(Mat &background, Mat &foreground) {
   double height = foreground.rows;
   double width = foreground.cols;
   if (height > background.rows) {
@@ -54,7 +59,8 @@ vector<double> Compositor::lerp(
     } else if (alpha <= 0.0) {
       result.push_back(background_values[i]);
     } else {
-      result.push_back((1.0 - alpha) * background_values[i] + alpha * foreground_values[i]);
+      result.push_back(
+          (1.0 - alpha) * background_values[i] + alpha * foreground_values[i]);
     }
   }
   return result;
