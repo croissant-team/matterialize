@@ -1,7 +1,7 @@
 #include "contrast_term.hpp"
 
 // Equation (7)
-double ContrastTerm::at(
+double ContrastTerm::between(
     int pixel1, int pixel2, mask::Label label1, mask::Label label2) const {
    double contrast = contrasts.ptr<double>()[pixel1 * 9 + offset_in_contrasts(pixel1, pixel2)];
    return abs(label1 - label2) * contrast;

@@ -30,7 +30,7 @@ Probability PixelBgModel::get_pixel_probability(const Image &image) const {
       det *= variance;
     }
 
-    *probabilities.ptr<double>(pixel) = pdf(l2, det);
+    *probabilities.ptr<double>(pixel) = std::min<double>(pdf(l2, det) * magic_scaling, 1);
   }
 
   return Probability(std::move(probabilities));

@@ -9,7 +9,7 @@
 
 class ColorModel {
 private:
-  constexpr static double mix_factor{1};
+  constexpr static double mix_factor{0.35};
   const GlobalBgModel global_bg_model;
   const PixelBgModel pixel_bg_model;
 

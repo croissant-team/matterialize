@@ -19,7 +19,7 @@ public:
       : contrasts{std::move(contrasts)}, image_width{image_width} {};
 
   [[nodiscard]] double
-  at(int pixel1, int pixel2, mask::Label label1, mask::Label label2) const;
+  between(int pixel1, int pixel2, mask::Label label1, mask::Label label2) const;
 };
 
 #endif//MATTERIALIZE_CONTRAST_TERM_HPP
