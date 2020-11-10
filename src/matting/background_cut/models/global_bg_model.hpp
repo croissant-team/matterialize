@@ -19,8 +19,8 @@ private:
 public:
   explicit GlobalBgModel(const Image &bg_image) : gmm{EM::create()} {
     TermCriteria term_criteria = gmm->getTermCriteria();
-    //gmm->setTermCriteria(TermCriteria(
-    //    term_criteria.type, max_iter_count, term_criteria.epsilon));
+    gmm->setTermCriteria(TermCriteria(
+        term_criteria.type, max_iter_count, term_criteria.epsilon));
     gmm->setClustersNumber(num_components);
 
     // Speeds up training though not necessary for training background model as

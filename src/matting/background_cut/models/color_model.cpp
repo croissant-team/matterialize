@@ -15,15 +15,15 @@ Probability ColorModel::mix_probs(const Image &img) const {
 }
 ColorTerm ColorModel::color_term(
     const Image &img, const SegmentationResult &prev_segmentation_result) {
-  Mat bgEnergies{};
-  Mat fgEnergies{};
+  Mat bg_energies{};
+  Mat fg_energies{};
 
-  log(mix_probs(img).mat, bgEnergies);
-  multiply(bgEnergies, Scalar(-1.0), bgEnergies);
+  log(mix_probs(img).mat, bg_energies);
+  multiply(bg_energies, Scalar(-1.0), bg_energies);
 
   log(global_fg_model.global_probs(img, prev_segmentation_result).mat,
-      fgEnergies);
-  multiply(fgEnergies, Scalar(-1.0), fgEnergies);
+      fg_energies);
+  multiply(fg_energies, Scalar(-1.0), fg_energies);
 
-  return ColorTerm(std::move(bgEnergies), std::move(fgEnergies));
+  return ColorTerm(std::move(bg_energies), std::move(fg_energies));
 }

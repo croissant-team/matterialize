@@ -16,7 +16,7 @@
 class BackgroundCutMatter : public IMatter {
 private:
   constexpr static int downscale_factor{2};
-  constexpr static int median_blur_kernel_size{21};
+  constexpr static int median_blur_kernel_size{11};
   constexpr static double contrast_term_scale{1};// lambda in equation (1)
 
   const SegmentationResult prev_segmentation_res;

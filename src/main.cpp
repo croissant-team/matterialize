@@ -11,7 +11,7 @@ constexpr int width{640};
 constexpr int height{480};
 constexpr int input_device{0};
 constexpr int output_device{2};
-constexpr int num_void_frames{60};
+constexpr int num_void_frames{120};
 
 int main() {
   std::cout << "Matterialize\n";
