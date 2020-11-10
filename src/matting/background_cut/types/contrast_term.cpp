@@ -3,10 +3,10 @@
 // Equation (7)
 double ContrastTerm::between(
     int pixel1, int pixel2, mask::Label label1, mask::Label label2) const {
-   double contrast = contrasts.ptr<double>()[pixel1 * 9 + offset_in_contrasts(pixel1, pixel2)];
-   return abs(label1 - label2) * contrast;
+  double contrast =
+      contrasts.ptr<double>()[pixel1 * 9 + offset_in_contrasts(pixel1, pixel2)];
+  return abs(label1 - label2) * contrast;
 }
-
 
 // TODO Ask andreas if we need rows (i.e. height) for anything
 int ContrastTerm::offset_in_contrasts(int p1, int p2) const {

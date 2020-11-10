@@ -39,8 +39,8 @@ int main() {
     cv::Mat result{matter.green_screen(frame)};
     output.write(result);
     std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::system_clock::now() - start)
-        .count()
+                     std::chrono::system_clock::now() - start)
+                     .count()
               << '\n';
   }
   webcam.stop();

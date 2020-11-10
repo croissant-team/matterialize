@@ -12,15 +12,12 @@ namespace mask {
   };
 }
 
-
 class Mask {
 private:
   const cv::Mat mat;
   const int num_channels;
 
 public:
-
-
   explicit Mask(cv::Mat &&t_mat) noexcept
       : mat{std::move(t_mat)}, num_channels{1} {}
 

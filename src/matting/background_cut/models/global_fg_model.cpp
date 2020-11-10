@@ -8,9 +8,10 @@ Probability GlobalFgModel::global_probs(
   Mat samples{find_fg_samples(img, prev_segmentation_result)};
   // everything might be background (we have no data to train the foreground model)
   if (samples.empty()) {
-    return Probability(std::move(Mat::zeros(img.mat.rows, img.mat.cols, CV_64FC1)));
+    return Probability(
+        std::move(Mat::zeros(img.mat.rows, img.mat.cols, CV_64FC1)));
   }
-    gmm->trainEM(samples);
+  gmm->trainEM(samples);
   return GMMGlobalColorModel::global_probs(gmm, img);
 }
 Mat GlobalFgModel::find_fg_samples(
@@ -53,4 +54,3 @@ Mat GlobalFgModel::find_fg_samples(
 
   return std::move(samples);
 }
-
