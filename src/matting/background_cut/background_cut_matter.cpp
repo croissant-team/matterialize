@@ -10,6 +10,8 @@ cv::Mat BackgroundCutMatter::background_mask(const cv::Mat &video_frame) {
   Image img{cv::Mat(video_frame)};
   Image downscaled_img = img.downscaled(downscale_factor);
   Probability probs = color_model.mix_probs(downscaled_img);
+  //ColorTerm color_term = color_model.color_term(downscaled_img, prev_segmentation_res);
+
 
   Mat downscaled_flat_mask{};
   threshold(probs.mat, downscaled_flat_mask, 0.05, 255.0, THRESH_BINARY_INV);

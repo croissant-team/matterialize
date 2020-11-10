@@ -9,7 +9,7 @@
 
 class ColorModel {
 private:
-  constexpr static double mix_factor{0.35};
+  const double mix_factor;
   const GlobalBgModel global_bg_model;
   const PixelBgModel pixel_bg_model;
 
@@ -17,9 +17,15 @@ private:
   GlobalFgModel global_fg_model;
 
 public:
-  explicit ColorModel(const Image &bg_image)
-      : global_bg_model{bg_image}, pixel_bg_model{bg_image},
-        global_fg_model{global_bg_model} {
+  explicit ColorModel(
+      const Image &bg_image, double mix_factor,
+      int global_bg_model_num_components, int global_fg_model_num_components,
+      double global_fg_model_fg_threshold)
+      : global_bg_model{bg_image, global_bg_model_num_components},
+        mix_factor{mix_factor}, pixel_bg_model{bg_image},
+        global_fg_model{
+            global_bg_model, global_fg_model_num_components,
+            global_fg_model_fg_threshold} {
     assert(0 <= mix_factor && mix_factor <= 1);
   }
 

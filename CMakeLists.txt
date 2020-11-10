@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.17)
 project(matterialize)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native")
 
 find_package(OpenCV REQUIRED)
 find_program(CLANG_FORMAT_BIN clang-format)
@@ -37,16 +39,6 @@ add_executable(matterialize_tests ${MATTERIALIZE_TEST_FILES})
 target_link_libraries(matterialize_tests gtest ${OpenCV_LIBS})
 target_include_directories(matterialize_tests PRIVATE src)
 
-include(ExternalProject)
-ExternalProject_Add(googletest
-        URL https://github.com/google/googletest/archive/master.zip
-        SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/googletest-src"
-        BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/googletest-build"
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND ""
-        INSTALL_COMMAND ""
-        TEST_COMMAND ""
-        )
 
 if (CLANG_FORMAT_BIN)
     set(ALL_FILES ${MATTERIALIZE_SRC_FILES} ${MATTERIALIZE_TEST_FILES})

@@ -3,6 +3,7 @@
 
 #include "../types/image.hpp"
 #include "gmm_global_color_model.hpp"
+#include <opencv2/imgproc.hpp>
 #include <opencv2/ml.hpp>
 
 using namespace cv;
@@ -10,14 +11,12 @@ using namespace cv::ml;
 
 class GlobalBgModel {
 private:
-  constexpr static int num_components{10};
-  constexpr static int max_iter_count{10};
   const Ptr<EM> gmm;
-  const int num_components;
-  const int max_iter_count;
+  constexpr static int max_iter_count{10};
 
 public:
-  explicit GlobalBgModel(const Image &bg_image) : gmm{EM::create()} {
+  explicit GlobalBgModel(const Image &bg_image, int num_components)
+      : gmm{EM::create()} {
     TermCriteria term_criteria = gmm->getTermCriteria();
     gmm->setTermCriteria(TermCriteria(
         term_criteria.type, max_iter_count, term_criteria.epsilon));
