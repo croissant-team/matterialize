@@ -56,18 +56,21 @@ int main() {
   // to give time for the automatic values to settle
   opencv_controls.disable_automatic();
 
+  std::atomic_bool running{true};
+
   // Begin REST server to allow for frontend communication
   Pistache::Port port(9000);
   int thr = 2;
   Pistache::Address addr(Pistache::Ipv4::any(), port);
 
-  CameraEndpoint cam_endpoint(addr, webcam, matter, matter_mutex, matters);
+  CameraEndpoint cam_endpoint(
+      addr, running, webcam, matter, matter_mutex, matters);
 
   cam_endpoint.init(thr);
 
   std::thread server_thread(&CameraEndpoint::start, &cam_endpoint);
 
-  while (true) {
+  while (running) {
     auto start{std::chrono::system_clock::now()};
     const cv::Mat frame{webcam.grab()};
     if (frame.empty()) {
@@ -85,6 +88,7 @@ int main() {
               << '\n';
   }
 
+  cam_endpoint.shutdown();
   server_thread.join();
   webcam.stop();
   output.stop();

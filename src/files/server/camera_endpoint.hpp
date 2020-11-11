@@ -13,33 +13,39 @@
 class CameraEndpoint {
 public:
   explicit CameraEndpoint(
-      Pistache::Address addr, OpenCVWebcam &webcam, IMatter *&matter,
-      std::mutex &matter_mutex,
+      Pistache::Address addr, std::atomic_bool &running, OpenCVWebcam &webcam,
+      IMatter *&matter, std::mutex &matter_mutex,
       std::vector<std::pair<std::string, IMatter *>> &matters);
 
   void init(size_t thr = 2);
 
   void start();
 
+  void shutdown();
+
 private:
   void setupRoutes();
-  void setCamera(
+  void set_camera(
       const Pistache::Rest::Request &request,
       Pistache::Http::ResponseWriter response);
-  void getCameras(
+  void get_cameras(
       const Pistache::Rest::Request &request,
       Pistache::Http::ResponseWriter response);
-  void setMatter(
+  void set_matter(
       const Pistache::Rest::Request &request,
       Pistache::Http::ResponseWriter response);
-  void getMatters(
+  void get_matters(
       const Pistache::Rest::Request &request,
       Pistache::Http::ResponseWriter response);
-  void setBackground(
+  void set_background(
+      const Pistache::Rest::Request &request,
+      Pistache::Http::ResponseWriter response);
+  void do_shutdown(
       const Pistache::Rest::Request &request,
       Pistache::Http::ResponseWriter response);
 
   std::shared_ptr<Pistache::Http::Endpoint> httpEndpoint;
+  std::atomic_bool &running;
   Pistache::Rest::Router router;
   OpenCVWebcam &webcam;
   IMatter *&matter;
