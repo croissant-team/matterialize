@@ -21,16 +21,17 @@ file(GLOB_RECURSE lib
         )
 
 file(GLOB_RECURSE src
-        ${PROJECT_SOURCE_DIR}/src/*.hpp
-        ${PROJECT_SOURCE_DIR}/src/*.cpp
+        ${PROJECT_SOURCE_DIR}/src/files/*.hpp
+        ${PROJECT_SOURCE_DIR}/src/files/*.cpp
         )
 
 set(MATTERIALIZE_SRC_FILES ${src} ${lib})
 
-add_executable(matterialize ${MATTERIALIZE_SRC_FILES})
-
+add_executable(matterialize ${MATTERIALIZE_SRC_FILES} ${PROJECT_SOURCE_DIR}/src/mains/matterialize.cpp)
 target_link_libraries(matterialize ${OpenCV_LIBS})
 
+add_executable(benchmatte ${MATTERIALIZE_SRC_FILES} ${PROJECT_SOURCE_DIR}/src/mains/benchmatte.cpp)
+target_link_libraries(benchmatte ${OpenCV_LIBS})
 
 set(MATTERIALIZE_TEST_FILES ${PROJECT_SOURCE_DIR}/tests/main.cpp
         ${PROJECT_SOURCE_DIR}/tests/matting/background_cut/types/ImageTest.cpp)

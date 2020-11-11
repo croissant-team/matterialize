@@ -7,9 +7,10 @@
 
 using namespace chrono;
 
-vector<BenchmarkResult> Benchmark::run() {
-  vector<BenchmarkResult> result;
-  int num_matters = 3;
+vector<vector<BenchmarkResult>> Benchmark::run() {
+  vector<vector<BenchmarkResult>> result(NUM_MATTERS + 1);
+  string names[] = {
+      "OpenCVMatter", "BackgroundNegationMatter", "BackgroundCutMatter"};
   for (int i = 0; i < backgrounds.size(); i++) {
     OpenCVMatter opencv_matter = OpenCVMatter();
     BackgroundNegationMatter background_negation_matter =
@@ -18,9 +19,7 @@ vector<BenchmarkResult> Benchmark::run() {
         BackgroundCutMatter(backgrounds[i]);
     IMatter *matters[] = {
         &opencv_matter, &background_negation_matter, &background_cut_matter};
-    string names[] = {
-        "OpenCVMatter", "BackgroundNegationMatter", "BackgroundCutMatter"};
-    for (int j = 0; j < num_matters; j++) {
+    for (int j = 0; j < NUM_MATTERS; j++) {
       auto start{system_clock::now()};
       Mat mask = matters[j]->background_mask(compositions[i]);
       long time =
@@ -30,8 +29,15 @@ vector<BenchmarkResult> Benchmark::run() {
               "_generated_mask.png",
           mask);
       ConfusionMatrix stats = Scorer::difference(mask, masks[i]);
-      result.emplace_back(names[j], stats, time);
+      result[j].emplace_back(names[j], stats, time);
     }
+  }
+  for (int i = 0; i < result.size() - 1; i++) {
+    vector<ConfusionMatrix> confusion_matrices;
+    for (auto &entry : result[i]) {
+      confusion_matrices.push_back(entry.stats);
+    }
+    result[NUM_MATTERS].emplace_back(names[i], ConfusionMatrix::average(confusion_matrices), -1);
   }
   return result;
 }

@@ -11,6 +11,8 @@
 #include <string>
 #include <utility>
 
+#define NUM_MATTERS 3
+
 using namespace cv;
 using namespace std;
 using namespace filesystem;
@@ -55,7 +57,7 @@ public:
       mask_file_iterator++;
     }
   }
-  vector<BenchmarkResult> run();
+  vector<vector<BenchmarkResult>> run();
   void export_images();
 };
 

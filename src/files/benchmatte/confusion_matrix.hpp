@@ -2,6 +2,7 @@
 #define MATTERIALIZE_SRC_BENCHMATTE_CONFUSION_MATRIX_HPP
 
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -17,6 +18,7 @@ public:
   double calculate_F1();
   double calculate_accuracy();
   string to_string();
+  static ConfusionMatrix average(const vector<ConfusionMatrix> &matrices);
 };
 
 #endif

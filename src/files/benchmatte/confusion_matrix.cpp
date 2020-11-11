@@ -55,3 +55,15 @@ string ConfusionMatrix::to_string() {
          << "            +--------+--------+\n";
   return buffer.str();
 }
+
+ConfusionMatrix
+ConfusionMatrix::average(const vector<ConfusionMatrix> &matrices) {
+  ConfusionMatrix result;
+  for (auto &mx : matrices) {
+    result.matrix[0][0] += mx.matrix[0][0];
+    result.matrix[0][1] += mx.matrix[0][1];
+    result.matrix[1][0] += mx.matrix[1][0];
+    result.matrix[1][1] += mx.matrix[1][1];
+  }
+  return result;
+}
