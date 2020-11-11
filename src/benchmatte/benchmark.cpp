@@ -32,7 +32,6 @@ vector<BenchmarkResult> Benchmark::run() {
       ConfusionMatrix stats = Scorer::difference(mask, masks[i]);
       result.emplace_back(names[j], stats, time);
     }
-    break;
   }
   return result;
 }

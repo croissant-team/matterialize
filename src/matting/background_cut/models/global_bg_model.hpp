@@ -12,19 +12,15 @@ using namespace cv::ml;
 class GlobalBgModel {
 private:
   const Ptr<EM> gmm;
-  constexpr static int max_iter_count{10};
 
 public:
   explicit GlobalBgModel(const Image &bg_image, int num_components)
       : gmm{EM::create()} {
-    TermCriteria term_criteria = gmm->getTermCriteria();
-    gmm->setTermCriteria(TermCriteria(
-        term_criteria.type, max_iter_count, term_criteria.epsilon));
     gmm->setClustersNumber(num_components);
 
     // Speeds up training though not necessary for training background model as
     // is only done once
-    //gmm->setCovarianceMatrixType(EM::COV_MAT_SPHERICAL);
+    gmm->setCovarianceMatrixType(EM::COV_MAT_SPHERICAL);
 
     std::cout << "StartedTraining global background model"
               << "\n";

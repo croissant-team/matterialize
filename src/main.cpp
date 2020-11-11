@@ -4,6 +4,7 @@
 #include "camera/opencv_webcam_controls.hpp"
 #include "matting/background_cut/background_cut_matter.hpp"
 #include "util/converter.hpp"
+
 #include <chrono>
 #include <iostream>
 #include <v4l2cpp/V4l2Capture.h>
@@ -46,10 +47,12 @@ int main() {
   }
   webcam.stop();
   output.stop();*/
-  Benchmark benchmark = Benchmark("../images/masks", "../images/bg", "../images/fg");
+  Benchmark benchmark =
+      Benchmark("../images/masks", "../images/bg", "../images/fg");
   vector<BenchmarkResult> results = benchmark.run();
-  for (auto & result : results) {
-    cout << result.owner << ": " << result.run_time << " ms\n" << result.stats.to_string() << "\n\n";
+  for (auto &result : results) {
+    cout << result.owner << ": " << result.run_time << " ms\n"
+         << result.stats.to_string() << "\n\n";
   }
   benchmark.export_images();
 }

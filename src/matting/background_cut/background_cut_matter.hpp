@@ -25,8 +25,8 @@ private:
 public:
   explicit BackgroundCutMatter(
       const cv::Mat &background, int downscale_factor = 2,
-      int median_blur_kernel_size = 11, double color_model_mix_factor = 0.47,
-      int global_bg_model_num_components = 10,
+      int median_blur_kernel_size = 21, double color_model_mix_factor = 0.25,
+      int global_bg_model_num_components = 11,
       int global_fg_model_num_components = 5,
       double global_fg_model_fg_threshold = 0.05) noexcept
       : downscale_factor{downscale_factor},
