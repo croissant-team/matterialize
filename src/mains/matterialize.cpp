@@ -1,8 +1,9 @@
-#include "camera/fake_webcam.hpp"
-#include "camera/opencv_webcam.hpp"
-#include "camera/opencv_webcam_controls.hpp"
-#include "matting/background_cut/background_cut_matter.hpp"
-#include "util/converter.hpp"
+#include "../files/benchmatte/benchmark.hpp"
+#include "../files/camera/fake_webcam.hpp"
+#include "../files/camera/opencv_webcam_controls.hpp"
+#include "../files/matting/background_cut/background_cut_matter.hpp"
+#include "../files/util/converter.hpp"
+
 #include <chrono>
 #include <iostream>
 #include <v4l2cpp/V4l2Capture.h>
