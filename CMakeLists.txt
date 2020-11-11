@@ -40,9 +40,13 @@ add_executable(matterialize_tests ${MATTERIALIZE_TEST_FILES})
 target_link_libraries(matterialize_tests gtest ${OpenCV_LIBS})
 target_include_directories(matterialize_tests PRIVATE src)
 
+file(GLOB_RECURSE mains
+        ${PROJECT_SOURCE_DIR}/src/mains/*.hpp
+        ${PROJECT_SOURCE_DIR}/src/mains/*.cpp
+        )
 
 if (CLANG_FORMAT_BIN)
-    set(ALL_FILES ${MATTERIALIZE_SRC_FILES} ${MATTERIALIZE_TEST_FILES})
+    set(ALL_FILES ${MATTERIALIZE_SRC_FILES} ${MATTERIALIZE_TEST_FILES} ${mains})
     add_custom_target(clang-format-check-formatting COMMAND ${CLANG_FORMAT_BIN} --dry-run --Werror -style=file ${ALL_FILES})
     add_custom_target(clang-format-project-files COMMAND ${CLANG_FORMAT_BIN} -i -style=file ${ALL_FILES})
 endif ()
