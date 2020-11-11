@@ -31,28 +31,28 @@ public:
         directory_iterator(backgrounds_path);
     directory_iterator foreground_file_iterator =
         directory_iterator(foregrounds_path);
-    directory_iterator masks_file_iterator = directory_iterator(masks_path);
+    directory_iterator mask_file_iterator = directory_iterator(masks_path);
     Compositor compositor = Compositor();
     while (background_file_iterator != end_iterator &&
            foreground_file_iterator != end_iterator &&
-           masks_file_iterator != end_iterator) {
+           mask_file_iterator != end_iterator) {
       string background_filename = background_file_iterator->path().filename();
       string foreground_filename = foreground_file_iterator->path().filename();
-      string mask_file_path = masks_file_iterator->path().filename();
+      string mask_filename = mask_file_iterator->path().filename();
       cout << "Composing (bg) " << background_filename << " with (fg) "
            << foreground_filename << "\n";
       Mat background_mat = imread(background_file_iterator->path());
       Mat foreground_mat = imread(foreground_file_iterator->path());
-      backgrounds.push_back(background_mat);
-      foregrounds.push_back(foreground_mat);
-      Mat mask_mat = imread(masks_file_iterator->path());
+      Mat mask_mat = imread(mask_file_iterator->path());
       pair<Mat, Mat> pair =
           compositor.compose(background_mat, foreground_mat, mask_mat);
+      backgrounds.push_back(background_mat);
+      foregrounds.push_back(foreground_mat);
       compositions.push_back(pair.first);
       masks.push_back(pair.second);
       background_file_iterator++;
       foreground_file_iterator++;
-      masks_file_iterator++;
+      mask_file_iterator++;
     }
   }
   vector<BenchmarkResult> run();

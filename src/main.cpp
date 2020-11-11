@@ -1,3 +1,4 @@
+#include "benchmatte/benchmark.hpp"
 #include "camera/fake_webcam.hpp"
 #include "camera/opencv_webcam.hpp"
 #include "camera/opencv_webcam_controls.hpp"
@@ -15,7 +16,7 @@ constexpr int num_void_frames{120};
 
 int main() {
   std::cout << "Matterialize\n";
-  OpenCVWebcam webcam(input_device, width, height);
+  /*OpenCVWebcam webcam(input_device, width, height);
   webcam.start();
   // The webcam must be started before the webcam controls are initialised
   OpenCVWebcamControls opencv_controls(webcam);
@@ -44,5 +45,11 @@ int main() {
               << '\n';
   }
   webcam.stop();
-  output.stop();
+  output.stop();*/
+  Benchmark benchmark = Benchmark("../images/masks", "../images/bg", "../images/fg");
+  vector<BenchmarkResult> results = benchmark.run();
+  for (auto & result : results) {
+    cout << result.owner << ": " << result.run_time << " ms\n" << result.stats.to_string() << "\n\n";
+  }
+  benchmark.export_images();
 }

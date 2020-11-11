@@ -25,17 +25,22 @@ vector<BenchmarkResult> Benchmark::run() {
       Mat mask = matters[j]->background_mask(compositions[i]);
       long time =
           duration_cast<milliseconds>(system_clock::now() - start).count();
-      imwrite("images/output/" + to_string(i) + "_" + names[j] + ".png", mask);
+      imwrite(
+          "../images/output/" + to_string(i) + "_" + names[j] +
+              "_generated_mask.png",
+          mask);
       ConfusionMatrix stats = Scorer::difference(mask, masks[i]);
       result.emplace_back(names[j], stats, time);
     }
+    break;
   }
   return result;
 }
 
 void Benchmark::export_images() {
   for (int i = 0; i < compositions.size(); i++) {
-    imwrite("images/output/" + to_string(i) + "_composed.png", compositions[i]);
-    imwrite("images/output/" + to_string(i) + "_mask.png", masks[i]);
+    imwrite(
+        "../images/output/" + to_string(i) + "_composed.png", compositions[i]);
+    imwrite("../images/output/" + to_string(i) + "_mask.png", masks[i]);
   }
 }

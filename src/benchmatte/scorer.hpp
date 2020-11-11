@@ -9,7 +9,7 @@ using namespace cv;
 class Scorer {
 public:
   static ConfusionMatrix
-  difference(Mat &predicted, Mat &truth, double threshold = 127.0);
+  difference(Mat &predicted, Mat &truth, uchar threshold = 127);
 };
 
 #endif

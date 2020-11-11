@@ -18,11 +18,11 @@ void ConfusionMatrix::increment(int a, int b) {
 }
 
 double ConfusionMatrix::calculate_precision() {
-  return 1.0 * *truePositives / (*truePositives + *falsePositives);
+  return 1.0 * matrix[0][0] / (matrix[0][0] + matrix[1][0]);
 }
 
 double ConfusionMatrix::calculate_recall() {
-  return 1.0 * *truePositives / (*truePositives + *falseNegatives);
+  return 1.0 * matrix[0][0] / (matrix[0][0] + matrix[0][1]);
 }
 
 double ConfusionMatrix::calculate_F1() {
@@ -33,8 +33,8 @@ double ConfusionMatrix::calculate_F1() {
 }
 
 double ConfusionMatrix::calculate_accuracy() {
-  return (1.0 * *truePositives + *trueNegatives) /
-         (*truePositives + *trueNegatives + *falsePositives + *falseNegatives);
+  return (1.0 * matrix[0][0] + matrix[1][1]) /
+         (matrix[0][0] + matrix[1][1] + matrix[1][0] + matrix[0][1]);
 }
 
 string ConfusionMatrix::to_string() {
@@ -47,11 +47,11 @@ string ConfusionMatrix::to_string() {
          << "                [Predicted]\n"
          << "                fg   |   bg\n"
          << "            +--------+--------+\n"
-         << "         fg | " << pad(*trueNegatives, 6) << " | "
-         << pad(*falseNegatives, 6) << " |\n"
+         << "         fg | " << pad(matrix[0][0], 6) << " | "
+         << pad(matrix[0][1], 6) << " |\n"
          << "[Actual] ---+--------+--------+\n"
-         << "         bg | " << pad(*falsePositives, 6) << " | "
-         << pad(*trueNegatives, 6) << " |\n"
+         << "         bg | " << pad(matrix[1][0], 6) << " | "
+         << pad(matrix[1][1], 6) << " |\n"
          << "            +--------+--------+\n";
   return buffer.str();
 }
