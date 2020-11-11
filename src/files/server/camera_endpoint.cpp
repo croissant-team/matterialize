@@ -1,4 +1,5 @@
 #include "camera_endpoint.hpp"
+#include "../util/video_devices.hpp"
 
 CameraEndpoint::CameraEndpoint(
     Pistache::Address addr, OpenCVWebcam &webcam, IMatter *&matter)
@@ -68,24 +69,25 @@ void CameraEndpoint::getCameras(
   writer.StartObject();
   writer.Key("devices");
   writer.StartArray();
-  writer.StartObject();
-  writer.Key("dev_num");
-  writer.Int(0);
-  writer.Key("name");
-  writer.String("Integrated Camera");
-  writer.EndObject();
-  writer.StartObject();
-  writer.Key("dev_num");
-  writer.Int(2);
-  writer.Key("name");
-  writer.String("C920 HD Camera");
-  writer.EndObject();
+
+  std::vector<VideoDevice> devices{VideoDevices::get_devices()};
+  for (auto &device : devices) {
+    writer.StartObject();
+    writer.Key("dev_num");
+    writer.Int(device.number);
+    writer.Key("name");
+    writer.String(device.name.c_str());
+    writer.EndObject();
+  }
+
   writer.EndArray();
   writer.EndObject();
 
-  auto cors_header(std::make_shared<Pistache::Http::Header::AccessControlAllowOrigin>("*"));
+  auto cors_header(
+      std::make_shared<Pistache::Http::Header::AccessControlAllowOrigin>("*"));
   response.headers().add(cors_header);
-  response.headers().add<Pistache::Http::Header::ContentType>(MIME(Application, Json));
+  response.headers().add<Pistache::Http::Header::ContentType>(
+      MIME(Application, Json));
   response.send(Pistache::Http::Code::Ok, s.GetString());
 }
 

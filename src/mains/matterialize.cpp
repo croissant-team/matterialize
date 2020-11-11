@@ -3,6 +3,7 @@
 #include "../files/camera/opencv_webcam_controls.hpp"
 #include "../files/matting/background_cut/background_cut_matter.hpp"
 #include "../files/util/converter.hpp"
+#include "../files/util/video_devices.hpp"
 #include "../files/server/camera_endpoint.hpp"
 
 #include <chrono>
@@ -14,7 +15,7 @@
 constexpr int width{640};
 constexpr int height{480};
 constexpr int input_device{0};
-constexpr int output_device{2};
+constexpr int output_device{MATTERIALIZE_CAM};
 constexpr int num_void_frames{120};
 
 int main() {
