@@ -5,6 +5,13 @@
 
 #include <opencv2/core.hpp>
 
+namespace mask {
+  enum Label {
+    BACKGROUND = 0,
+    FOREGROUND = 1,
+  };
+}
+
 class Mask {
 private:
   const cv::Mat mat;

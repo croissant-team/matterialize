@@ -2,7 +2,9 @@
 #define MATTERIALIZE_BACKGROUND_CUT_MATTER_HPP
 
 #include "../matter.hpp"
+#include "models/color_model.hpp"
 #include "models/global_bg_model.hpp"
+#include "models/global_fg_model.hpp"
 #include "models/pixel_bg_model.hpp"
 #include "types/image.hpp"
 
@@ -12,17 +14,30 @@
 #include <opencv2/core.hpp>
 
 class BackgroundCutMatter : public IMatter {
+private:
+  int downscale_factor;
+  int median_blur_kernel_size;
+  constexpr static double contrast_term_scale{1};// lambda in equation (1)
+
+  const SegmentationResult prev_segmentation_res;
+  ColorModel color_model;
+
 public:
-  //const PixelBgModel pixel_bg_model;
-  const GlobalBgModel color_bg_model;
-  const double fg_thresh;
-  const int median_blur_kernel_size;
-
-  explicit BackgroundCutMatter(const cv::Mat &&background) noexcept
-      : /*pixel_bg_model{PixelBgModel(Image(cv::Mat(background)))},*/
-        color_bg_model{GlobalBgModel(Image(cv::Mat(background)))},
-        fg_thresh{1E-30}, median_blur_kernel_size{25} {}
-
+  explicit BackgroundCutMatter(
+      const cv::Mat &background, int downscale_factor = 2,
+      int median_blur_kernel_size = 11, double color_model_mix_factor = 0.47,
+      int global_bg_model_num_components = 10,
+      int global_fg_model_num_components = 5,
+      double global_fg_model_fg_threshold = 0.05) noexcept
+      : downscale_factor{downscale_factor},
+        median_blur_kernel_size{median_blur_kernel_size},
+        prev_segmentation_res{SegmentationResult::empty(
+            background.rows / downscale_factor,
+            background.cols / downscale_factor)},
+        color_model{
+            Image(std::move(background)).downscaled(downscale_factor),
+            color_model_mix_factor, global_bg_model_num_components,
+            global_fg_model_num_components, global_fg_model_fg_threshold} {};
   cv::Mat background_mask(const cv::Mat &video_frame) override;
 };
 

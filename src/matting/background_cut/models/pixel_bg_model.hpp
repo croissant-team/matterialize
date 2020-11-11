@@ -9,6 +9,7 @@
 
 class PixelBgModel {
 private:
+  constexpr static double magic_scaling = (0.05 / 1E-25);
   const PixelVariance per_pixel_variance;
   const Image bg_image;
 

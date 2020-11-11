@@ -15,8 +15,8 @@ Probability PixelBgModel::get_pixel_probability(const Image &image) const {
   cv::Mat probabilities(
       cv::Size2d(1.0, static_cast<double>(image.num_pixels())), CV_64FC1);
 
-  for (int pixel{}; pixel < image.num_pixels(); ++pixel) {
-    double l2{};
+  for (int pixel{0}; pixel < image.num_pixels(); ++pixel) {
+    double l2{0};
     double det{1.0};
 
     for (int channel{}; channel < 3; ++channel) {
@@ -30,7 +30,8 @@ Probability PixelBgModel::get_pixel_probability(const Image &image) const {
       det *= variance;
     }
 
-    *probabilities.ptr<double>(pixel) = pdf(l2, det);
+    *probabilities.ptr<double>(pixel) =
+        std::min<double>(pdf(l2, det) * magic_scaling, 1);
   }
 
   return Probability(std::move(probabilities));
