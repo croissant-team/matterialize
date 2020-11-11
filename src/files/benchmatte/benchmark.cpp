@@ -37,7 +37,8 @@ vector<vector<BenchmarkResult>> Benchmark::run() {
     for (auto &entry : result[i]) {
       confusion_matrices.push_back(entry.stats);
     }
-    result[NUM_MATTERS].emplace_back(names[i], ConfusionMatrix::average(confusion_matrices), -1);
+    result[NUM_MATTERS].emplace_back(
+        names[i], ConfusionMatrix::average(confusion_matrices), -1);
   }
   return result;
 }
