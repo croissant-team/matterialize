@@ -2,10 +2,18 @@
 #include "../util/video_devices.hpp"
 
 CameraEndpoint::CameraEndpoint(
-    Pistache::Address addr, OpenCVWebcam &webcam, IMatter *&matter)
+    Pistache::Address addr, OpenCVWebcam &webcam, IMatter *&matter,
+    std::mutex &matter_mutex,
+    std::vector<std::pair<std::string, IMatter *>> &matters)
     : httpEndpoint(std::make_shared<Pistache::Http::Endpoint>(addr)),
       webcam{webcam},
-      matter{matter} {}
+      matter{matter},
+      matter_lock(matter_mutex, std::defer_lock),
+      matters_map{} {
+  for (auto &[name, matter] : matters) {
+    matters_map[name] = matter;
+  }
+}
 
 void CameraEndpoint::init(size_t thr) {
   auto opts =
@@ -31,9 +39,7 @@ void CameraEndpoint::setupRoutes() {
       "/camera/options",
       Routes::bind(&CameraEndpoint::getCameras, this));
   Routes::Post(
-      router,
-      "/matter/set/:name",
-      Routes::bind(&CameraEndpoint::setMatter, this));
+      router, "/matter/set", Routes::bind(&CameraEndpoint::setMatter, this));
   Routes::Get(
       router,
       "/matter/options",
@@ -94,30 +100,45 @@ void CameraEndpoint::getCameras(
 void CameraEndpoint::setMatter(
     const Pistache::Rest::Request &request,
     Pistache::Http::ResponseWriter response) {
-  response.send(Pistache::Http::Code::Ok);
+  std::string choice{request.body()};
+
+  if (choice.empty()) {
+    response.send(Pistache::Http::Code::Bad_Request, "No matter option given");
+    return;
+  }
+
+  if (matters_map.count(choice) == 0) {
+    response.send(Pistache::Http::Code::Bad_Request, "Invalid matter name");
+    return;
+  }
+
+  matter_lock.lock();
+  matter = matters_map[choice];
+  matter_lock.unlock();
+
+  response.send(Pistache::Http::Code::Ok, "Matter changed to " + choice);
 }
 
 void CameraEndpoint::getMatters(
     const Pistache::Rest::Request &request,
     Pistache::Http::ResponseWriter response) {
-  const int num_matters = 4;
-  const char *all_matters[num_matters] = {
-      "KMeans", "Background Negation", "OpenCV", "Background Cut"};
-
   rapidjson::StringBuffer s;
   rapidjson::Writer<rapidjson::StringBuffer> writer(s);
 
   writer.StartArray();
-  for (int i = 0; i < num_matters; i++) {
+  for (auto &[name, _] : matters_map) {
     writer.StartObject();
     writer.Key("name");
-    writer.String(all_matters[i]);
-    writer.Key("id");
-    writer.Int(i);
+    writer.String(name.c_str());
     writer.EndObject();
   }
   writer.EndArray();
 
+  auto cors_header(
+      std::make_shared<Pistache::Http::Header::AccessControlAllowOrigin>("*"));
+  response.headers().add(cors_header);
+  response.headers().add<Pistache::Http::Header::ContentType>(
+      MIME(Application, Json));
   response.send(Pistache::Http::Code::Ok, s.GetString());
 }
 

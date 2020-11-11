@@ -13,7 +13,9 @@
 class CameraEndpoint {
 public:
   explicit CameraEndpoint(
-      Pistache::Address addr, OpenCVWebcam &webcam, IMatter *&matter);
+      Pistache::Address addr, OpenCVWebcam &webcam, IMatter *&matter,
+      std::mutex &matter_mutex,
+      std::vector<std::pair<std::string, IMatter *>> &matters);
 
   void init(size_t thr = 2);
 
@@ -41,6 +43,8 @@ private:
   Pistache::Rest::Router router;
   OpenCVWebcam &webcam;
   IMatter *&matter;
+  std::unique_lock<std::mutex> matter_lock;
+  std::map<std::string, IMatter *> matters_map;
 };
 
-#endif// MATTERIALIZE_CAMERA_ENDPOINT_HPP
+#endif

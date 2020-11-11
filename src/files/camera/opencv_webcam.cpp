@@ -19,8 +19,6 @@ void OpenCVWebcam::stop() {
 }
 
 void OpenCVWebcam::changeDevice(int new_device) {
-  std::scoped_lock lock(device_mutex);
-
   cv::VideoCapture attempt_capture;
   attempt_capture.open(new_device);
 
@@ -29,6 +27,8 @@ void OpenCVWebcam::changeDevice(int new_device) {
   }
 
   attempt_capture.release();
+
+  std::scoped_lock lock(device_mutex);
 
   stop();
   device = new_device;

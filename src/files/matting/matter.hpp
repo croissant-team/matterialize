@@ -3,12 +3,7 @@
 
 #include <opencv2/core.hpp>
 
-enum class MatterMode {
-  K_MEANS,
-  BACKGROUND_NEGATION,
-  OPENCV,
-  BACKGROUND_CUT,
-};
+enum class MatterMode { BACKGROUND_NEGATION, OPENCV, BACKGROUND_CUT };
 
 class IMatter {
 public:
