@@ -67,7 +67,7 @@ private:
   std::map<std::string, IMatter *> matters_map;
   const cv::Mat *&bg_mat;
   const cv::Mat &green_screen;
-  const cv::Mat &file_bg_mat;
+  cv::Mat file_bg_mat;
 };
 
 #endif
