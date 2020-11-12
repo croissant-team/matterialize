@@ -9,16 +9,17 @@ CameraEndpoint::CameraEndpoint(
       running{running},
       webcam{webcam},
       matter{matter},
+      curr_matter{"None"},
       matter_lock(matter_mutex, std::defer_lock),
       matters_map{},
       bg_mat{bg_mat},
       green_screen{green_screen},
-      file_bg_mat{green_screen} {
+      file_bg_mat{green_screen.clone()} {
   for (auto &[name, matter] : matters) {
     matters_map[name] = matter;
   }
 
-  bg_mat = &green_screen;
+  this->bg_mat = &green_screen;
 }
 
 void CameraEndpoint::init(size_t thr) {
@@ -47,9 +48,7 @@ void CameraEndpoint::setupRoutes() {
   using namespace Pistache::Rest;
 
   Routes::Post(
-      router,
-      "/camera/set",
-      Routes::bind(&CameraEndpoint::set_camera, this));
+      router, "/camera/set", Routes::bind(&CameraEndpoint::set_camera, this));
   Routes::Get(
       router,
       "/camera/options",
@@ -79,6 +78,10 @@ void CameraEndpoint::setupRoutes() {
 void CameraEndpoint::set_camera(
     const Pistache::Rest::Request &request,
     Pistache::Http::ResponseWriter response) {
+  auto cors_header(
+      std::make_shared<Pistache::Http::Header::AccessControlAllowOrigin>("*"));
+  response.headers().add(cors_header);
+
   rapidjson::Document document;
   document.Parse(request.body().c_str());
 
@@ -98,12 +101,18 @@ void CameraEndpoint::set_camera(
     return;
   }
 
-  response.send(Pistache::Http::Code::Ok, "Camera set to /dev/video" + dev_num);
+  response.send(
+      Pistache::Http::Code::Ok,
+      "Camera set to /dev/video" + std::to_string(dev_num));
 }
 
 void CameraEndpoint::get_cameras(
     const Pistache::Rest::Request &request,
     Pistache::Http::ResponseWriter response) {
+  auto cors_header(
+      std::make_shared<Pistache::Http::Header::AccessControlAllowOrigin>("*"));
+  response.headers().add(cors_header);
+
   rapidjson::StringBuffer s;
   rapidjson::Writer<rapidjson::StringBuffer> writer(s);
 
@@ -124,9 +133,6 @@ void CameraEndpoint::get_cameras(
   writer.EndArray();
   writer.EndObject();
 
-  auto cors_header(
-      std::make_shared<Pistache::Http::Header::AccessControlAllowOrigin>("*"));
-  response.headers().add(cors_header);
   response.headers().add<Pistache::Http::Header::ContentType>(
       MIME(Application, Json));
   response.send(Pistache::Http::Code::Ok, s.GetString());
@@ -135,15 +141,19 @@ void CameraEndpoint::get_cameras(
 void CameraEndpoint::set_matter(
     const Pistache::Rest::Request &request,
     Pistache::Http::ResponseWriter response) {
+  auto cors_header(
+      std::make_shared<Pistache::Http::Header::AccessControlAllowOrigin>("*"));
+  response.headers().add(cors_header);
+
   rapidjson::Document document;
   document.Parse(request.body().c_str());
 
-  if (document.IsNull() || !document.HasMember("content")) {
+  if (document.IsNull() || !document.HasMember("matter")) {
     response.send(Pistache::Http::Code::Bad_Request, "No matter option given");
     return;
   }
 
-  std::string choice{document["content"].GetString()};
+  std::string choice{document["matter"].GetString()};
 
   if (matters_map.count(choice) == 0) {
     response.send(Pistache::Http::Code::Bad_Request, "Invalid matter name");
@@ -151,6 +161,7 @@ void CameraEndpoint::set_matter(
   }
 
   matter_lock.lock();
+  curr_matter = choice;
   matter = matters_map[choice];
   matter_lock.unlock();
 
@@ -160,6 +171,10 @@ void CameraEndpoint::set_matter(
 void CameraEndpoint::get_matters(
     const Pistache::Rest::Request &request,
     Pistache::Http::ResponseWriter response) {
+  auto cors_header(
+      std::make_shared<Pistache::Http::Header::AccessControlAllowOrigin>("*"));
+  response.headers().add(cors_header);
+
   rapidjson::StringBuffer s;
   rapidjson::Writer<rapidjson::StringBuffer> writer(s);
 
@@ -177,9 +192,6 @@ void CameraEndpoint::get_matters(
   writer.EndArray();
   writer.EndObject();
 
-  auto cors_header(
-      std::make_shared<Pistache::Http::Header::AccessControlAllowOrigin>("*"));
-  response.headers().add(cors_header);
   response.headers().add<Pistache::Http::Header::ContentType>(
       MIME(Application, Json));
   response.send(Pistache::Http::Code::Ok, s.GetString());
@@ -188,16 +200,20 @@ void CameraEndpoint::get_matters(
 void CameraEndpoint::set_background(
     const Pistache::Rest::Request &request,
     Pistache::Http::ResponseWriter response) {
+  auto cors_header(
+      std::make_shared<Pistache::Http::Header::AccessControlAllowOrigin>("*"));
+  response.headers().add(cors_header);
+
   rapidjson::Document document;
   document.Parse(request.body().c_str());
 
-  if (document.IsNull() || !document.HasMember("content")) {
+  if (document.IsNull() || !document.HasMember("file_path")) {
     response.send(
         Pistache::Http::Code::Bad_Request, "No background path given in body");
     return;
   }
 
-  std::string bg_path = document["content"].GetString();
+  std::string bg_path = document["file_path"].GetString();
 
   cv::Mat new_bg;
 
@@ -220,6 +236,10 @@ void CameraEndpoint::set_background(
 void CameraEndpoint::clear_background(
     const Pistache::Rest::Request &request,
     Pistache::Http::ResponseWriter response) {
+  auto cors_header(
+      std::make_shared<Pistache::Http::Header::AccessControlAllowOrigin>("*"));
+  response.headers().add(cors_header);
+
   matter_lock.lock();
   bg_mat = &green_screen;
   matter_lock.unlock();
@@ -230,20 +250,9 @@ void CameraEndpoint::clear_background(
 void CameraEndpoint::take_clean_plate(
     const Pistache::Rest::Request &request,
     Pistache::Http::ResponseWriter response) {
-  rapidjson::Document document;
-  document.Parse(request.body().c_str());
-
-  if (document.IsNull() || !document.HasMember("matter")) {
-    response.send(Pistache::Http::Code::Bad_Request, "No matter option given");
-    return;
-  }
-
-  std::string matter_choice{document["matter"].GetString()};
-
-  if (matters_map.count(matter_choice) == 0) {
-    response.send(Pistache::Http::Code::Bad_Request, "Invalid matter option");
-    return;
-  }
+  auto cors_header(
+      std::make_shared<Pistache::Http::Header::AccessControlAllowOrigin>("*"));
+  response.headers().add(cors_header);
 
   const cv::Mat new_plate{webcam.grab()};
 
@@ -260,7 +269,7 @@ void CameraEndpoint::take_clean_plate(
   delete old_bg_negate;
   delete old_bg_cut;
 
-  matter = matters_map[matter_choice];
+  matter = matters_map[curr_matter];
 
   matter_lock.unlock();
 
@@ -272,6 +281,10 @@ void CameraEndpoint::take_clean_plate(
 void CameraEndpoint::do_shutdown(
     const Pistache::Rest::Request &request,
     Pistache::Http::ResponseWriter response) {
+  auto cors_header(
+      std::make_shared<Pistache::Http::Header::AccessControlAllowOrigin>("*"));
+  response.headers().add(cors_header);
+
   running = false;
 
   response.send(Pistache::Http::Code::Ok);
