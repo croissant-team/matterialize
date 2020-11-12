@@ -3,10 +3,14 @@
 
 #include "../camera/opencv_webcam.hpp"
 #include "../matting/matter.hpp"
+#include "../util/video_devices.hpp"
 
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/imgproc.hpp>
 #include <pistache/endpoint.h>
 #include <pistache/http.h>
 #include <pistache/router.h>
+#include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
@@ -15,7 +19,8 @@ public:
   explicit CameraEndpoint(
       Pistache::Address addr, std::atomic_bool &running, OpenCVWebcam &webcam,
       IMatter *&matter, std::mutex &matter_mutex,
-      std::vector<std::pair<std::string, IMatter *>> &matters);
+      std::vector<std::pair<std::string, IMatter *>> &matters,
+      const cv::Mat *&bg_mat, const cv::Mat &green_screen);
 
   void init(size_t thr = 2);
 
@@ -51,6 +56,9 @@ private:
   IMatter *&matter;
   std::unique_lock<std::mutex> matter_lock;
   std::map<std::string, IMatter *> matters_map;
+  const cv::Mat *&bg_mat;
+  const cv::Mat &green_screen;
+  const cv::Mat &file_bg_mat;
 };
 
 #endif

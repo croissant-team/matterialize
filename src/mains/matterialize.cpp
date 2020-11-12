@@ -58,13 +58,24 @@ int main() {
 
   std::atomic_bool running{true};
 
+  const cv::Scalar scalar(0.0, 255.0, 0.0);
+  const cv::Mat green_screen(height, width, CV_8UC3, scalar);
+  const cv::Mat *bg_mat;
+
   // Begin REST server to allow for frontend communication
   Pistache::Port port(9000);
   int thr = 2;
   Pistache::Address addr(Pistache::Ipv4::any(), port);
 
   CameraEndpoint cam_endpoint(
-      addr, running, webcam, matter, matter_mutex, matters);
+      addr,
+      running,
+      webcam,
+      matter,
+      matter_mutex,
+      matters,
+      bg_mat,
+      green_screen);
 
   cam_endpoint.init(thr);
 
@@ -78,7 +89,7 @@ int main() {
     }
 
     matter_lock.lock();
-    cv::Mat result{matter->green_screen(frame)};
+    cv::Mat result{matter->change_background(frame, *bg_mat)};
     matter_lock.unlock();
 
     output.write(result);
