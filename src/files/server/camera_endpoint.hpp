@@ -62,6 +62,7 @@ private:
   Pistache::Rest::Router router;
   OpenCVWebcam &webcam;
   IMatter *&matter;
+  std::string curr_matter;
   std::unique_lock<std::mutex> matter_lock;
   std::map<std::string, IMatter *> matters_map;
   const cv::Mat *&bg_mat;

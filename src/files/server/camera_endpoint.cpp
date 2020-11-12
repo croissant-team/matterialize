@@ -9,6 +9,7 @@ CameraEndpoint::CameraEndpoint(
       running{running},
       webcam{webcam},
       matter{matter},
+      curr_matter{"None"},
       matter_lock(matter_mutex, std::defer_lock),
       matters_map{},
       bg_mat{bg_mat},
@@ -47,9 +48,7 @@ void CameraEndpoint::setupRoutes() {
   using namespace Pistache::Rest;
 
   Routes::Post(
-      router,
-      "/camera/set",
-      Routes::bind(&CameraEndpoint::set_camera, this));
+      router, "/camera/set", Routes::bind(&CameraEndpoint::set_camera, this));
   Routes::Get(
       router,
       "/camera/options",
@@ -151,6 +150,7 @@ void CameraEndpoint::set_matter(
   }
 
   matter_lock.lock();
+  curr_matter = choice;
   matter = matters_map[choice];
   matter_lock.unlock();
 
@@ -230,21 +230,6 @@ void CameraEndpoint::clear_background(
 void CameraEndpoint::take_clean_plate(
     const Pistache::Rest::Request &request,
     Pistache::Http::ResponseWriter response) {
-  rapidjson::Document document;
-  document.Parse(request.body().c_str());
-
-  if (document.IsNull() || !document.HasMember("matter")) {
-    response.send(Pistache::Http::Code::Bad_Request, "No matter option given");
-    return;
-  }
-
-  std::string matter_choice{document["matter"].GetString()};
-
-  if (matters_map.count(matter_choice) == 0) {
-    response.send(Pistache::Http::Code::Bad_Request, "Invalid matter option");
-    return;
-  }
-
   const cv::Mat new_plate{webcam.grab()};
 
   matter_lock.lock();
@@ -260,7 +245,7 @@ void CameraEndpoint::take_clean_plate(
   delete old_bg_negate;
   delete old_bg_cut;
 
-  matter = matters_map[matter_choice];
+  matter = matters_map[curr_matter];
 
   matter_lock.unlock();
 
