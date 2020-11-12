@@ -2,6 +2,8 @@
 #define MATTERIALIZE_CAMERA_ENDPOINT_HPP
 
 #include "../camera/opencv_webcam.hpp"
+#include "../matting/background_cut/background_cut_matter.hpp"
+#include "../matting/background_negation_matter.hpp"
 #include "../matting/matter.hpp"
 #include "../util/video_devices.hpp"
 
@@ -43,6 +45,12 @@ private:
       const Pistache::Rest::Request &request,
       Pistache::Http::ResponseWriter response);
   void set_background(
+      const Pistache::Rest::Request &request,
+      Pistache::Http::ResponseWriter response);
+  void clear_background(
+      const Pistache::Rest::Request &request,
+      Pistache::Http::ResponseWriter response);
+  void take_clean_plate(
       const Pistache::Rest::Request &request,
       Pistache::Http::ResponseWriter response);
   void do_shutdown(

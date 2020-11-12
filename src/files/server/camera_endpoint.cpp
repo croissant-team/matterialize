@@ -35,6 +35,11 @@ void CameraEndpoint::start() {
 }
 
 void CameraEndpoint::shutdown() {
+  for (auto &[_, matter] : matters_map) {
+    delete matter;
+    matter = nullptr;
+  }
+
   httpEndpoint->shutdown();
 }
 
@@ -43,7 +48,7 @@ void CameraEndpoint::setupRoutes() {
 
   Routes::Post(
       router,
-      "/camera/set/:dev_num",
+      "/camera/set",
       Routes::bind(&CameraEndpoint::set_camera, this));
   Routes::Get(
       router,
@@ -60,16 +65,33 @@ void CameraEndpoint::setupRoutes() {
       "/background/set",
       Routes::bind(&CameraEndpoint::set_background, this));
   Routes::Post(
+      router,
+      "/background/clear",
+      Routes::bind(&CameraEndpoint::clear_background, this));
+  Routes::Post(
+      router,
+      "/cleanplate/take",
+      Routes::bind(&CameraEndpoint::take_clean_plate, this));
+  Routes::Post(
       router, "/shutdown", Routes::bind(&CameraEndpoint::do_shutdown, this));
 }
 
 void CameraEndpoint::set_camera(
     const Pistache::Rest::Request &request,
     Pistache::Http::ResponseWriter response) {
-  auto dev_num = request.param(":dev_num").as<std::string>();
+  rapidjson::Document document;
+  document.Parse(request.body().c_str());
+
+  if (document.IsNull() || !document.HasMember("dev_num")) {
+    response.send(
+        Pistache::Http::Code::Bad_Request, "No device number given in body");
+    return;
+  }
+
+  auto dev_num = document["dev_num"].GetInt();
 
   try {
-    webcam.changeDevice(std::stoi(dev_num));
+    webcam.changeDevice(dev_num);
   } catch (const std::exception &e) {
     response.send(
         Pistache::Http::Code::Bad_Request, "Invalid device number parameter");
@@ -193,6 +215,58 @@ void CameraEndpoint::set_background(
   matter_lock.unlock();
 
   response.send(Pistache::Http::Code::Ok);
+}
+
+void CameraEndpoint::clear_background(
+    const Pistache::Rest::Request &request,
+    Pistache::Http::ResponseWriter response) {
+  matter_lock.lock();
+  bg_mat = &green_screen;
+  matter_lock.unlock();
+
+  response.send(Pistache::Http::Code::Ok);
+}
+
+void CameraEndpoint::take_clean_plate(
+    const Pistache::Rest::Request &request,
+    Pistache::Http::ResponseWriter response) {
+  rapidjson::Document document;
+  document.Parse(request.body().c_str());
+
+  if (document.IsNull() || !document.HasMember("matter")) {
+    response.send(Pistache::Http::Code::Bad_Request, "No matter option given");
+    return;
+  }
+
+  std::string matter_choice{document["matter"].GetString()};
+
+  if (matters_map.count(matter_choice) == 0) {
+    response.send(Pistache::Http::Code::Bad_Request, "Invalid matter option");
+    return;
+  }
+
+  const cv::Mat new_plate{webcam.grab()};
+
+  matter_lock.lock();
+  auto bg_negate_matter{new BackgroundNegationMatter(new_plate)};
+  auto bg_cut_matter{new BackgroundCutMatter(new_plate)};
+
+  auto old_bg_negate{matters_map["Background Negation"]};
+  auto old_bg_cut{matters_map["Background Cut"]};
+
+  matters_map["Background Negation"] = bg_negate_matter;
+  matters_map["Background Cut"] = bg_cut_matter;
+
+  delete old_bg_negate;
+  delete old_bg_cut;
+
+  matter = matters_map[matter_choice];
+
+  matter_lock.unlock();
+
+  response.send(
+      Pistache::Http::Code::Ok,
+      "New clean plate taken and matters initialised");
 }
 
 void CameraEndpoint::do_shutdown(

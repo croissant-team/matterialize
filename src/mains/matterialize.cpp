@@ -26,7 +26,7 @@ int main() {
 
   OpenCVWebcam webcam(input_device, width, height);
   webcam.start();
-  // The webcam must be started before the webcam controls are initialised
+  // The webcam must be started before request.param(":dev_num").as<std::string>();request.param(":dev_num").as<std::string>();the webcam controls are initialised
   OpenCVWebcamControls opencv_controls(webcam);
   // The webcam must be started before the fake webcam is initialised
   FakeWebcam output(output_device, width, height);
@@ -36,19 +36,19 @@ int main() {
     webcam.grab();
   }
 
-  cv::Mat cleanPlate = webcam.grab();
+  cv::Mat cleanPlate{webcam.grab()};
 
   // Initialise matters available to user
-  auto none_matter{NoneMatter()};
-  auto background_negate_matter{BackgroundNegationMatter(cleanPlate)};
-  auto opencv_matter{OpenCVMatter()};
-  auto background_cut_matter{BackgroundCutMatter(cleanPlate)};
+  auto none_matter{new NoneMatter()};
+  auto background_negate_matter{new BackgroundNegationMatter(cleanPlate)};
+  auto opencv_matter{new OpenCVMatter()};
+  auto background_cut_matter{new BackgroundCutMatter(cleanPlate)};
   std::vector<std::pair<std::string, IMatter *>> matters{
-      {"None", &none_matter},
-      {"Background Negation", &background_negate_matter},
-      {"OpenCV", &opencv_matter},
-      {"Background Cut", &background_cut_matter}};
-  IMatter *matter = &none_matter;
+      {"None", none_matter},
+      {"Background Negation", background_negate_matter},
+      {"OpenCV", opencv_matter},
+      {"Background Cut", background_cut_matter}};
+  IMatter *matter = none_matter;
   std::mutex matter_mutex;
   std::unique_lock<std::mutex> matter_lock(matter_mutex, std::defer_lock);
 
@@ -83,12 +83,13 @@ int main() {
 
   while (running) {
     auto start{std::chrono::system_clock::now()};
+
+    matter_lock.lock();
     const cv::Mat frame{webcam.grab()};
     if (frame.empty()) {
       break;
     }
 
-    matter_lock.lock();
     cv::Mat result{matter->change_background(frame, *bg_mat)};
     matter_lock.unlock();
 
