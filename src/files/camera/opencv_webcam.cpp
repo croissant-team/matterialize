@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <iostream>
+#include <stdexcept>
 
 #include <opencv2/core.hpp>
 #include <opencv2/videoio.hpp>
@@ -17,7 +18,25 @@ void OpenCVWebcam::stop() {
   capture.release();
 }
 
+void OpenCVWebcam::changeDevice(int new_device) {
+  cv::VideoCapture attempt_capture;
+  attempt_capture.open(new_device);
+
+  if (!attempt_capture.isOpened()) {
+    throw std::invalid_argument("Device number not available");
+  }
+
+  attempt_capture.release();
+
+  std::scoped_lock lock(device_mutex);
+
+  stop();
+  device = new_device;
+  start();
+}
+
 cv::Mat OpenCVWebcam::grab() {
+  std::scoped_lock lock(device_mutex);
   cv::Mat frame{};
 
   capture >> frame;
