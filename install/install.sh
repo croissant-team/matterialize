@@ -13,7 +13,7 @@ EXE=matterialize-server
 
 # Install system deps
 if [ -f /etc/arch-release ]; then
-  sudo pacman -Sy --no-confirm v4l2loopback-dkms opencv
+  sudo pacman -Sy --noconfirm v4l2loopback-dkms opencv
 elif [ -f /etc/debian_version ]; then
   sudo apt update -y
   sudo apt install -y v4l2loopback-dkms opencv
