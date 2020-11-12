@@ -6,10 +6,16 @@ using namespace cv;
 Probability ColorModel::mix_probs(const Image &img) const {
   Mat result{};
 
-  addWeighted(
-      global_bg_model.global_probs(img).mat, mix_factor,
-      pixel_bg_model.get_pixel_probability(img).mat, 1 - mix_factor, 0.0,
-      result, CV_64FC1);
+  if (mix_factor <= 0.0) {
+    result = pixel_bg_model.get_pixel_probability(img).mat;
+  } else if (mix_factor >= 1.0) {
+    result = global_bg_model.global_probs(img).mat;
+  } else {
+    addWeighted(
+        global_bg_model.global_probs(img).mat, mix_factor,
+        pixel_bg_model.get_pixel_probability(img).mat, 1 - mix_factor, 0.0,
+        result, CV_64FC1);
+  }
 
   return Probability(std::move(result));
 }
