@@ -13,10 +13,10 @@ EXE=matterialize
 
 # Install system deps
 if [ -f /etc/arch-release ]; then
-  sudo pacman -Sy --no-confirm v4l2loopback-dkms
+  sudo pacman -Sy --no-confirm v4l2loopback-dkms opencv
 elif [ -f /etc/debian_version ]; then
   sudo apt update -y
-  sudo apt install -y v4l2loopback-dkms
+  sudo apt install -y v4l2loopback-dkms opencv
 else
   echo "Failed: Distro must be arch or debian based"
   exit 1
@@ -27,6 +27,7 @@ sudo install -D -m644 "install/$V4L2_LOOPBACK_CONFIG" "/etc/modprobe.d/$V4L2_LOO
 sudo modprobe -r v4l2loopback
 sudo modprobe v4l2loopback
 
+git submodule update --init --recursive
 
 # install C++ deps
 if [ ! -f vcpkg/vcpkg ]; then
@@ -36,10 +37,10 @@ fi
 ./vcpkg/vcpkg install pistache
 ./vcpkg/vcpkg install rapidjson
 ./vcpkg/vcpkg install gtest
-./vcpkg/vcpkg install opencv
+# ./vcpkg/vcpkg install opencv
 
 # build executable
-cmake -S $PROJECT_ROOT -B $BUILD_DIR -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=$CMAKE_TOOLCHAIN_FILE
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=$CMAKE_TOOLCHAIN_FILE -S $PROJECT_ROOT -B $BUILD_DIRs
 cmake --build $BUILD_DIR --target $EXE
 chmod +x $BUILD_DIR/$EXE
 
