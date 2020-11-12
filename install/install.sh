@@ -9,7 +9,7 @@ PROJECT_ROOT=$PWD
 BUILD_DIR=build_dir
 CMAKE_TOOLCHAIN_FILE=$(realpath vcpkg/scripts/buildsystems/vcpkg.cmake)
 V4L2_LOOPBACK_CONFIG=v4l2loopback.conf
-EXE=matterialize
+EXE=matterialize-server
 
 # Install system deps
 if [ -f /etc/arch-release ]; then
@@ -40,7 +40,7 @@ fi
 # ./vcpkg/vcpkg install opencv
 
 # build executable
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=$CMAKE_TOOLCHAIN_FILE -S $PROJECT_ROOT -B $BUILD_DIRs
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=$CMAKE_TOOLCHAIN_FILE -S $PROJECT_ROOT -B $BUILD_DIR
 cmake --build $BUILD_DIR --target $EXE
 chmod +x $BUILD_DIR/$EXE
 

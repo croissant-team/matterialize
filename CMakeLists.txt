@@ -33,9 +33,9 @@ file(GLOB_RECURSE tests
 
 set(MATTERIALIZE_SRC_FILES ${src} ${lib})
 
-add_executable(matterialize ${MATTERIALIZE_SRC_FILES} ${PROJECT_SOURCE_DIR}/src/mains/matterialize.cpp)
-target_link_libraries(matterialize PRIVATE ${OpenCV_LIBS})
-target_link_libraries(matterialize PRIVATE ${Pistache_LIBS} ${RAPIDJSON_INCLUDE_DIRS})
+add_executable(matterialize-server ${MATTERIALIZE_SRC_FILES} ${PROJECT_SOURCE_DIR}/src/mains/matterialize.cpp)
+target_link_libraries(matterialize-server PRIVATE ${OpenCV_LIBS})
+target_link_libraries(matterialize-server PRIVATE ${Pistache_LIBS} ${RAPIDJSON_INCLUDE_DIRS})
 
 
 add_executable(benchmatte ${MATTERIALIZE_SRC_FILES} ${PROJECT_SOURCE_DIR}/src/mains/benchmatte.cpp)
@@ -50,6 +50,7 @@ file(GLOB_RECURSE mains
         ${PROJECT_SOURCE_DIR}/src/mains/*.cpp
         )
 
+find_program(CLANG_FORMAT_BIN clang-format)
 if (NOT CLANG_FORMAT_BIN)
     message(STATUS "clang-format not found.")
 else ()
