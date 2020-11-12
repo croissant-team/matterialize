@@ -18,6 +18,7 @@
 constexpr int width{640};
 constexpr int height{480};
 constexpr int input_device{0};
+constexpr int preview_device{MATTERIALIZE_PREVIEW};
 constexpr int output_device{MATTERIALIZE_CAM};
 constexpr int num_void_frames{120};
 
@@ -31,6 +32,9 @@ int main() {
   // The webcam must be started before the fake webcam is initialised
   FakeWebcam output(output_device, width, height);
   output.start();
+  // Create preview webcam explicitly for frontend GUI use.
+  FakeWebcam preview(preview_device, width, height);
+  preview.start();
   // Grab some frames to ensure exposure/white balance are setup correctly
   for (int i{0}; i < num_void_frames; ++i) {
     webcam.grab();
@@ -94,6 +98,7 @@ int main() {
     matter_lock.unlock();
 
     output.write(result);
+    preview.write(result);
     std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(
                      std::chrono::system_clock::now() - start)
                      .count()
