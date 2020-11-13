@@ -14,4 +14,4 @@ uninstall-matterialize:
 uninstall-matterialize-server:
 	sudo rm -rf /usr/local/bin/matterialize-server
 
-.PHONY: install uninstall
+.PHONY: install install-matterialize install-matterialize-server uninstall uninstall-matterialize uninstall-matterialize-server
