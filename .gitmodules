@@ -1,6 +1,6 @@
 [submodule "vcpkg"]
 	path = vcpkg
-	url = git@github.com:microsoft/vcpkg.git
+	url = https://github.com/microsoft/vcpkg.git
 [submodule "matterialize-react-gui"]
 	path = matterialize-react-gui
 	url = git@gitlab.doc.ic.ac.uk:g17/matterialize-react-gui.git
