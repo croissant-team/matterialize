@@ -40,6 +40,7 @@ fi
 # ./vcpkg/vcpkg install opencv
 
 # build executable
+mkdir -p $BUILD_DIR
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=$CMAKE_TOOLCHAIN_FILE -S $PROJECT_ROOT -B $BUILD_DIR
 cmake --build $BUILD_DIR --target $EXE
 chmod +x $BUILD_DIR/$EXE
