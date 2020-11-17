@@ -5,9 +5,9 @@
 #include "../files/matting/background_negation_matter.hpp"
 #include "../files/matting/none_matter.hpp"
 #include "../files/matting/opencv_matter.hpp"
+#include "../files/server/server_endpoint.hpp"
 #include "../files/util/converter.hpp"
 #include "../files/util/video_devices.hpp"
-#include "../files/server/camera_endpoint.hpp"
 
 #include <chrono>
 #include <iostream>
@@ -71,7 +71,7 @@ int main() {
   int thr = 2;
   Pistache::Address addr(Pistache::Ipv4::any(), port);
 
-  CameraEndpoint cam_endpoint(
+  ServerEndpoint server(
       addr,
       running,
       webcam,
@@ -81,9 +81,11 @@ int main() {
       bg_mat,
       green_screen);
 
-  cam_endpoint.init(thr);
+  server.init(thr);
 
-  std::thread server_thread(&CameraEndpoint::start, &cam_endpoint);
+  std::thread server_thread(&ServerEndpoint::start, &server);
+
+  std::cout << "Starting...\n";
 
   while (running) {
     auto start{std::chrono::system_clock::now()};
@@ -105,7 +107,7 @@ int main() {
               << '\n';
   }
 
-  cam_endpoint.shutdown();
+  server.shutdown();
   server_thread.join();
   webcam.stop();
   output.stop();
