@@ -67,3 +67,8 @@ long double OpenCVWebcam::fps(int samples) {
 
   return 1000 / (sum / static_cast<long double>(samples));
 }
+void OpenCVWebcam::roll(int num_grabs) {
+  for (int i = 0; i < num_grabs; i++) {
+    grab();
+  }
+}

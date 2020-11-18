@@ -60,9 +60,7 @@ int main() {
   cleanup_handler.set_preview_webcam(&preview);
 
   // Grab some frames to ensure exposure/white balance are setup correctly
-  for (int i{0}; i < num_void_frames; ++i) {
-    webcam.grab();
-  }
+  webcam.roll(num_void_frames);
 
   const cv::Mat clean_plate{webcam.grab()};
 
@@ -88,6 +86,7 @@ int main() {
       addr,
       running,
       webcam,
+      opencv_controls,
       matter,
       initial_matter,
       matter_mutex,

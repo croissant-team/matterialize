@@ -2,10 +2,12 @@
 #include "../matting/none_matter.hpp"
 #include "../matting/opencv_matter.hpp"
 
+#define READJUSTMENT_FRAMES 60
+
 MatterHandler::MatterHandler(
-    OpenCVWebcam &webcam, IMatter *&matter, std::string &initial_matter,
-    std::mutex &matter_mutex, const cv::Mat &clean_plate)
+    OpenCVWebcam &webcam, OpenCVWebcamControls &webcam_controls, IMatter *&matter, std::string &initial_matter, std::mutex &matter_mutex,const cv::Mat &clean_plate)
     : webcam{webcam},
+      webcam_controls{webcam_controls},
       matter(matter),
       curr_matter{initial_matter},
       matter_lock(matter_mutex, std::defer_lock),
@@ -129,6 +131,9 @@ void MatterHandler::take_clean_plate(
       std::make_shared<Pistache::Http::Header::AccessControlAllowOrigin>("*"));
   response.headers().add(cors_header);
 
+  webcam_controls.enable_automatic();
+  webcam.roll(READJUSTMENT_FRAMES);
+  webcam_controls.disable_automatic();
   clean_plate = webcam.grab();
 
   matter_lock.lock();

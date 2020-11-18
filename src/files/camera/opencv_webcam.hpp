@@ -32,6 +32,8 @@ public:
 
   cv::Mat grab();
 
+  void roll(int num_grabs);
+
   long double fps(int samples);
 };
 
