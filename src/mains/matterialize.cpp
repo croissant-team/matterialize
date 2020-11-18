@@ -104,6 +104,7 @@ int main() {
                      .count()
               << '\n';
   }
+  opencv_controls.enable_automatic();
 
   server.shutdown();
   server_thread.join();
