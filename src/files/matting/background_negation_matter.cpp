@@ -16,3 +16,7 @@ cv::Mat BackgroundNegationMatter::background_mask(const cv::Mat &video_frame) {
 
   return mask;
 }
+
+bool BackgroundNegationMatter::requires_clean_plate() {
+  return true;
+}

@@ -14,8 +14,8 @@
 class MatterHandler {
 public:
   MatterHandler(
-      OpenCVWebcam &webcam, IMatter *&matter, std::mutex &matter_mutex,
-      std::vector<std::pair<std::string, IMatter *>> &matters);
+      OpenCVWebcam &webcam, IMatter *&matter, std::string &initial_matter,
+      std::mutex &matter_mutex, const cv::Mat &clean_plate);
   void setup_routes(Pistache::Rest::Router &router);
   void cleanup();
 
@@ -24,8 +24,11 @@ private:
   IMatter *&matter;
   std::string curr_matter;
   std::unique_lock<std::mutex> matter_lock;
-  std::map<std::string, IMatter *> matters_map;
+  std::map<std::string, MatterMode> type_map;
+  std::unordered_map<MatterMode, IMatter *> matters_map;
+  cv::Mat clean_plate;
 
+  IMatter *init_matter(MatterMode type);
   void get_matters(
       const Pistache::Rest::Request &request,
       Pistache::Http::ResponseWriter response);

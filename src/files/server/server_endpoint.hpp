@@ -24,9 +24,9 @@ class ServerEndpoint {
 public:
   explicit ServerEndpoint(
       Pistache::Address addr, std::atomic_bool &running, OpenCVWebcam &webcam,
-      IMatter *&matter, std::mutex &matter_mutex,
-      std::vector<std::pair<std::string, IMatter *>> &matters,
-      const cv::Mat *&bg_mat, const cv::Mat &green_screen);
+      IMatter *&matter, std::string &initial_matter, std::mutex &matter_mutex,
+      const cv::Mat &clean_plate, const cv::Mat *&bg_mat,
+      const cv::Mat &green_screen);
 
   void init(size_t thr = 2);
 

@@ -3,13 +3,15 @@
 
 #include <opencv2/core.hpp>
 
-enum class MatterMode { BACKGROUND_NEGATION, OPENCV, BACKGROUND_CUT };
+enum class MatterMode { NONE, BACKGROUND_NEGATION, OPENCV, BACKGROUND_CUT };
 
 class IMatter {
 public:
   virtual ~IMatter() = default;
 
   virtual cv::Mat background_mask(const cv::Mat &video_frame) = 0;
+
+  virtual bool requires_clean_plate() = 0;
 
   cv::Mat
   change_background(const cv::Mat &video_frame, const cv::Mat &new_background);

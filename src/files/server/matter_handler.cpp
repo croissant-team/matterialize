@@ -1,16 +1,25 @@
 #include "matter_handler.hpp"
+#include "../matting/none_matter.hpp"
+#include "../matting/opencv_matter.hpp"
 
 MatterHandler::MatterHandler(
-    OpenCVWebcam &webcam, IMatter *&matter, std::mutex &matter_mutex,
-    std::vector<std::pair<std::string, IMatter *>> &matters)
+    OpenCVWebcam &webcam, IMatter *&matter, std::string &initial_matter,
+    std::mutex &matter_mutex, const cv::Mat &clean_plate)
     : webcam{webcam},
       matter(matter),
-      curr_matter{"None"},
+      curr_matter{initial_matter},
       matter_lock(matter_mutex, std::defer_lock),
-      matters_map{} {
-  for (auto &[name, matter] : matters) {
-    matters_map[name] = matter;
-  }
+      type_map{},
+      matters_map{},
+      clean_plate{clean_plate} {
+  type_map["Background Cut"] = MatterMode::BACKGROUND_CUT;
+  type_map["Background Negation"] = MatterMode::BACKGROUND_NEGATION;
+  type_map["None"] = MatterMode::NONE;
+  type_map["OpenCV"] = MatterMode::OPENCV;
+
+  auto initial_type = type_map[initial_matter];
+  matters_map[initial_type] = init_matter(initial_type);
+  matter = matters_map[initial_type];
 }
 
 void MatterHandler::setup_routes(Pistache::Rest::Router &router) {
@@ -35,6 +44,19 @@ void MatterHandler::cleanup() {
   }
 }
 
+IMatter *MatterHandler::init_matter(MatterMode type) {
+  switch (type) {
+    case MatterMode::NONE:
+      return new NoneMatter();
+    case MatterMode::BACKGROUND_NEGATION:
+      return new BackgroundNegationMatter(clean_plate);
+    case MatterMode::OPENCV:
+      return new OpenCVMatter();
+    case MatterMode::BACKGROUND_CUT:
+      return new BackgroundCutMatter(clean_plate);
+  }
+}
+
 void MatterHandler::get_matters(
     const Pistache::Rest::Request &request,
     Pistache::Http::ResponseWriter response) {
@@ -48,7 +70,7 @@ void MatterHandler::get_matters(
   writer.StartObject();
   writer.Key("matters");
   writer.StartArray();
-  for (auto &[name, _] : matters_map) {
+  for (auto &[name, _] : type_map) {
     if (name != "None") {
       writer.StartObject();
       writer.Key("name");
@@ -81,18 +103,25 @@ void MatterHandler::set_matter(
 
   std::string choice{document["matter"].GetString()};
 
-  if (matters_map.count(choice) == 0) {
+  if (type_map.count(choice) == 0) {
     response.send(Pistache::Http::Code::Bad_Request, "Invalid matter name");
     return;
   }
 
-  matter_lock.lock();
   curr_matter = choice;
-  matter = matters_map[choice];
+  auto matter_type = type_map[choice];
+
+  if (matters_map.count(matter_type) == 0) {
+    matters_map[matter_type] = init_matter(matter_type);
+  }
+
+  matter_lock.lock();
+  matter = matters_map[matter_type];
   matter_lock.unlock();
 
   response.send(Pistache::Http::Code::Ok, "Matter changed to " + choice);
 }
+
 void MatterHandler::take_clean_plate(
     const Pistache::Rest::Request &request,
     Pistache::Http::ResponseWriter response) {
@@ -100,22 +129,26 @@ void MatterHandler::take_clean_plate(
       std::make_shared<Pistache::Http::Header::AccessControlAllowOrigin>("*"));
   response.headers().add(cors_header);
 
-  const cv::Mat new_plate{webcam.grab()};
+  clean_plate = webcam.grab();
 
   matter_lock.lock();
-  auto bg_negate_matter{new BackgroundNegationMatter(new_plate)};
-  auto bg_cut_matter{new BackgroundCutMatter(new_plate)};
 
-  auto old_bg_negate{matters_map["Background Negation"]};
-  auto old_bg_cut{matters_map["Background Cut"]};
+  for (auto i{matters_map.begin()}; i != matters_map.end();) {
+    auto j = i;
+    i++;
 
-  matters_map["Background Negation"] = bg_negate_matter;
-  matters_map["Background Cut"] = bg_cut_matter;
+    if (j->second->requires_clean_plate()) {
+      delete j->second;
+      matters_map.erase(j);
+    }
+  }
 
-  delete old_bg_negate;
-  delete old_bg_cut;
+  auto curr_matter_type = type_map[curr_matter];
 
-  matter = matters_map[curr_matter];
+  if (matters_map.count(curr_matter_type) == 0) {
+    matters_map[curr_matter_type] = init_matter(curr_matter_type);
+    matter = matters_map[curr_matter_type];
+  }
 
   matter_lock.unlock();
 

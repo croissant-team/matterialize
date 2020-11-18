@@ -11,8 +11,8 @@
 
 #include <chrono>
 #include <iostream>
-#include <thread>
 #include <pistache/net.h>
+#include <thread>
 #include <v4l2cpp/V4l2Capture.h>
 
 constexpr int width{640};
@@ -26,8 +26,11 @@ int main() {
   std::cout << "Matterialize\n";
 
   OpenCVWebcam webcam(input_device, width, height);
-  webcam.start();
-  // The webcam must be started before request.param(":dev_num").as<std::string>();request.param(":dev_num").as<std::string>();the webcam controls are initialised
+
+  try {
+    webcam.start();
+  } catch (const std::exception &e) { std::cout << e.what() << "\n"; }
+  // The webcam must be started before the webcam controls are initialised
   OpenCVWebcamControls opencv_controls(webcam);
   // The webcam must be started before the fake webcam is initialised
   FakeWebcam output(output_device, width, height);
@@ -35,24 +38,16 @@ int main() {
   // Create preview webcam explicitly for frontend GUI use.
   FakeWebcam preview(preview_device, width, height);
   preview.start();
+
   // Grab some frames to ensure exposure/white balance are setup correctly
   for (int i{0}; i < num_void_frames; ++i) {
     webcam.grab();
   }
 
-  cv::Mat cleanPlate{webcam.grab()};
+  const cv::Mat clean_plate{webcam.grab()};
 
-  // Initialise matters available to user
-  auto none_matter{new NoneMatter()};
-  auto background_negate_matter{new BackgroundNegationMatter(cleanPlate)};
-  auto opencv_matter{new OpenCVMatter()};
-  auto background_cut_matter{new BackgroundCutMatter(cleanPlate)};
-  std::vector<std::pair<std::string, IMatter *>> matters{
-      {"None", none_matter},
-      {"Background Negation", background_negate_matter},
-      {"OpenCV", opencv_matter},
-      {"Background Cut", background_cut_matter}};
-  IMatter *matter = none_matter;
+  IMatter *matter = nullptr;
+  std::string initial_matter{"None"};
   std::mutex matter_mutex;
   std::unique_lock<std::mutex> matter_lock(matter_mutex, std::defer_lock);
 
@@ -76,14 +71,17 @@ int main() {
       running,
       webcam,
       matter,
+      initial_matter,
       matter_mutex,
-      matters,
+      clean_plate,
       bg_mat,
       green_screen);
 
   server.init(thr);
 
   std::thread server_thread(&ServerEndpoint::start, &server);
+
+  matter = new BackgroundCutMatter(clean_plate);
 
   std::cout << "Starting...\n";
 

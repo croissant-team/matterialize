@@ -26,3 +26,7 @@ cv::Mat BackgroundCutMatter::background_mask(const cv::Mat &video_frame) {
       INTER_LINEAR_EXACT);
   return std::move(mask);
 }
+
+bool BackgroundCutMatter::requires_clean_plate() {
+  return true;
+}
