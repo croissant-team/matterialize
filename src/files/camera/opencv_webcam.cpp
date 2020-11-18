@@ -9,6 +9,11 @@
 
 void OpenCVWebcam::start() {
   capture.open(device, cv::CAP_V4L);
+
+  if (!capture.isOpened()) {
+    throw std::invalid_argument("Device number not available");
+  }
+
   capture.set(cv::CAP_PROP_FRAME_WIDTH, width);
   capture.set(cv::CAP_PROP_FRAME_HEIGHT, height);
   //  capture.set(cv::CAP_PROP_BUFFERSIZE, 3);

@@ -39,6 +39,7 @@ public:
             color_model_mix_factor, global_bg_model_num_components,
             global_fg_model_num_components, global_fg_model_fg_threshold} {};
   cv::Mat background_mask(const cv::Mat &video_frame) override;
+  bool requires_clean_plate() override;
 };
 
 #endif
