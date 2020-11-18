@@ -6,10 +6,12 @@
 #include "../files/matting/none_matter.hpp"
 #include "../files/matting/opencv_matter.hpp"
 #include "../files/server/server_endpoint.hpp"
+#include "../files/util/cleanup_handler.hpp"
 #include "../files/util/converter.hpp"
 #include "../files/util/video_devices.hpp"
 
 #include <chrono>
+#include <csignal>
 #include <iostream>
 #include <pistache/net.h>
 #include <thread>
@@ -21,28 +23,43 @@ constexpr int input_device{0};
 constexpr int preview_device{MATTERIALIZE_PREVIEW};
 constexpr int output_device{MATTERIALIZE_CAM};
 constexpr int num_void_frames{120};
+CleanupHandler cleanup_handler{};
+std::vector<int> signals{SIGABRT, SIGFPE, SIGILL, SIGINT, SIGSEGV, SIGTERM};
+
+void handle_signal(int signal) {
+  cleanup_handler.perform_cleanup_actions(signal);
+}
 
 int main() {
+  std::atomic_bool running{true};
+  cleanup_handler = CleanupHandler();
+  for (auto &signal : signals) {
+    std::signal(signal, handle_signal);
+  }
   std::cout << "Matterialize\n";
 
   OpenCVWebcam webcam(input_device, width, height);
-
   try {
     webcam.start();
   } catch (const std::exception &e) { std::cout << e.what() << "\n"; }
+  cleanup_handler.set_input_webcam(&webcam);
+  // The webcam must be started before
+  // webcam controls are initialised
+
   // The webcam must be started before the webcam controls are initialised
   OpenCVWebcamControls opencv_controls(webcam);
+  cleanup_handler.set_camera_controls(&opencv_controls);
   // The webcam must be started before the fake webcam is initialised
   FakeWebcam output(output_device, width, height);
   output.start();
+  cleanup_handler.set_output_webcam(&output);
   // Create preview webcam explicitly for frontend GUI use.
   FakeWebcam preview(preview_device, width, height);
   preview.start();
+  cleanup_handler.set_preview_webcam(&preview);
 
   // Grab some frames to ensure exposure/white balance are setup correctly
-  for (int i{0}; i < num_void_frames; ++i) {
-    webcam.grab();
-  }
+  webcam.roll(num_void_frames);
 
   const cv::Mat clean_plate{webcam.grab()};
 
@@ -51,11 +68,9 @@ int main() {
   std::mutex matter_mutex;
   std::unique_lock<std::mutex> matter_lock(matter_mutex, std::defer_lock);
 
-  // The automatic controls should be disabled after the fake cam is initialised
-  // to give time for the automatic values to settle
+  // The automatic controls should be disabled after the fake cam is
+  // initialised to give time for the automatic values to settle
   opencv_controls.disable_automatic();
-
-  std::atomic_bool running{true};
 
   const cv::Scalar scalar(0.0, 255.0, 0.0);
   const cv::Mat green_screen(height, width, CV_8UC3, scalar);
@@ -70,18 +85,18 @@ int main() {
       addr,
       running,
       webcam,
+      opencv_controls,
       matter,
       initial_matter,
       matter_mutex,
       clean_plate,
       bg_mat,
       green_screen);
-
   server.init(thr);
+  cleanup_handler.set_server_endpoint(&server);
 
   std::thread server_thread(&ServerEndpoint::start, &server);
-
-  matter = new BackgroundCutMatter(clean_plate);
+  cleanup_handler.set_server_thread(&server_thread);
 
   std::cout << "Starting...\n";
 
@@ -104,9 +119,5 @@ int main() {
                      .count()
               << '\n';
   }
-
-  server.shutdown();
-  server_thread.join();
-  webcam.stop();
-  output.stop();
+  cleanup_handler.perform_cleanup_actions(0);
 }

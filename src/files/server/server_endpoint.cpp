@@ -2,12 +2,13 @@
 
 ServerEndpoint::ServerEndpoint(
     Pistache::Address addr, std::atomic_bool &running, OpenCVWebcam &webcam,
-    IMatter *&matter, std::string &initial_matter, std::mutex &matter_mutex,
-    const cv::Mat &clean_plate, const cv::Mat *&bg_mat,
-    const cv::Mat &green_screen)
+    OpenCVWebcamControls &webcam_controls, IMatter *&matter, std::string &initial_matter,
+    std::mutex &matter_mutex,
+    const cv::Mat &clean_plate,
+    const cv::Mat *&bg_mat, const cv::Mat &green_screen)
     : httpEndpoint(std::make_shared<Pistache::Http::Endpoint>(addr)),
       camera_handler(webcam),
-      matter_handler(webcam, matter, initial_matter, matter_mutex, clean_plate),
+      matter_handler(webcam, webcam_controls, matter, initial_matter, matter_mutex, clean_plate),
       bg_handler(matter_mutex, bg_mat, green_screen),
       server_handler(running) {}
 

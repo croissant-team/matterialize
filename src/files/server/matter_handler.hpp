@@ -2,6 +2,7 @@
 #define MATTERIALIZE_MATTER_HANDLER_HPP
 
 #include "../camera/opencv_webcam.hpp"
+#include "../camera/opencv_webcam_controls.hpp"
 #include "../matting/background_cut/background_cut_matter.hpp"
 #include "../matting/background_negation_matter.hpp"
 #include "../matting/matter.hpp"
@@ -14,13 +15,15 @@
 class MatterHandler {
 public:
   MatterHandler(
-      OpenCVWebcam &webcam, IMatter *&matter, std::string &initial_matter,
-      std::mutex &matter_mutex, const cv::Mat &clean_plate);
+      OpenCVWebcam &webcam, OpenCVWebcamControls &webcam_controls,
+      IMatter *&matter, std::string &initial_matter, std::mutex &matter_mutex,
+      const cv::Mat &clean_plate);
   void setup_routes(Pistache::Rest::Router &router);
   void cleanup();
 
 private:
   OpenCVWebcam &webcam;
+  OpenCVWebcamControls &webcam_controls;
   IMatter *&matter;
   std::string curr_matter;
   std::unique_lock<std::mutex> matter_lock;
