@@ -99,8 +99,6 @@ int main() {
   std::thread server_thread(&ServerEndpoint::start, &server);
   cleanup_handler.set_server_thread(&server_thread);
 
-  matter = new BackgroundCutMatter(clean_plate);
-
   std::cout << "Starting...\n";
 
   while (running) {
