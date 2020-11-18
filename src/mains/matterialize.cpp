@@ -44,7 +44,6 @@ int main() {
   } catch (const std::exception &e) { std::cout << e.what() << "\n"; }
   cleanup_handler.set_input_webcam(&webcam);
   // The webcam must be started before
-  // request.param(":dev_num").as<std::string>();request.param(":dev_num").as<std::string>();the
   // webcam controls are initialised
 
   // The webcam must be started before the webcam controls are initialised
