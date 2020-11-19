@@ -1,12 +1,14 @@
 #include "../files/benchmatte/benchmark.hpp"
 #include "../files/camera/fake_webcam.hpp"
 #include "../files/camera/opencv_webcam_controls.hpp"
+#include "../files/camera/video_recorder.hpp"
 #include "../files/matting/background_negation_matter.hpp"
 #include "../files/server/server_endpoint.hpp"
 #include "../files/util/cleanup_handler.hpp"
 #include "../files/util/converter.hpp"
 
 #include <chrono>
+#include <condition_variable>
 #include <csignal>
 #include <iostream>
 #include <pistache/net.h>
@@ -92,6 +94,51 @@ int main() {
 
   std::cout << "Starting...\n";
 
+  queue<cv::Mat> frame_queue;
+  cleanup_handler.set_frame_queue(&frame_queue);
+  std::mutex frame_queue_mutex;
+  cleanup_handler.set_frame_queue_mutex(&frame_queue_mutex);
+  std::condition_variable new_entry;
+  cleanup_handler.set_condition_variable(&new_entry);
+  bool has_new_entry = false;
+  cleanup_handler.set_condition_boolean(&has_new_entry);
+
+  int i = 0;
+  auto start{std::chrono::system_clock::now()};
+  while (i < 30) {
+    matter_lock.lock();
+    const cv::Mat frame{webcam.grab()};
+    if (frame.empty()) {
+      break;
+    }
+
+    cv::Mat result{matter->change_background(frame, bg_settings.generate_background(frame))};
+    matter_lock.unlock();
+
+    output.write(result);
+    preview.write(result);
+    frame_queue_mutex.lock();
+    frame_queue.push(result);
+    has_new_entry = true;
+    cout << frame_queue.size() << "\n";
+    frame_queue_mutex.unlock();
+    new_entry.notify_one();
+    i++;
+  }
+  int fps = 30000 / std::chrono::duration_cast<std::chrono::milliseconds>(
+                     std::chrono::system_clock::now() - start)
+                     .count();
+  cout << "fps is " << fps << "\n";
+
+  VideoRecorder recorder = VideoRecorder(
+      fps,
+      output.get_size(),
+      frame_queue,
+      frame_queue_mutex,
+      new_entry,
+      has_new_entry);
+  std::thread recording_thread(&VideoRecorder::record, recorder);
+
   while (running) {
     auto start{std::chrono::system_clock::now()};
 
@@ -106,10 +153,16 @@ int main() {
 
     output.write(result);
     preview.write(result);
-    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(
-                     std::chrono::system_clock::now() - start)
-                     .count()
-              << '\n';
+    frame_queue_mutex.lock();
+    frame_queue.push(result);
+    has_new_entry = true;
+    cout << frame_queue.size() << "\n";
+    frame_queue_mutex.unlock();
+    new_entry.notify_one();
+    int elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                         std::chrono::system_clock::now() - start)
+                         .count();
+    cout << elapsed_ms << '\n';
   }
   cleanup_handler.perform_cleanup_actions(0);
 }
