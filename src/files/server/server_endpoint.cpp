@@ -1,15 +1,16 @@
 #include "server_endpoint.hpp"
+#include "../util/background_settings.hpp"
 
 ServerEndpoint::ServerEndpoint(
     Pistache::Address addr, std::atomic_bool &running, OpenCVWebcam &webcam,
     OpenCVWebcamControls &webcam_controls, IMatter *&matter, std::string &initial_matter,
     std::mutex &matter_mutex,
     const cv::Mat &clean_plate,
-    const cv::Mat *&bg_mat, const cv::Mat &green_screen)
+    BackgroundSettings &bg_settings)
     : httpEndpoint(std::make_shared<Pistache::Http::Endpoint>(addr)),
       camera_handler(webcam),
       matter_handler(webcam, webcam_controls, matter, initial_matter, matter_mutex, clean_plate),
-      bg_handler(matter_mutex, bg_mat, green_screen),
+      bg_handler(matter_mutex, bg_settings),
       server_handler(running) {}
 
 void ServerEndpoint::init(size_t thr) {
