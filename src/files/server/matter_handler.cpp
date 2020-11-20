@@ -4,8 +4,12 @@
 
 #define READJUSTMENT_FRAMES 60
 
+using namespace Pistache;
+
 MatterHandler::MatterHandler(
-    OpenCVWebcam &webcam, OpenCVWebcamControls &webcam_controls, IMatter *&matter, std::string &initial_matter, std::mutex &matter_mutex,const cv::Mat &clean_plate)
+    OpenCVWebcam &webcam, OpenCVWebcamControls &webcam_controls,
+    IMatter *&matter, std::string &initial_matter, std::mutex &matter_mutex,
+    const cv::Mat &clean_plate)
     : webcam{webcam},
       webcam_controls{webcam_controls},
       matter(matter),
@@ -58,7 +62,54 @@ IMatter *MatterHandler::init_matter(MatterMode type) {
       return new BackgroundCutMatter(clean_plate);
   }
 }
+/*
+void MatterHandler::set_config(
+    const Rest::Request &request, Http::ResponseWriter response) {
+  auto cors_header(
+      std::make_shared<Http::Header::AccessControlAllowOrigin>("*"));
+  response.headers().add(cors_header);
 
+  rapidjson::Document document;
+  document.Parse(request.body().c_str());
+
+  if (document.IsNull() || !document.HasMember("matter")) {
+    response.send(Http::Code::Bad_Request, "No matter option given");
+    return;
+  }
+
+  // TODO probably want to change the API for the JSON field to be "matter_type"
+  // rather than "matter"
+  std::string matter_type{document["matter"].GetString()};
+
+  if (type_map.count(matter_type) == 0) {
+    response.send(Http::Code::Bad_Request, "Invalid matter name");
+    return;
+  }
+
+  if (!document.HasMember("config")) {
+    response.send(Http::Code::Bad_Request, "No \"config\" field given");
+    return;
+  }
+
+  auto config_fields_json = document["config"].GetObject();
+  map<string, string> config_fields{};
+  for (auto &field : config_fields_json) {
+    if (!field.value.IsString()) {
+      response.send(
+          Http::Code::Bad_Request,
+          "Currently only string config fields are supported");
+      return;
+    }
+    config_fields[field.name.GetString()] = field.value.GetString();
+  }
+
+  auto matter_mode = type_map[matter_type];
+  auto matter = matters_map[matter_mode];
+  matter_lock.lock();
+  matters_map[matter_mode] = matter.update_config(config_fields);
+  matter_lock.unlock();
+}
+*/
 void MatterHandler::get_matters(
     const Pistache::Rest::Request &request,
     Pistache::Http::ResponseWriter response) {
