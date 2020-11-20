@@ -13,8 +13,15 @@ vector<vector<BenchmarkResult>> Benchmark::run() {
       "OpenCVMatter", "BackgroundNegationMatter", "BackgroundCutMatter"};
   for (int i = 0; i < backgrounds.size(); i++) {
     OpenCVMatter opencv_matter = OpenCVMatter();
-    BackgroundNegationMatter background_negation_matter =
-        BackgroundNegationMatter(backgrounds[i]);
+
+    // TODO Ask Matteo for cleanup help here
+    const auto &background_negation_mode = BackgroundNegationMode();
+    auto background_negation_config =
+        MatterConfig::default_for(background_negation_mode);
+    auto background_negation_matter =
+        BackgroundNegationMatter(backgrounds[i], background_negation_config);
+    //-------------------------------------------------------------------------
+
     BackgroundCutMatter background_cut_matter =
         BackgroundCutMatter(backgrounds[i]);
     IMatter *matters[] = {

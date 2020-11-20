@@ -7,7 +7,9 @@
 #include <opencv2/core.hpp>
 
 #include "matter.hpp"
-#include "matter_type.hpp"
+#include "matter_config.hpp"
+#include "matter_mode.hpp"
+
 class BackgroundNegationMatter : public IMatter {
 private:
   const cv::Mat background;
@@ -26,7 +28,8 @@ public:
 };
 
 // Example of how an implementer would create matter mode
-class BackgroundNegationMode : IMatterMode {
+class BackgroundNegationMode : public IMatterMode {
+public:
   [[nodiscard]] string name() const override {
     return "Background Negation";
   }
@@ -36,7 +39,7 @@ class BackgroundNegationMode : IMatterMode {
   }
 
   [[nodiscard]] IMatter *
-  init_matter(MatterInitData &data, MatterConfig &config) override {
+  init_matter(MatterInitData &data, MatterConfig &config) const override {
     return new BackgroundNegationMatter(data.clean_plate.mat, config);
   }
 };

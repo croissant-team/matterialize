@@ -55,7 +55,9 @@ IMatter *MatterHandler::init_matter(MatterMode type) {
     case MatterMode::NONE:
       return new NoneMatter();
     case MatterMode::BACKGROUND_NEGATION:
-      return new BackgroundNegationMatter(clean_plate);
+      //TODO
+      //return new BackgroundNegationMatter(clean_plate);
+      exit(1);
     case MatterMode::OPENCV:
       return new OpenCVMatter();
     case MatterMode::BACKGROUND_CUT:
