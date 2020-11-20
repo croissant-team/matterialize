@@ -14,6 +14,9 @@ set(Pistache_LIBS pistache_static gcov) # Don't really know why but gcov is need
 find_package(RapidJSON CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 set(GTest_LIBS GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main)
+find_package(X11 REQUIRED)
+include_directories(${X11_INCLUDE_DIR})
+link_directories(${X11_LIBRARIES})
 
 include_directories(lib)
 
@@ -36,7 +39,7 @@ set(MATTERIALIZE_SRC_FILES ${src} ${lib})
 add_executable(matterialize-server ${MATTERIALIZE_SRC_FILES} ${PROJECT_SOURCE_DIR}/src/mains/matterialize.cpp)
 target_link_libraries(matterialize-server PRIVATE ${OpenCV_LIBS})
 target_link_libraries(matterialize-server PRIVATE ${Pistache_LIBS} ${RAPIDJSON_INCLUDE_DIRS})
-
+target_link_libraries(matterialize-server PRIVATE ${X11_LIBRARIES})
 
 add_executable(benchmatte ${MATTERIALIZE_SRC_FILES} ${PROJECT_SOURCE_DIR}/src/mains/benchmatte.cpp)
 target_link_libraries(benchmatte ${OpenCV_LIBS})
