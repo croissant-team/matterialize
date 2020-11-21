@@ -1,14 +1,10 @@
 #include "../files/benchmatte/benchmark.hpp"
 #include "../files/camera/fake_webcam.hpp"
 #include "../files/camera/opencv_webcam_controls.hpp"
-#include "../files/matting/background_cut/background_cut_matter.hpp"
 #include "../files/matting/background_negation_matter.hpp"
-#include "../files/matting/none_matter.hpp"
-#include "../files/matting/opencv_matter.hpp"
 #include "../files/server/server_endpoint.hpp"
 #include "../files/util/cleanup_handler.hpp"
 #include "../files/util/converter.hpp"
-#include "../files/util/video_devices.hpp"
 
 #include <chrono>
 #include <csignal>

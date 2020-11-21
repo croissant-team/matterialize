@@ -7,3 +7,16 @@ cv::Mat NoneMatter::background_mask(const cv::Mat &video_frame) {
 bool NoneMatter::requires_clean_plate() {
   return false;
 }
+const string NoneMode::name() const {
+  return "None";
+}
+IMatter *
+NoneMode::init_matter(MatterInitData &data, MatterConfig &config) const {
+  return new NoneMatter();
+}
+vector<MatterConfigField> NoneMode::config_fields() const {
+  return vector<MatterConfigField>();
+}
+bool NoneMode::requires_clean_plate() const {
+  return false;
+}

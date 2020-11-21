@@ -16,9 +16,12 @@ MatterHandler::MatterHandler(
       curr_matter{initial_matter},
       matter_lock(matter_mutex, std::defer_lock),
       clean_plate{clean_plate} {
-  for (const IMatterMode *const mode : MatterModes::modes) {
+  for (auto mode : MatterModes::modes) {
     matter_states.try_emplace(mode, mode, clean_plate);
   }
+  auto matter_mode = MatterModes::get_by_name(curr_matter);
+  auto &matter_state = matter_states.at(matter_mode);
+  matter = matter_state.get_matter();
 }
 
 void MatterHandler::setup_routes(Pistache::Rest::Router &router) {
@@ -114,6 +117,9 @@ void MatterHandler::take_clean_plate(
   webcam_controls.disable_automatic();
   clean_plate = webcam.grab();
 
+  //TODO fix problems (at least 2)
+  // 1. curr_matter is probably out of date
+  // 2. clean_plate_update doesn't get passed a clean plate!!
   for (auto &[matter_mode, matter_state] : matter_states) {
     if (matter_mode->name() == curr_matter) {
       matter_lock.lock();

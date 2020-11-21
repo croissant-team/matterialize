@@ -13,26 +13,37 @@ bool MatterConfig::update(map<string, string> field_updates) {
   for (auto &[name, value] : field_updates) {
     MatterConfigField field;
 
-    try {
-      field = fields_map.at(name);
-    } catch (const out_of_range &e) {
+    if (!config_document.HasMember(name.c_str())) {
       string err_msg{name + " is not a valid config field for given matter"};
       throw invalid_argument(err_msg);
     }
 
-    this->set_field(name, value);
+    // Sets field value in json document
+    auto &json_field = config_document[name.c_str()];
+    json_field.SetString(value.c_str(), config_document.GetAllocator());
+
     must_reinit |= field.requires_init;
   }
 
   return must_reinit;
 }
 
-void MatterConfig::set_field(string field_name, string value) {
-  assert(config_document.HasMember(field_name.c_str()));
-  auto value_json = &config_document[field_name.c_str()];
-  value_json->SetString(value.c_str(), config_document.GetAllocator());
-}
-
 MatterConfig MatterConfig::default_for(const IMatterMode *mode) {
   return MatterConfig(mode->config_fields());
+}
+MatterConfig::MatterConfig(vector<MatterConfigField> fields) {
+  // initialize json document with default fields values;
+
+  config_document.SetObject();
+  for (auto &field : fields) {
+    rapidjson::Value field_name;
+    rapidjson::Value field_default_value;
+
+    field_name.SetString(field.name, config_document.GetAllocator());
+    field_default_value.SetString(
+        field.default_value, config_document.GetAllocator());
+
+    config_document.AddMember(
+        field_name, field_default_value, config_document.GetAllocator());
+  }
 }
