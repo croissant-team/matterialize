@@ -15,9 +15,9 @@ vector<vector<BenchmarkResult>> Benchmark::run() {
     OpenCVMatter opencv_matter = OpenCVMatter();
 
     // TODO Ask Matteo for cleanup help here
-    const auto &background_negation_mode = BackgroundNegationMode();
+    const auto background_negation_mode = BackgroundNegationMode();
     auto background_negation_config =
-        MatterConfig::default_for(background_negation_mode);
+        MatterConfig::default_for(&background_negation_mode);
     auto background_negation_matter =
         BackgroundNegationMatter(backgrounds[i], background_negation_config);
     //-------------------------------------------------------------------------

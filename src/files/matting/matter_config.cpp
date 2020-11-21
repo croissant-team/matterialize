@@ -5,6 +5,8 @@ string MatterConfig::get(MatterConfigField field) {
   return config_document[field.name].GetString();
 }
 
+// Updates the config an returns true if the updates require the matter
+// to be reinitialized
 bool MatterConfig::update(map<string, string> field_updates) {
   bool must_reinit = false;
 
@@ -14,9 +16,8 @@ bool MatterConfig::update(map<string, string> field_updates) {
     try {
       field = fields_map.at(name);
     } catch (const out_of_range &e) {
-      ostringstream err_msg;
-      err_msg << name << " is not a valid config field for given matter";
-      throw invalid_argument(err_msg.str());
+      string err_msg{name + " is not a valid config field for given matter"};
+      throw invalid_argument(err_msg);
     }
 
     this->set_field(name, value);
@@ -32,6 +33,6 @@ void MatterConfig::set_field(string field_name, string value) {
   value_json->SetString(value.c_str(), config_document.GetAllocator());
 }
 
-MatterConfig MatterConfig::default_for(const IMatterMode &mode) {
-  return MatterConfig(mode.config_fields());
+MatterConfig MatterConfig::default_for(const IMatterMode *mode) {
+  return MatterConfig(mode->config_fields());
 }

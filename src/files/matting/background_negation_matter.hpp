@@ -1,7 +1,6 @@
 #ifndef MATTERIALIZE_BACKGROUND_NEGATION_MATTER_HPP
 #define MATTERIALIZE_BACKGROUND_NEGATION_MATTER_HPP
 
-
 #include <utility>
 
 #include <opencv2/core.hpp>
@@ -16,8 +15,8 @@ private:
   MatterConfig &config;
 
 public:
-  constexpr static MatterConfigField threshold =
-      MatterConfigField{"threshold", "25", false};
+  constexpr static MatterConfigField threshold{
+      MatterConfigField{"threshold", "25", false}};
 
   explicit BackgroundNegationMatter(
       cv::Mat background, MatterConfig &config) noexcept
@@ -30,7 +29,7 @@ public:
 // Example of how an implementer would create matter mode
 class BackgroundNegationMode : public IMatterMode {
 public:
-  [[nodiscard]] string name() const override {
+  [[nodiscard]] const string name() const override {
     return "Background Negation";
   }
 
@@ -38,9 +37,13 @@ public:
     return {BackgroundNegationMatter::threshold};
   }
 
+  [[nodiscard]] bool requires_clean_plate() const override {
+    return true;
+  }
+
   [[nodiscard]] IMatter *
   init_matter(MatterInitData &data, MatterConfig &config) const override {
-    return new BackgroundNegationMatter(data.clean_plate.mat, config);
+    return new BackgroundNegationMatter(data.clean_plate, config);
   }
 };
 #endif

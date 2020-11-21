@@ -3,14 +3,13 @@
 
 #include <opencv2/core.hpp>
 
-enum class MatterMode { NONE, BACKGROUND_NEGATION, OPENCV, BACKGROUND_CUT };
-
 class IMatter {
 public:
   virtual ~IMatter() = default;
 
   virtual cv::Mat background_mask(const cv::Mat &video_frame) = 0;
 
+  //TODO remove once every IMatter has been converted
   virtual bool requires_clean_plate() = 0;
 
   cv::Mat

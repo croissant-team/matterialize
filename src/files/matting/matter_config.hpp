@@ -29,17 +29,18 @@ private:
   rapidjson::Document config_document{};
   std::map<std::string, MatterConfigField> fields_map{};
 
-  void set_field(std::string field_name, std::string value);
-  [[nodiscard]] bool update(std::map<std::string, std::string> field_updates);
+  void set_field(string field_name, string value);
+  [[nodiscard]] bool update(map<string, string> field_updates);
 
   explicit MatterConfig(vector<MatterConfigField> fields) {
     for (auto &field : fields) {
       fields_map[field.name] = field;
+      set_field(field.name, field.default_value);
     }
   }
 
 public:
-  static MatterConfig default_for(const IMatterMode &mode);
+  static MatterConfig default_for(const IMatterMode *mode);
   std::string get(MatterConfigField field);
 };
 
