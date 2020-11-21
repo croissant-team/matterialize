@@ -9,7 +9,7 @@ cv::Mat BackgroundNegationMatter::background_mask(const cv::Mat &video_frame) {
   cv::absdiff(video_frame, background, mask);
   cv::cvtColor(mask, mask, cv::COLOR_BGR2GRAY);
 
-  double threshold{25.0};
+  double threshold{stod(config.get(threshold_field))};
   double max_val{255.0};
 
   cv::threshold(mask, mask, threshold, max_val, cv::THRESH_BINARY);

@@ -11,8 +11,6 @@ bool MatterConfig::update(map<string, string> field_updates) {
   bool must_reinit = false;
 
   for (auto &[name, value] : field_updates) {
-    MatterConfigField field;
-
     if (!config_document.HasMember(name.c_str())) {
       string err_msg{name + " is not a valid config field for given matter"};
       throw invalid_argument(err_msg);
@@ -22,7 +20,7 @@ bool MatterConfig::update(map<string, string> field_updates) {
     auto &json_field = config_document[name.c_str()];
     json_field.SetString(value.c_str(), config_document.GetAllocator());
 
-    must_reinit |= field.requires_init;
+    must_reinit |= fields_map[name].requires_init;
   }
 
   return must_reinit;
@@ -36,6 +34,9 @@ MatterConfig::MatterConfig(vector<MatterConfigField> fields) {
 
   config_document.SetObject();
   for (auto &field : fields) {
+    fields_map[field.name] = field;
+
+    // add field to json representation
     rapidjson::Value field_name;
     rapidjson::Value field_default_value;
 

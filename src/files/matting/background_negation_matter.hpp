@@ -15,8 +15,8 @@ private:
   MatterConfig &config;
 
 public:
-  constexpr static MatterConfigField threshold{
-      MatterConfigField{"threshold", "25", false}};
+  constexpr static MatterConfigField threshold_field{
+      MatterConfigField{"threshold", "25.0", false}};
 
   explicit BackgroundNegationMatter(
       cv::Mat background, MatterConfig &config) noexcept
@@ -34,7 +34,7 @@ public:
   }
 
   [[nodiscard]] vector<MatterConfigField> config_fields() const override {
-    return {BackgroundNegationMatter::threshold};
+    return {BackgroundNegationMatter::threshold_field};
   }
 
   [[nodiscard]] bool requires_clean_plate() const override {
@@ -42,7 +42,7 @@ public:
   }
 
   [[nodiscard]] IMatter *
-  init_matter(MatterInitData &data, MatterConfig &config) const override {
+  init_matter(MatterInitData data, MatterConfig &config) const override {
     return new BackgroundNegationMatter(data.clean_plate, config);
   }
 };

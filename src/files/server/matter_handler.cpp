@@ -37,6 +37,10 @@ void MatterHandler::setup_routes(Pistache::Rest::Router &router) {
       router,
       "/cleanplate/take",
       Routes::bind(&MatterHandler::take_clean_plate, this));
+  Routes::Post(
+      router,
+      "/matter/update_config",
+      Routes::bind(&MatterHandler::update_config, this));
 }
 
 void MatterHandler::cleanup() {
@@ -100,6 +104,7 @@ void MatterHandler::set_matter(
   auto selected_matter = selected_matter_state.get_matter();
 
   matter_lock.lock();
+  curr_matter = selected_mode->name();
   matter = selected_matter;
   matter_lock.unlock();
 
@@ -117,17 +122,14 @@ void MatterHandler::take_clean_plate(
   webcam_controls.disable_automatic();
   clean_plate = webcam.grab();
 
-  //TODO fix problems (at least 2)
-  // 1. curr_matter is probably out of date
-  // 2. clean_plate_update doesn't get passed a clean plate!!
   for (auto &[matter_mode, matter_state] : matter_states) {
     if (matter_mode->name() == curr_matter) {
       matter_lock.lock();
-      matter_state.clean_plate_update();
+      matter_state.clean_plate_update(clean_plate);
       matter = matter_state.get_matter();
       matter_lock.unlock();
     } else {
-      matter_state.clean_plate_update();
+      matter_state.clean_plate_update(clean_plate);
     }
   }
 
@@ -181,5 +183,14 @@ void MatterHandler::update_config(
 
   matter_lock.lock();
   selected_matter_state.config_update(config_fields);
+
+  // Updating the config might have invalidated the current matter so we get it again
+  // this should be removed during a refactor into an object that bundles all matter
+  // states together
+  matter = matter_states.at(MatterModes::get_by_name(curr_matter)).get_matter();
   matter_lock.unlock();
+
+  response.send(
+      Http::Code::Ok,
+      "Updated specified configuration fields for " + selected_mode->name());
 }

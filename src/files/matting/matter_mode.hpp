@@ -14,7 +14,7 @@ class IMatterMode;
 class IMatterMode {
 public:
   [[nodiscard]] virtual const string name() const = 0;
-  [[nodiscard]] virtual IMatter *init_matter(MatterInitData &data, MatterConfig &config) const = 0;
+  [[nodiscard]] virtual IMatter *init_matter(MatterInitData data, MatterConfig &config) const = 0;
   [[nodiscard]] virtual vector<MatterConfigField> config_fields() const = 0;
   [[nodiscard]] virtual bool requires_clean_plate() const = 0;
 };

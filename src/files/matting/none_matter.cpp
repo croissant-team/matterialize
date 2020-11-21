@@ -11,7 +11,7 @@ const string NoneMode::name() const {
   return "None";
 }
 IMatter *
-NoneMode::init_matter(MatterInitData &data, MatterConfig &config) const {
+NoneMode::init_matter(MatterInitData data, MatterConfig &config) const {
   return new NoneMatter();
 }
 vector<MatterConfigField> NoneMode::config_fields() const {

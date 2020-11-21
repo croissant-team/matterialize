@@ -11,15 +11,15 @@ class MatterState {
 private:
   const IMatterMode *mode;
   MatterConfig config;
-  MatterInitData init_data;
+  cv::Mat clean_plate;
   IMatter *matter_instance;
 
 public:
-  explicit MatterState(const IMatterMode *mode, const cv::Mat& clean_plate)
+  explicit MatterState(const IMatterMode *mode, const cv::Mat &clean_plate)
       : mode{mode},
         config{MatterConfig::default_for(mode)},
-        init_data{MatterInitData{clean_plate}},
-        matter_instance{mode->init_matter(init_data, config)} {};
+        clean_plate{clean_plate},
+        matter_instance{mode->init_matter(MatterInitData{clean_plate}, config)} {};
 
   ~MatterState() {
     // FIXME clion detects and endless loop here. I think it's lying
@@ -28,7 +28,7 @@ public:
 
   IMatter *get_matter();
 
-  void clean_plate_update();
+  void clean_plate_update(const cv::Mat &new_clean_plate);
 
   // updates each config field according to field_updates, throws
   // invalid_argument if field is not valid for this matter config
