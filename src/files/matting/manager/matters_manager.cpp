@@ -1,6 +1,5 @@
 #include "matters_manager.hpp"
-
-#include "matter_state.hpp"
+#include <fstream>
 
 MattersManager::MattersManager(
     IMatter *&running_matter, mutex &running_matter_mutex,
@@ -73,11 +72,28 @@ void MattersManager::update_clean_plate(const cv::Mat &new_clean_plate) {
     }
   }
 }
-void MattersManager::export_configs(path config_file) {
-  // TODO
+void MattersManager::save_configs(const path &config_file) {
+  json configs = dump_matters_config();
+  ofstream file{config_file};
+  file << configs.dump(4);
+  file.close();
 }
-void MattersManager::load_configs(path config_file) {
-  // TODO
+void MattersManager::load_configs(const path &config_file) {
+  ifstream file{config_file};
+  json configs = json::parse(file);
+
+  for (auto mode : MatterModes::modes) {
+    json config = configs[mode->name()];
+
+    map<string, string> config_fields;
+    for (auto &[name, value] : config.items()) {
+      config_fields[name] = value;
+    }
+
+    update_config(mode, config_fields);
+  }
+
+  file.close();
 }
 void MattersManager::pause_running_matter() {
   assert(!running_matter_lock.owns_lock());
@@ -86,4 +102,14 @@ void MattersManager::pause_running_matter() {
 void MattersManager::resume_running_matter() {
   assert(running_matter_lock.owns_lock());
   running_matter_lock.unlock();
+}
+const MatterConfig &MattersManager::get_matter_config(MatterMode mode) {
+  return matters_state.at(mode).get_config();
+}
+json MattersManager::dump_matters_config() {
+  json configs;
+  for (const auto &[mode, state] : matters_state) {
+    configs[mode->name()] = state.get_config();
+  }
+  return configs;
 }

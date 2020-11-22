@@ -6,6 +6,7 @@
 
 #include "../modes.hpp"
 #include "matter_state.hpp"
+#include "../matter_config.hpp"
 
 using namespace std;
 using namespace filesystem;
@@ -21,6 +22,7 @@ private:
   MatterInitData init_data;
 
   map<MatterMode, MatterState> matters_state;
+
 public:
   MattersManager(
       IMatter *&running_matter, mutex &running_matter_mutex,
@@ -29,11 +31,12 @@ public:
   void pause_running_matter();
   void resume_running_matter();
   void set_running_mode(MatterMode mode);
-  void
-  update_config(MatterMode mode, map<string, string> config_updates);
-  void update_clean_plate(const cv::Mat&new_clean_plate);
-  void export_configs(path config_file);
-  void load_configs(path config_file);
+  void update_config(MatterMode mode, map<string, string> config_updates);
+  void update_clean_plate(const cv::Mat &new_clean_plate);
+  const MatterConfig& get_matter_config(MatterMode mode);
+  json dump_matters_config();
+  void save_configs(const path& config_file);
+  void load_configs(const path& config_file);
 };
 
 #endif// MATTERIALIZE_MATTERS_MANAGER_HPP

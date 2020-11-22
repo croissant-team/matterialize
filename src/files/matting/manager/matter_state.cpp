@@ -34,3 +34,6 @@ void MatterState::reinit_matter() {
   delete matter_instance;
   matter_instance = nullptr;
 }
+const MatterConfig &MatterState::get_config() const {
+  return config;
+}

@@ -37,9 +37,12 @@ MatterConfig::MatterConfig(vector<MatterConfigField> fields) {
     json_config[field.name] = field.default_value;
   }
 }
-void MatterConfig::to_json(json &j, const MatterConfig &matter_config) {
+
+void to_json(json &j, const MatterConfig &matter_config) {
   j = matter_config.json_config;
 }
-void MatterConfig::from_json(const json &j, MatterConfig &matterConfig) {
+
+void from_json(const json &j, MatterConfig &matterConfig) {
   matterConfig.json_config = j;
 }
+

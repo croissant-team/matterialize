@@ -1,5 +1,5 @@
 #include "matter_handler.hpp"
-#include "../matting/modes.hpp"
+#include "../config/config.hpp"
 
 #define READJUSTMENT_FRAMES 60
 
@@ -32,8 +32,20 @@ void MatterHandler::setup_routes(Pistache::Rest::Router &router) {
       Routes::bind(&MatterHandler::take_clean_plate, this));
   Routes::Post(
       router,
-      "/matter/update_config",
+      "/matter/config/update",
       Routes::bind(&MatterHandler::update_config, this));
+  Routes::Get(
+      router,
+      "/matters/config",
+      Routes::bind(&MatterHandler::get_matters_config, this));
+  Routes::Post(
+      router,
+      "/matters/config/export_file",
+      Routes::bind(&MatterHandler::export_config_file, this));
+  Routes::Post(
+      router,
+      "/matters/config/import_file",
+      Routes::bind(&MatterHandler::import_config_file, this));
 }
 
 void MatterHandler::cleanup() {
@@ -41,10 +53,9 @@ void MatterHandler::cleanup() {
 }
 
 void MatterHandler::get_matters(
-    const Pistache::Rest::Request &request,
-    Pistache::Http::ResponseWriter response) {
+    const Rest::Request &request, Http::ResponseWriter response) {
   auto cors_header(
-      std::make_shared<Pistache::Http::Header::AccessControlAllowOrigin>("*"));
+      std::make_shared<Http::Header::AccessControlAllowOrigin>("*"));
   response.headers().add(cors_header);
 
   rapidjson::StringBuffer s;
@@ -171,7 +182,53 @@ void MatterHandler::update_config(
       Http::Code::Ok,
       "Updated specified configuration fields for " + selected_mode->name());
 }
-void MatterHandler::get_matters_configs(
+
+// TODO completely untested from here ----
+void MatterHandler::get_matters_config(
     const Rest::Request &request, Http::ResponseWriter response) {
-  //TODO
+  auto cors_header(
+      std::make_shared<Http::Header::AccessControlAllowOrigin>("*"));
+  response.headers().add(cors_header);
+  response.headers().add<Http::Header::ContentType>(MIME(Application, Json));
+
+  json configs = matters_manager.dump_matters_config();
+  const int indent = 4;
+  response.send(Http::Code::Ok, configs.dump(indent));
+}
+
+void MatterHandler::import_config_file(
+    const Rest::Request &request, Http::ResponseWriter response) {
+  auto cors_header(
+      std::make_shared<Http::Header::AccessControlAllowOrigin>("*"));
+  response.headers().add(cors_header);
+  response.headers().add<Http::Header::ContentType>(MIME(Application, Json));
+
+  const path file_path = Config::default_matters_config_path();
+
+  try {
+    matters_manager.load_configs(file_path);
+  } catch (const exception &e) {
+    response.send(Http::Code::Bad_Request, e.what());
+    return;
+  }
+
+  response.send(Http::Code::Ok, "Loaded config file " + file_path.string());
+}
+void MatterHandler::export_config_file(
+    const Rest::Request &request, Http::ResponseWriter response) {
+  auto cors_header(
+      std::make_shared<Http::Header::AccessControlAllowOrigin>("*"));
+  response.headers().add(cors_header);
+  response.headers().add<Http::Header::ContentType>(MIME(Application, Json));
+
+  const path file_path = Config::default_matters_config_path();
+  try {
+    matters_manager.save_configs(file_path);
+  } catch (const exception &e) {
+    response.send(Http::Code::Bad_Request, e.what());
+    return;
+  }
+
+  response.send(
+      Http::Code::Ok, "Exported config to file " + file_path.string());
 }
