@@ -5,8 +5,8 @@
 #include "../camera/opencv_webcam_controls.hpp"
 #include "../matting/background_cut/background_cut_matter.hpp"
 #include "../matting/background_negation_matter.hpp"
+#include "../matting/manager/matters_manager.hpp"
 #include "../matting/matter.hpp"
-#include "matter_state.hpp"
 
 #include <pistache/router.h>
 #include <rapidjson/document.h>
@@ -20,20 +20,15 @@ class MatterHandler {
 public:
   MatterHandler(
       OpenCVWebcam &webcam, OpenCVWebcamControls &webcam_controls,
-      IMatter *&matter, std::string &initial_matter, std::mutex &matter_mutex,
-      const cv::Mat &clean_plate);
+      IMatter *&running_matter_ptr, std::mutex &running_matter_mutex,
+      MatterMode initial_matter_mode, const cv::Mat &clean_plate);
   void setup_routes(Rest::Router &router);
   void cleanup();
 
 private:
   OpenCVWebcam &webcam;
   OpenCVWebcamControls &webcam_controls;
-  IMatter *&matter;
-  std::string curr_matter;
-  std::unique_lock<std::mutex> matter_lock;
-  cv::Mat clean_plate;
-
-  map<const IMatterMode *, MatterState> matter_states;
+  MattersManager matters_manager;
 
   void get_matters(const Rest::Request &request, Http::ResponseWriter response);
   void set_matter(const Rest::Request &request, Http::ResponseWriter response);

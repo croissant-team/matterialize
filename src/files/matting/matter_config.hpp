@@ -28,9 +28,7 @@ class MatterConfig {
 private:
   rapidjson::Document config_document{};
   map<string, MatterConfigField>fields_map{};
-
   [[nodiscard]] bool update(map<string, string> field_updates);
-
   explicit MatterConfig(vector<MatterConfigField> fields);
 
 public:

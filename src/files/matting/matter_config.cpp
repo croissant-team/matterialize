@@ -1,5 +1,5 @@
 #include "matter_config.hpp"
-#include "matter_mode.hpp"
+#include "modes.hpp"
 
 string MatterConfig::get(MatterConfigField field) {
   return config_document[field.name].GetString();
@@ -20,13 +20,13 @@ bool MatterConfig::update(map<string, string> field_updates) {
     auto &json_field = config_document[name.c_str()];
     json_field.SetString(value.c_str(), config_document.GetAllocator());
 
-    must_reinit |= fields_map[name].requires_init;
+    must_reinit |= fields_map.at(name).requires_init;
   }
 
   return must_reinit;
 }
 
-MatterConfig MatterConfig::default_for(const IMatterMode *mode) {
+MatterConfig MatterConfig::default_for(MatterMode mode) {
   return MatterConfig(mode->config_fields());
 }
 MatterConfig::MatterConfig(vector<MatterConfigField> fields) {

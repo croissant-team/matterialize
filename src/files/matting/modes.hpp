@@ -5,16 +5,18 @@
 #include "matter_mode.hpp"
 #include "none_matter.hpp"
 
+using MatterMode = const IMatterMode *;
+
 // MatterModes enables the use of IMatterMode instances as glorified enums
 class MatterModes {
 private:
-  constexpr static const NoneMode NONE{};
   constexpr static const BackgroundNegationMode BACKGROUND_NEGATION{};
 
 public:
-  constexpr static const IMatterMode *const modes[] = {
+  constexpr static const NoneMode NONE{};
+  constexpr static MatterMode const modes[] = {
       &NONE, &BACKGROUND_NEGATION};
-  static const IMatterMode *get_by_name(string name) {
+  static MatterMode get_by_name(string name) {
     for (auto mode : modes) {
       if (mode->name() == name) {
         return mode;

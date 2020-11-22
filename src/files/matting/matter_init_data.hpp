@@ -6,6 +6,7 @@
 // The initialization data we give to the matter (this is the same for all
 // matters) the matters can decide to ignore it or use it
 struct MatterInitData {
-  const cv::Mat &clean_plate;
+  cv::Mat clean_plate;
 };
+
 #endif// MATTERIALIZE_MATTER_INIT_DATA_HPP

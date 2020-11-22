@@ -1,6 +1,5 @@
 #include "matter_handler.hpp"
 #include "../matting/modes.hpp"
-#include "matter_state.hpp"
 
 #define READJUSTMENT_FRAMES 60
 
@@ -8,21 +7,11 @@ using namespace Pistache;
 
 MatterHandler::MatterHandler(
     OpenCVWebcam &webcam, OpenCVWebcamControls &webcam_controls,
-    IMatter *&matter, std::string &initial_matter, std::mutex &matter_mutex,
-    const cv::Mat &clean_plate)
+    IMatter *&running_matter_ptr, std::mutex &running_matter_mutex,
+    MatterMode initial_matter_mode, const cv::Mat &clean_plate)
     : webcam{webcam},
       webcam_controls{webcam_controls},
-      matter(matter),
-      curr_matter{initial_matter},
-      matter_lock(matter_mutex, std::defer_lock),
-      clean_plate{clean_plate} {
-  for (auto mode : MatterModes::modes) {
-    matter_states.try_emplace(mode, mode, clean_plate);
-  }
-  auto matter_mode = MatterModes::get_by_name(curr_matter);
-  auto &matter_state = matter_states.at(matter_mode);
-  matter = matter_state.get_matter();
-}
+      matters_manager{running_matter_ptr, running_matter_mutex, initial_matter_mode, clean_plate} {}
 
 void MatterHandler::setup_routes(Pistache::Rest::Router &router) {
   using namespace Pistache::Rest;
@@ -44,7 +33,7 @@ void MatterHandler::setup_routes(Pistache::Rest::Router &router) {
 }
 
 void MatterHandler::cleanup() {
-  // TODO
+  // Nothing to cleanup (hopefully)
 }
 
 void MatterHandler::get_matters(
@@ -100,13 +89,7 @@ void MatterHandler::set_matter(
     return;
   }
 
-  auto &selected_matter_state = matter_states.at(selected_mode);
-  auto selected_matter = selected_matter_state.get_matter();
-
-  matter_lock.lock();
-  curr_matter = selected_mode->name();
-  matter = selected_matter;
-  matter_lock.unlock();
+  matters_manager.set_running_mode(selected_mode);
 
   response.send(Http::Code::Ok, "Matter changed to " + choice);
 }
@@ -117,21 +100,16 @@ void MatterHandler::take_clean_plate(
       std::make_shared<Http::Header::AccessControlAllowOrigin>("*"));
   response.headers().add(cors_header);
 
+  // take clean plate (pause the running matter to guarantee that this thread
+  // is the only one grabbing frames from the webcam)
+  matters_manager.pause_running_matter();
   webcam_controls.enable_automatic();
   webcam.roll(READJUSTMENT_FRAMES);
   webcam_controls.disable_automatic();
-  clean_plate = webcam.grab();
+  cv::Mat clean_plate = webcam.grab();
+  matters_manager.resume_running_matter();
 
-  for (auto &[matter_mode, matter_state] : matter_states) {
-    if (matter_mode->name() == curr_matter) {
-      matter_lock.lock();
-      matter_state.clean_plate_update(clean_plate);
-      matter = matter_state.get_matter();
-      matter_lock.unlock();
-    } else {
-      matter_state.clean_plate_update(clean_plate);
-    }
-  }
+  matters_manager.update_clean_plate(clean_plate);
 
   response.send(
       Pistache::Http::Code::Ok,
@@ -161,7 +139,6 @@ void MatterHandler::update_config(
     response.send(Http::Code::Bad_Request, e.what());
     return;
   }
-  auto &selected_matter_state = matter_states.at(selected_mode);
 
   if (!document.HasMember("config")) {
     response.send(Http::Code::Bad_Request, "No \"config\" field given");
@@ -169,7 +146,6 @@ void MatterHandler::update_config(
   }
 
   auto config_fields_json = document["config"].GetObject();
-  // validate fields
   map<string, string> config_fields{};
   for (auto &field : config_fields_json) {
     if (!field.value.IsString()) {
@@ -181,14 +157,12 @@ void MatterHandler::update_config(
     config_fields[field.name.GetString()] = field.value.GetString();
   }
 
-  matter_lock.lock();
-  selected_matter_state.config_update(config_fields);
-
-  // Updating the config might have invalidated the current matter so we get it again
-  // this should be removed during a refactor into an object that bundles all matter
-  // states together
-  matter = matter_states.at(MatterModes::get_by_name(curr_matter)).get_matter();
-  matter_lock.unlock();
+  try {
+    matters_manager.update_config(selected_mode, config_fields);
+  } catch (invalid_argument &e) {
+    response.send(Http::Code::Bad_Request, e.what());
+    return;
+  }
 
   response.send(
       Http::Code::Ok,

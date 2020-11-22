@@ -60,7 +60,7 @@ int main() {
   const cv::Mat clean_plate{webcam.grab()};
 
   IMatter *matter = nullptr;
-  std::string initial_matter{"None"};
+  MatterMode initial_matter_mode = &MatterModes::NONE;
   std::mutex matter_mutex;
   std::unique_lock<std::mutex> matter_lock(matter_mutex, std::defer_lock);
   BackgroundSettings bg_settings{width, height};
@@ -80,7 +80,7 @@ int main() {
       webcam,
       opencv_controls,
       matter,
-      initial_matter,
+      initial_matter_mode,
       matter_mutex,
       clean_plate,
       bg_settings);

@@ -42,7 +42,7 @@ public:
   }
 
   [[nodiscard]] IMatter *
-  init_matter(MatterInitData data, MatterConfig &config) const override {
+  init_matter(MatterInitData &data, MatterConfig &config) const override {
     return new BackgroundNegationMatter(data.clean_plate, config);
   }
 };
