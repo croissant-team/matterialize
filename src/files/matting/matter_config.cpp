@@ -2,24 +2,26 @@
 #include "modes.hpp"
 
 string MatterConfig::get(MatterConfigField field) {
-  return config_document[field.name].GetString();
+  return json_config[field.name];
+  // return config_document[field.name].GetString();
 }
 
 // Updates the config an returns true if the updates require the matter
 // to be reinitialized
-bool MatterConfig::update(map<string, string> field_updates) {
+bool MatterConfig::update(const map<string, string> &field_updates) {
   bool must_reinit = false;
 
-  for (auto &[name, value] : field_updates) {
-    if (!config_document.HasMember(name.c_str())) {
+  // validate updates
+  for (auto &[name, _] : field_updates) {
+    if (!json_config.contains(name)) {
       string err_msg{name + " is not a valid config field for given matter"};
       throw invalid_argument(err_msg);
     }
+  }
 
-    // Sets field value in json document
-    auto &json_field = config_document[name.c_str()];
-    json_field.SetString(value.c_str(), config_document.GetAllocator());
-
+  // perform updates
+  for (auto &[name, value] : field_updates) {
+    json_config[name] = value;
     must_reinit |= fields_map.at(name).requires_init;
   }
 
@@ -30,21 +32,14 @@ MatterConfig MatterConfig::default_for(MatterMode mode) {
   return MatterConfig(mode->config_fields());
 }
 MatterConfig::MatterConfig(vector<MatterConfigField> fields) {
-  // initialize json document with default fields values;
-
-  config_document.SetObject();
   for (auto &field : fields) {
     fields_map[field.name] = field;
-
-    // add field to json representation
-    rapidjson::Value field_name;
-    rapidjson::Value field_default_value;
-
-    field_name.SetString(field.name, config_document.GetAllocator());
-    field_default_value.SetString(
-        field.default_value, config_document.GetAllocator());
-
-    config_document.AddMember(
-        field_name, field_default_value, config_document.GetAllocator());
+    json_config[field.name] = field.default_value;
   }
+}
+void MatterConfig::to_json(json &j, const MatterConfig &matter_config) {
+  j = matter_config.json_config;
+}
+void MatterConfig::from_json(const json &j, MatterConfig &matterConfig) {
+  matterConfig.json_config = j;
 }

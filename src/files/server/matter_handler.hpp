@@ -36,6 +36,10 @@ private:
   update_config(const Rest::Request &request, Http::ResponseWriter response);
   void
   take_clean_plate(const Rest::Request &request, Http::ResponseWriter response);
+  void get_matters_configs(
+      const Rest::Request &request, Http::ResponseWriter response);
+  void export_config_file(const Rest::Request &request, Http::ResponseWriter response);
+  void import_config_file(const Rest::Request &request, Http::ResponseWriter response);
 };
 
 #endif

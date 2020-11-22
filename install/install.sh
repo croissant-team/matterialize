@@ -36,6 +36,7 @@ fi
 
 ./vcpkg/vcpkg install pistache
 ./vcpkg/vcpkg install rapidjson
+./vcpkg/vcpkg install nlohmann-json
 ./vcpkg/vcpkg install gtest
 # ./vcpkg/vcpkg install opencv
 

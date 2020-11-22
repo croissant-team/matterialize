@@ -11,7 +11,11 @@ MatterHandler::MatterHandler(
     MatterMode initial_matter_mode, const cv::Mat &clean_plate)
     : webcam{webcam},
       webcam_controls{webcam_controls},
-      matters_manager{running_matter_ptr, running_matter_mutex, initial_matter_mode, clean_plate} {}
+      matters_manager{
+          running_matter_ptr,
+          running_matter_mutex,
+          initial_matter_mode,
+          clean_plate} {}
 
 void MatterHandler::setup_routes(Pistache::Rest::Router &router) {
   using namespace Pistache::Rest;
@@ -112,8 +116,7 @@ void MatterHandler::take_clean_plate(
   matters_manager.update_clean_plate(clean_plate);
 
   response.send(
-      Pistache::Http::Code::Ok,
-      "New clean plate taken and matters initialised");
+      Http::Code::Ok, "New clean plate taken and matters initialised");
 }
 
 void MatterHandler::update_config(
@@ -167,4 +170,8 @@ void MatterHandler::update_config(
   response.send(
       Http::Code::Ok,
       "Updated specified configuration fields for " + selected_mode->name());
+}
+void MatterHandler::get_matters_configs(
+    const Rest::Request &request, Http::ResponseWriter response) {
+  //TODO
 }

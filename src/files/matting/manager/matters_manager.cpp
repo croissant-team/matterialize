@@ -43,12 +43,14 @@ void MattersManager::update_config(
   auto &state = matters_state.at(mode);
 
   if (mode == running_matter_mode) {
-    running_matter_lock.lock();
+    // lock running_matter_lock and make sure it gets unlocked when leaving
+    // scope even if exception is thrown by config_update
+    std::lock_guard<unique_lock<mutex>> lock_guard{running_matter_lock};
+
     state.config_update(config_updates);
     // Updating the config might have invalidated the current matter so we get
     // it again
     running_matter = state.get_matter();
-    running_matter_lock.unlock();
   } else {
     state.config_update(config_updates);
   }
