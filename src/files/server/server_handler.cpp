@@ -1,6 +1,6 @@
 #include "server_handler.hpp"
 
-ServerHandler::ServerHandler(std::atomic_bool &running) : running{running} {}
+ServerHandler::ServerHandler(volatile std::atomic_bool &running) : running{running} {}
 
 void ServerHandler::setup_routes(Pistache::Rest::Router &router) {
   using namespace Pistache::Rest;

@@ -8,14 +8,11 @@ using namespace Pistache;
 MatterHandler::MatterHandler(
     OpenCVWebcam &webcam, OpenCVWebcamControls &webcam_controls,
     IMatter *&running_matter_ptr, std::mutex &running_matter_mutex,
-    MatterMode initial_matter_mode, const cv::Mat &clean_plate)
+    MatterMode initial_matter_mode)
     : webcam{webcam},
       webcam_controls{webcam_controls},
       matters_manager{
-          running_matter_ptr,
-          running_matter_mutex,
-          initial_matter_mode,
-          clean_plate} {}
+          running_matter_ptr, running_matter_mutex, initial_matter_mode} {}
 
 void MatterHandler::setup_routes(Pistache::Rest::Router &router) {
   using namespace Pistache::Rest;
@@ -104,7 +101,13 @@ void MatterHandler::set_matter(
     return;
   }
 
-  matters_manager.set_running_mode(selected_mode);
+  try {
+    matters_manager.set_running_mode(selected_mode);
+  } catch (MattersManager::MissingCleanPlate &e) {
+    response.send(
+        Pistache::Http::Code::Precondition_Failed, e.what());
+    return;
+  }
 
   response.send(Http::Code::Ok, "Matter changed to " + choice);
 }

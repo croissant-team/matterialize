@@ -12,9 +12,7 @@ public:
 
   void disable_automatic();
 
-  explicit OpenCVWebcamControls(OpenCVWebcam &webcam) : webcam{webcam} {
-    enable_automatic();
-  }
+  explicit OpenCVWebcamControls(OpenCVWebcam &webcam) : webcam{webcam} {}
 };
 
 #endif

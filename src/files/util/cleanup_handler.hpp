@@ -12,17 +12,21 @@
 
 class CleanupHandler {
 private:
-  OpenCVWebcamControls *controls{NULL};
-  ServerEndpoint *server{NULL};
-  std::thread *server_thread{NULL};
-  OpenCVWebcam *input{NULL};
-  FakeWebcam *output{NULL};
-  FakeWebcam *preview{NULL};
-  queue<cv::Mat> *frame_queue{NULL};
-  std::mutex *frame_queue_mutex{NULL};
-  std::condition_variable *new_entry{NULL};
-  bool *has_new_entry{NULL};
+  OpenCVWebcamControls *controls{nullptr};
+  ServerEndpoint *server{nullptr};
+  std::thread *server_thread{nullptr};
+  OpenCVWebcam *input{nullptr};
+  FakeWebcam *output{nullptr};
+  FakeWebcam *preview{nullptr};
+  queue<cv::Mat> *frame_queue{nullptr};
+  std::mutex *frame_queue_mutex{nullptr};
+  std::condition_variable *new_entry{nullptr};
+  bool *has_new_entry{nullptr};
+  std::thread *recording_thread{nullptr};
 
+  void reenable_automatic_controls();
+  void shutdown_server();
+  void stop_cameras();
   void finish_recording();
 
 public:
@@ -37,6 +41,7 @@ public:
   void set_frame_queue_mutex(std::mutex *new_frame_queue_mutex);
   void set_condition_variable(std::condition_variable *new_condition_variable);
   void set_condition_boolean(bool *new_condition_boolean);
+  void set_recording_thread(std::thread *new_recording_thread);
 };
 
 #endif
