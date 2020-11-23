@@ -5,6 +5,7 @@
 #include "../matting/background_cut/background_cut_matter.hpp"
 #include "../matting/background_negation_matter.hpp"
 #include "../matting/matter.hpp"
+#include "../util/background_settings.hpp"
 #include "../util/video_devices.hpp"
 #include "background_handler.hpp"
 #include "camera_handler.hpp"
@@ -27,7 +28,7 @@ public:
       OpenCVWebcamControls &webcam_controls, IMatter *&matter, std::string &initial_matter,
       std::mutex &matter_mutex,
       const cv::Mat &clean_plate,
-      const cv::Mat *&bg_mat, const cv::Mat &green_screen);
+      BackgroundSettings &bg_settings);
 
   void init(size_t thr = 2);
 

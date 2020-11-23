@@ -67,14 +67,11 @@ int main() {
   std::string initial_matter{"None"};
   std::mutex matter_mutex;
   std::unique_lock<std::mutex> matter_lock(matter_mutex, std::defer_lock);
+  BackgroundSettings bg_settings{width, height};
 
   // The automatic controls should be disabled after the fake cam is
   // initialised to give time for the automatic values to settle
   opencv_controls.disable_automatic();
-
-  const cv::Scalar scalar(0.0, 255.0, 0.0);
-  const cv::Mat green_screen(height, width, CV_8UC3, scalar);
-  const cv::Mat *bg_mat;
 
   // Begin REST server to allow for frontend communication
   Pistache::Port port(9000);
@@ -90,8 +87,7 @@ int main() {
       initial_matter,
       matter_mutex,
       clean_plate,
-      bg_mat,
-      green_screen);
+      bg_settings);
   server.init(thr);
   cleanup_handler.set_server_endpoint(&server);
 
@@ -109,7 +105,7 @@ int main() {
       break;
     }
 
-    cv::Mat result{matter->change_background(frame, *bg_mat)};
+    cv::Mat result{matter->change_background(frame, bg_settings.generate_background(frame))};
     matter_lock.unlock();
 
     output.write(result);
