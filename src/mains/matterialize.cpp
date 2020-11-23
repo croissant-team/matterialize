@@ -1,14 +1,10 @@
 #include "../files/benchmatte/benchmark.hpp"
 #include "../files/camera/fake_webcam.hpp"
 #include "../files/camera/opencv_webcam_controls.hpp"
-#include "../files/matting/background_cut/background_cut_matter.hpp"
 #include "../files/matting/background_negation_matter.hpp"
-#include "../files/matting/none_matter.hpp"
-#include "../files/matting/opencv_matter.hpp"
 #include "../files/server/server_endpoint.hpp"
 #include "../files/util/cleanup_handler.hpp"
 #include "../files/util/converter.hpp"
-#include "../files/util/video_devices.hpp"
 
 #include <chrono>
 #include <csignal>
@@ -64,7 +60,7 @@ int main() {
   const cv::Mat clean_plate{webcam.grab()};
 
   IMatter *matter = nullptr;
-  std::string initial_matter{"None"};
+  MatterMode initial_matter_mode = &MatterModes::NONE;
   std::mutex matter_mutex;
   std::unique_lock<std::mutex> matter_lock(matter_mutex, std::defer_lock);
   BackgroundSettings bg_settings{width, height};
@@ -84,7 +80,7 @@ int main() {
       webcam,
       opencv_controls,
       matter,
-      initial_matter,
+      initial_matter_mode,
       matter_mutex,
       clean_plate,
       bg_settings);

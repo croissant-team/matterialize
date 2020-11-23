@@ -11,8 +11,6 @@
 #include <string>
 #include <utility>
 
-#define NUM_MATTERS 3
-
 using namespace cv;
 using namespace std;
 using namespace filesystem;

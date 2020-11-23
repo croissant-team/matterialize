@@ -2,6 +2,7 @@
 #define MATTERIALIZE_OPENCV_MATTER_HPP
 
 #include "matter.hpp"
+#include "matter_mode.hpp"
 
 #include <opencv2/core.hpp>
 #include <opencv2/video.hpp>
@@ -13,7 +14,26 @@ private:
 
 public:
   cv::Mat background_mask(const cv::Mat &video_frame) override;
-  bool requires_clean_plate() override;
+};
+
+class OpenCVMode : public IMatterMode {
+public:
+  [[nodiscard]] const string name() const override {
+    return "OpenCV";
+  }
+
+  IMatter *
+  init_matter(MatterInitData &data, MatterConfig &config) const override {
+    return new OpenCVMatter();
+  }
+
+  [[nodiscard]] vector<MatterConfigField> config_fields() const override {
+    return vector<MatterConfigField>();
+  }
+
+  [[nodiscard]] bool requires_clean_plate() const override {
+    return false;
+  }
 };
 
 #endif
