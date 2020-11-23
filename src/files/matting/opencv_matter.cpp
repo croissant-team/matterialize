@@ -10,6 +10,3 @@ cv::Mat OpenCVMatter::background_mask(const cv::Mat &video_frame) {
   return mask;
 }
 
-bool OpenCVMatter::requires_clean_plate() {
-  return false;
-}

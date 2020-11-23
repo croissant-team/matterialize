@@ -2,30 +2,33 @@
 #include "../matting/background_cut/background_cut_matter.hpp"
 #include "../matting/background_negation_matter.hpp"
 #include "../matting/opencv_matter.hpp"
+#include "../matting/modes.hpp"
 #include "scorer.hpp"
 #include <chrono>
 
 using namespace chrono;
 
+#define NUM_MATTERS MatterModes::num_modes
+
 vector<vector<BenchmarkResult>> Benchmark::run() {
   vector<vector<BenchmarkResult>> result(NUM_MATTERS + 1);
-  string names[] = {
-      "OpenCVMatter", "BackgroundNegationMatter", "BackgroundCutMatter"};
-  for (int i = 0; i < backgrounds.size(); i++) {
-    OpenCVMatter opencv_matter = OpenCVMatter();
+  string names[NUM_MATTERS];
+  for (int i = 0; i < NUM_MATTERS; i++) {
+    auto mode = MatterModes::modes[i];
+    names[i] = mode->name();
+  }
 
-    // TODO Ask Matteo for cleanup help here
-    const auto background_negation_mode = BackgroundNegationMode();
-    auto background_negation_config =
-        MatterConfig::default_for(&background_negation_mode);
-    auto background_negation_matter =
-        BackgroundNegationMatter(backgrounds[i], background_negation_config);
+  for (int i = 0; i < backgrounds.size(); i++) {
+    MatterInitData init_data{backgrounds[i]};
+
+    IMatter *matters[NUM_MATTERS];
+    for (int j = 0; j < NUM_MATTERS; j++) {
+      auto mode = MatterModes::modes[j];
+      auto config = MatterConfig::default_for(mode);
+      matters[j] = mode->init_matter(init_data, config);
+    }
     //-------------------------------------------------------------------------
 
-    BackgroundCutMatter background_cut_matter =
-        BackgroundCutMatter(backgrounds[i]);
-    IMatter *matters[] = {
-        &opencv_matter, &background_negation_matter, &background_cut_matter};
     for (int j = 0; j < NUM_MATTERS; j++) {
       auto start{system_clock::now()};
       Mat mask = matters[j]->background_mask(compositions[i]);

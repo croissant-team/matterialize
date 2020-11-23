@@ -30,7 +30,7 @@ public:
       const cv::Mat &clean_plate,
       BackgroundSettings &bg_settings);
 
-  void init(size_t thr = 2);
+  void init(size_t thr = 1);
 
   void start();
 

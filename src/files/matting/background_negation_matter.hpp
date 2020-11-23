@@ -23,7 +23,6 @@ public:
       : background{std::move(background)}, config{config} {}
 
   cv::Mat background_mask(const cv::Mat &video_frame) override;
-  bool requires_clean_plate() override;
 };
 
 // Example of how an implementer would create matter mode
