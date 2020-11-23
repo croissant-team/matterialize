@@ -31,12 +31,7 @@ bool MatterializeApp::process_frame() {
 
   output_cam.write(result);
   preview_cam.write(result);
-  frame_queue_mutex.lock();
-  frame_queue.push(result);
-  has_new_entry = true;
-  cout << frame_queue.size() << "\n";
-  frame_queue_mutex.unlock();
-  new_entry.notify_one();
+
   int elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
                        std::chrono::system_clock::now() - start)
                        .count();

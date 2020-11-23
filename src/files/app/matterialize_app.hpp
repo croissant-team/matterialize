@@ -83,21 +83,6 @@ public:
     server_thread = std::thread(&ServerEndpoint::start, &server);
     cleanup_handler.set_server_endpoint(&server);
     cleanup_handler.set_server_thread(&server_thread);
-
-    // Setup recording thread
-    video_recorder = VideoRecorder(
-        estimate_fps(),
-        output_cam.get_size(),
-        &frame_queue,
-        &frame_queue_mutex,
-        &new_entry,
-        &has_new_entry);
-    recording_thread = std::thread(&VideoRecorder::record, video_recorder);
-    cleanup_handler.set_frame_queue(&frame_queue);
-    cleanup_handler.set_frame_queue_mutex(&frame_queue_mutex);
-    cleanup_handler.set_condition_variable(&new_entry);
-    cleanup_handler.set_condition_boolean(&has_new_entry);
-    cleanup_handler.set_recording_thread(&recording_thread);
   }
 
   void run();
