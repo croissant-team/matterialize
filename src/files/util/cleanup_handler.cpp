@@ -36,7 +36,7 @@ void CleanupHandler::stop_cameras() {
     preview->stop();
     preview = nullptr;
   }
-  cout << "Stopped cameras";
+  cout << "Stopped cameras\n";
 }
 
 void CleanupHandler::finish_recording() {
