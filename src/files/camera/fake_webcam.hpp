@@ -32,6 +32,8 @@ public:
   void stop();
 
   void write(const cv::Mat &);
+
+  cv::Size get_size();
 };
 
 #endif

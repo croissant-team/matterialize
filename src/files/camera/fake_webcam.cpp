@@ -15,3 +15,6 @@ void FakeWebcam::stop() {
 void FakeWebcam::start() {
   output->start();
 }
+cv::Size FakeWebcam::get_size() {
+  return cv::Size(width, height);
+}

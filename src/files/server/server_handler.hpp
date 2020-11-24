@@ -4,11 +4,11 @@
 #include <pistache/router.h>
 class ServerHandler {
 public:
-  explicit ServerHandler(std::atomic_bool &running);
+  explicit ServerHandler(volatile std::atomic_bool &running);
   void setup_routes(Pistache::Rest::Router &router);
 
 private:
-  std::atomic_bool &running;
+  volatile std::atomic_bool &running;
 
   void shutdown_server(
       const Pistache::Rest::Request &request,

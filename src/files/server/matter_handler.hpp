@@ -21,7 +21,7 @@ public:
   MatterHandler(
       OpenCVWebcam &webcam, OpenCVWebcamControls &webcam_controls,
       IMatter *&running_matter_ptr, std::mutex &running_matter_mutex,
-      MatterMode initial_matter_mode, const cv::Mat &clean_plate);
+      MatterMode initial_matter_mode);
   void setup_routes(Rest::Router &router);
   void cleanup();
 

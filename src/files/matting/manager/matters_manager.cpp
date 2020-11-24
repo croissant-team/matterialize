@@ -3,11 +3,10 @@
 
 MattersManager::MattersManager(
     IMatter *&running_matter, mutex &running_matter_mutex,
-    MatterMode running_matter_mode, cv::Mat clean_plate)
+    MatterMode running_matter_mode)
     : running_matter{running_matter},
       running_matter_mode{running_matter_mode},
-      running_matter_lock{running_matter_mutex, std::defer_lock},
-      init_data{MatterInitData{std::move(clean_plate)}} {
+      running_matter_lock{running_matter_mutex, std::defer_lock} {
   // the MattersManager should be responsible for IMatter initializations
   assert(running_matter == nullptr);
 

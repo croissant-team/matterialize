@@ -17,12 +17,13 @@ private:
 public:
   explicit MatterState(MatterMode mode, MatterInitData &init_data);
   ~MatterState();
+
   IMatter *get_matter();
   const MatterConfig &get_config() const;
   void reinit_matter();
   // updates each config field according to field_updates, throws
   // invalid_argument if field is not valid for this matter config
-  void config_update(std::map<string, string> config_updates);
+  void config_update(const std::map<string, string>& config_updates);
 };
 
 #endif// MATTERIALIZE_MATTER_STATE_HPP
