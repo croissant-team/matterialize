@@ -2,6 +2,7 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <iostream>
 
 BackgroundSettings::BackgroundSettings(int width, int height)
     : mode{BackgroundMode::CLEAR}, width{width}, height{height} {
@@ -9,8 +10,7 @@ BackgroundSettings::BackgroundSettings(int width, int height)
   green_screen = cv::Mat(height, width, CV_8UC3, scalar);
 
   bg = green_screen.clone();
-
-  blur_size = 25;
+  blur_size = 63;
 }
 
 cv::Mat BackgroundSettings::generate_background(cv::Mat frame) {
@@ -57,6 +57,28 @@ cv::Mat BackgroundSettings::generate_background(cv::Mat frame) {
     case BackgroundMode::CLEAR: {
       return green_screen;
     }
+    case BackgroundMode::VIDEO: {
+      cv::Mat result{};
+      cv::Mat raw{};
+
+      while (raw.empty()) {
+        cap.read(raw);
+
+        ++cap_frame_current;
+
+        if (cap_frame_current == cap_frame_count - 1) {
+          cap_frame_current = 0;
+          cap.set(cv::CAP_PROP_POS_FRAMES, 0);
+          cap.set(cv::CAP_PROP_POS_AVI_RATIO, 0);
+        }
+      }
+
+      std::cout << "frame: " << cap_frame_current << "/" << cap_frame_count << "\n";
+
+      cv::resize(raw, result, get_size());
+
+      return result;
+    }
   }
 }
 
@@ -77,4 +99,10 @@ void BackgroundSettings::set_desktop(int x, int y, int w, int h) {
   desktop_y = y;
   desktop_w = w;
   desktop_h = h;
+}
+
+void BackgroundSettings::set_video(cv::VideoCapture capture) {
+  cap = capture;
+  cap_frame_count = (int)cap.get(cv::CAP_PROP_FRAME_COUNT);
+  cap_frame_current = 0;
 }
