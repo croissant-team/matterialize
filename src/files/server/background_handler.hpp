@@ -32,7 +32,9 @@ private:
   void get_desktops(
       const Pistache::Rest::Request &request,
       Pistache::Http::ResponseWriter response);
-
+  void video_background(
+      const Pistache::Rest::Request &request,
+      Pistache::Http::ResponseWriter response);
 };
 
 #endif

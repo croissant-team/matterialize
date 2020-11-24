@@ -1,5 +1,6 @@
 #include "background_handler.hpp"
 #include "../util/desktop_capture.hpp"
+#include <opencv2/videoio.hpp>
 #include <rapidjson/writer.h>
 
 BackgroundHandler::BackgroundHandler(
@@ -29,6 +30,10 @@ void BackgroundHandler::setup_routes(Pistache::Rest::Router &router) {
       router,
       "/background/desktop/options",
       Routes::bind(&BackgroundHandler::get_desktops, this));
+  Routes::Post(
+      router,
+      "/background/video",
+      Routes::bind(&BackgroundHandler::video_background, this));
 }
 
 void BackgroundHandler::blur_background(
@@ -83,6 +88,7 @@ void BackgroundHandler::clear_background(
 
   response.send(Pistache::Http::Code::Ok);
 }
+
 void BackgroundHandler::set_background(
     const Pistache::Rest::Request &request,
     Pistache::Http::ResponseWriter response) {
@@ -199,3 +205,39 @@ void BackgroundHandler::get_desktops(
       MIME(Application, Json));
   response.send(Pistache::Http::Code::Ok, s.GetString());
 }
+
+void BackgroundHandler::video_background(
+    const Pistache::Rest::Request &request,
+    Pistache::Http::ResponseWriter response) {
+  auto cors_header(
+      std::make_shared<Pistache::Http::Header::AccessControlAllowOrigin>("*"));
+  response.headers().add(cors_header);
+
+  rapidjson::Document document;
+  document.Parse(request.body().c_str());
+
+  if (document.IsNull() || !document.HasMember("file_path")) {
+    response.send(
+        Pistache::Http::Code::Bad_Request, "No video path given in body");
+    return;
+  }
+
+  std::string video_path = document["file_path"].GetString();
+
+  cv::VideoCapture new_cap{};
+
+  try {
+    new_cap = cv::VideoCapture{video_path};
+  } catch (const std::exception &e) {
+    response.send(Pistache::Http::Code::Bad_Request, e.what());
+    return;
+  }
+
+  matter_lock.lock();
+  bg_settings.set_video(new_cap);
+  bg_settings.mode = BackgroundMode::VIDEO;
+  matter_lock.unlock();
+
+  response.send(Pistache::Http::Code::Ok);
+}
+
