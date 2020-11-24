@@ -3,15 +3,16 @@
 
 ServerEndpoint::ServerEndpoint(
     Pistache::Address addr, std::atomic_bool &running, OpenCVWebcam &webcam,
-    OpenCVWebcamControls &webcam_controls, IMatter *&matter, MatterMode initial_matter_mode,
-    std::mutex &matter_mutex,
+    OpenCVWebcamControls &webcam_controls, IMatter *&matter,
+    MatterMode initial_matter_mode, std::mutex &matter_mutex,
     BackgroundSettings &bg_settings)
     : httpEndpoint(std::make_shared<Pistache::Http::Endpoint>(addr)),
       camera_handler(webcam),
       matter_handler(
           webcam, webcam_controls, matter, matter_mutex, initial_matter_mode),
       bg_handler(matter_mutex, bg_settings),
-      server_handler(running) {}
+      server_handler(running),
+      recording_handler{} {}
 
 void ServerEndpoint::init(size_t thr) {
   auto opts = Pistache::Http::Endpoint::options()
@@ -27,6 +28,7 @@ void ServerEndpoint::start() {
 }
 
 void ServerEndpoint::shutdown() {
+  recording_handler.cleanup();
   matter_handler.cleanup();
   httpEndpoint->shutdown();
 }
@@ -38,4 +40,5 @@ void ServerEndpoint::setup_routes() {
   matter_handler.setup_routes(router);
   bg_handler.setup_routes(router);
   server_handler.setup_routes(router);
+  recording_handler.setup_routes(router);
 }

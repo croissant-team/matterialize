@@ -5,17 +5,6 @@ void MatterializeApp::run() {
   cleanup_handler.perform_cleanup_actions(0);
 }
 
-long MatterializeApp::estimate_fps() {
-  auto start = std::chrono::system_clock::now();
-  for (int i = 0; i < num_estimation_frames; i++) {
-    process_frame();
-  }
-  return (
-      30000 / std::chrono::duration_cast<std::chrono::milliseconds>(
-                  std::chrono::system_clock::now() - start)
-                  .count());
-}
-
 bool MatterializeApp::process_frame() {
   auto start{std::chrono::system_clock::now()};
 
