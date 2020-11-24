@@ -41,6 +41,7 @@ add_executable(matterialize-server ${MATTERIALIZE_SRC_FILES} ${PROJECT_SOURCE_DI
 target_link_libraries(matterialize-server PRIVATE ${OpenCV_LIBS})
 target_link_libraries(matterialize-server PRIVATE ${Pistache_LIBS} ${RAPIDJSON_INCLUDE_DIRS})
 target_link_libraries(matterialize-server PRIVATE ${X11_LIBRARIES})
+target_link_libraries(matterialize-server PUBLIC stdc++fs)
 target_link_libraries(matterialize-server PRIVATE nlohmann_json nlohmann_json::nlohmann_json)
 
 add_executable(benchmatte ${MATTERIALIZE_SRC_FILES} ${PROJECT_SOURCE_DIR}/src/mains/benchmatte.cpp)
