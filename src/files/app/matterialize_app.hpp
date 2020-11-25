@@ -54,10 +54,10 @@ public:
     // Setup cameras
     try {
       input_cam.start();
-    } catch (const std::exception &e) { std::cout << e.what() << "\n"; }
-    cleanup_handler.set_input_webcam(&input_cam);
+      input_cam_controls.enable_automatic();
+    } catch (const std::invalid_argument &e) { std::cout << e.what() << "\n"; }
 
-    input_cam_controls.enable_automatic();
+    cleanup_handler.set_input_webcam(&input_cam);
     cleanup_handler.set_camera_controls(&input_cam_controls);
 
     output_cam.start();
@@ -67,8 +67,10 @@ public:
     cleanup_handler.set_preview_webcam(&preview_cam);
 
     // Setup clean plate
-    input_cam.roll(num_void_frames);
-    input_cam_controls.disable_automatic();
+    if (input_cam.isAvailable) {
+      input_cam.roll(num_void_frames);
+      input_cam_controls.disable_automatic();
+    }
 
     // Setup server
     server.init(thr);

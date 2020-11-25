@@ -104,8 +104,7 @@ void MatterHandler::set_matter(
   try {
     matters_manager.set_running_mode(selected_mode);
   } catch (MattersManager::MissingCleanPlate &e) {
-    response.send(
-        Pistache::Http::Code::Precondition_Failed, e.what());
+    response.send(Pistache::Http::Code::Precondition_Failed, e.what());
     return;
   }
 
@@ -117,6 +116,14 @@ void MatterHandler::take_clean_plate(
   auto cors_header(
       std::make_shared<Http::Header::AccessControlAllowOrigin>("*"));
   response.headers().add(cors_header);
+
+  if (!webcam.isAvailable) {
+    response.send(
+        Pistache::Http::Code::Bad_Request,
+        "Camera not available, please select an available camera to take a "
+        "clean plate");
+    return;
+  }
 
   // take clean plate (pause the running matter to guarantee that this thread
   // is the only one grabbing frames from the webcam)

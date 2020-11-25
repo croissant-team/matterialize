@@ -62,11 +62,26 @@ void CameraHandler::set_camera(
 
   auto dev_num = document["dev_num"].GetInt();
 
-  try {
-    webcam.changeDevice(dev_num);
-  } catch (const std::exception &e) {
+  bool validNum = false;
+
+  for (const auto &device : VideoDevices::get_devices()) {
+    if (device.number == dev_num) {
+      validNum = true;
+      break;
+    }
+  }
+
+  if (!validNum) {
     response.send(
         Pistache::Http::Code::Bad_Request, "Invalid device number parameter");
+    return;
+  }
+
+  try {
+    webcam.changeDevice(dev_num);
+  } catch (const std::invalid_argument &e) {
+    response.send(
+        Pistache::Http::Code::Conflict, "Device number not available");
     return;
   }
 

@@ -10,7 +10,7 @@ public:
   RecordingHandler() {
     struct stat buffer{};
     if (stat(recordings_path.c_str(), &buffer) != 0) {
-      assert(std::system(("mkdir " + recordings_path).c_str()));
+      assert(std::system(("mkdir " + recordings_path).c_str()) == EXIT_SUCCESS);
     }
   }
 

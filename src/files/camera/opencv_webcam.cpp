@@ -11,8 +11,11 @@ void OpenCVWebcam::start() {
   capture.open(device, cv::CAP_V4L);
 
   if (!capture.isOpened()) {
+    isAvailable = false;
     throw std::invalid_argument("Device number not available");
   }
+
+  isAvailable = true;
 
   capture.set(cv::CAP_PROP_FRAME_WIDTH, width);
   capture.set(cv::CAP_PROP_FRAME_HEIGHT, height);
@@ -21,6 +24,7 @@ void OpenCVWebcam::start() {
 
 void OpenCVWebcam::stop() {
   capture.release();
+  isAvailable = false;
 }
 
 void OpenCVWebcam::changeDevice(int new_device) {
@@ -36,6 +40,7 @@ void OpenCVWebcam::changeDevice(int new_device) {
   std::scoped_lock lock(device_mutex);
 
   stop();
+  isAvailable = true;
   device = new_device;
   start();
 }
@@ -67,6 +72,7 @@ long double OpenCVWebcam::fps(int samples) {
 
   return 1000 / (sum / static_cast<long double>(samples));
 }
+
 void OpenCVWebcam::roll(int num_grabs) {
   for (int i = 0; i < num_grabs; i++) {
     grab();
