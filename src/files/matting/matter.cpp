@@ -1,6 +1,7 @@
 #include "matter.hpp"
 
 #include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
 
 cv::Mat IMatter::change_background(
     const cv::Mat &video_frame, const cv::Mat &new_background) {
