@@ -1,7 +1,6 @@
 #include "../files/benchmatte/benchmark.hpp"
 #include "../files/camera/fake_webcam.hpp"
 #include "../files/camera/opencv_webcam_controls.hpp"
-#include "../files/camera/video_recorder.hpp"
 #include "../files/matting/background_negation_matter.hpp"
 #include "../files/server/server_endpoint.hpp"
 #include "../files/util/cleanup_handler.hpp"

@@ -11,6 +11,7 @@
 #include "camera_handler.hpp"
 #include "matter_handler.hpp"
 #include "server_handler.hpp"
+#include "recording_handler.hpp"
 
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
@@ -45,6 +46,7 @@ private:
   MatterHandler matter_handler;
   BackgroundHandler bg_handler;
   ServerHandler server_handler;
+  RecordingHandler recording_handler;
 };
 
 #endif

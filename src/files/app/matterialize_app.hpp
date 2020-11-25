@@ -46,14 +46,6 @@ private:
       bg_settings};
   std::thread server_thread;
 
-  queue<cv::Mat> frame_queue;
-  std::mutex frame_queue_mutex;
-  std::condition_variable new_entry;
-  bool has_new_entry{false};
-  VideoRecorder video_recorder{0, cv::Size(0, 0), nullptr, nullptr, nullptr, nullptr};
-  std::thread recording_thread;
-
-  long estimate_fps();
   bool process_frame();
 
 public:
