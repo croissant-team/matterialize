@@ -27,6 +27,10 @@ void RecordingHandler::cleanup() {
 void RecordingHandler::start_recording(
     const Pistache::Rest::Request &request,
     Pistache::Http::ResponseWriter response) {
+  auto cors_header(
+      std::make_shared<Pistache::Http::Header::AccessControlAllowOrigin>("*"));
+  response.headers().add(cors_header);
+
   pid_t thread_pid = fork();
   if (thread_pid == 0) {
     time_t raw_time;
@@ -57,6 +61,10 @@ void RecordingHandler::start_recording(
 void RecordingHandler::stop_recording(
     const Pistache::Rest::Request &request,
     Pistache::Http::ResponseWriter response) {
+  auto cors_header(
+      std::make_shared<Pistache::Http::Header::AccessControlAllowOrigin>("*"));
+  response.headers().add(cors_header);
+
   if (!recording) {
     response.send(Pistache::Http::Code::Ok);
     return;
