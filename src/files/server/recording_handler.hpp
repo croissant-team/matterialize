@@ -2,13 +2,18 @@
 #define MATTERIALIZE_SRC_FILES_SERVER_RECORDING_HANDLER_HPP
 
 #include <pistache/router.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
+
 #include <pwd.h>
 #include <sys/stat.h>
+#include <time.h>
+#include <wait.h>
 
 class RecordingHandler {
 public:
   RecordingHandler() {
-    struct stat buffer{};
+    struct stat buffer {};
     if (stat(recordings_path.c_str(), &buffer) != 0) {
       assert(std::system(("mkdir " + recordings_path).c_str()) == EXIT_SUCCESS);
     }
