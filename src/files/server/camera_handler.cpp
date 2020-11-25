@@ -7,10 +7,36 @@ void CameraHandler::setup_routes(Pistache::Rest::Router &router) {
 
   Routes::Get(
       router,
+      "/camera/current",
+      Routes::bind(&CameraHandler::get_current_camera, this));
+  Routes::Get(
+      router,
       "/camera/options",
       Routes::bind(&CameraHandler::get_cameras, this));
   Routes::Post(
       router, "/camera/set", Routes::bind(&CameraHandler::set_camera, this));
+}
+
+void CameraHandler::get_current_camera(
+    const Pistache::Rest::Request &request,
+    Pistache::Http::ResponseWriter response) {
+  auto cors_header(
+      std::make_shared<Pistache::Http::Header::AccessControlAllowOrigin>("*"));
+  response.headers().add(cors_header);
+
+  rapidjson::StringBuffer s;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+
+  writer.StartObject();
+  writer.Key("dev_num");
+  writer.Int(webcam.get_device_num());
+  writer.Key("available");
+  writer.Bool(webcam.isAvailable);
+  writer.EndObject();
+
+  response.headers().add<Pistache::Http::Header::ContentType>(
+      MIME(Application, Json));
+  response.send(Pistache::Http::Code::Ok, s.GetString());
 }
 
 void CameraHandler::get_cameras(

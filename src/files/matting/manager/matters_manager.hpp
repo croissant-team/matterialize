@@ -38,6 +38,7 @@ public:
 
   void pause_running_matter();
   void resume_running_matter();
+  MatterMode get_running_mode();
   void set_running_mode(MatterMode mode);
   void update_config(MatterMode mode, map<string, string> config_updates);
   void update_clean_plate(const cv::Mat &new_clean_plate);

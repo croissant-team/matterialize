@@ -19,6 +19,10 @@ void MatterHandler::setup_routes(Pistache::Rest::Router &router) {
 
   Routes::Get(
       router,
+      "/matter/current",
+      Routes::bind(&MatterHandler::get_current_matter, this));
+  Routes::Get(
+      router,
       "/matter/options",
       Routes::bind(&MatterHandler::get_matters, this));
   Routes::Post(
@@ -47,6 +51,26 @@ void MatterHandler::setup_routes(Pistache::Rest::Router &router) {
 
 void MatterHandler::cleanup() {
   // Nothing to cleanup (hopefully)
+}
+
+void MatterHandler::get_current_matter(
+    const Pistache::Rest::Request &request,
+    Pistache::Http::ResponseWriter response) {
+  auto cors_header(
+      std::make_shared<Pistache::Http::Header::AccessControlAllowOrigin>("*"));
+  response.headers().add(cors_header);
+
+  rapidjson::StringBuffer s;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+
+  writer.StartObject();
+  writer.Key("matter");
+  writer.String(matters_manager.get_running_mode()->name().c_str());
+  writer.EndObject();
+
+  response.headers().add<Pistache::Http::Header::ContentType>(
+      MIME(Application, Json));
+  response.send(Pistache::Http::Code::Ok, s.GetString());
 }
 
 void MatterHandler::get_matters(

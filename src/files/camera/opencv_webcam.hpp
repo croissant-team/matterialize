@@ -38,6 +38,8 @@ public:
   void roll(int num_grabs);
 
   long double fps(int samples);
+
+  int get_device_num() const;
 };
 
 #endif

@@ -7,6 +7,7 @@
 #include "../util/video_devices.hpp"
 
 #include <atomic>
+#include <thread>
 
 class MatterializeApp {
 private:

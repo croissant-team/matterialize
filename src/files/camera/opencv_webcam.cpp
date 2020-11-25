@@ -78,3 +78,7 @@ void OpenCVWebcam::roll(int num_grabs) {
     grab();
   }
 }
+
+int OpenCVWebcam::get_device_num() const {
+  return device;
+}

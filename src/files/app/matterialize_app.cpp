@@ -30,6 +30,7 @@ bool MatterializeApp::process_frame() {
     cout << elapsed_ms << '\n';
   } else {
     cout << "Selected device not available" << '\n';
+    std::this_thread::sleep_for(std::chrono::seconds(1));
   }
 
   return true;
