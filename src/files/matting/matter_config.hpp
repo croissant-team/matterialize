@@ -32,7 +32,7 @@ class MatterConfig;
 class MatterConfig {
   friend class MatterState;
   friend void to_json(json &j, const MatterConfig &matter_config);
-  friend void from_json(const json &j, MatterConfig &matterConfig);
+  friend void from_json(const json &j, MatterConfig &matter_config);
 private:
   map<string, MatterConfigField> fields_map{};
   json json_config;

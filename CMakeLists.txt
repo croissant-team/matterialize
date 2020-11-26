@@ -36,19 +36,17 @@ file(GLOB_RECURSE tests
         ${PROJECT_SOURCE_DIR}/tests/*.cpp)
 
 set(MATTERIALIZE_SRC_FILES ${src} ${lib})
+set(LIBS ${OpenCV_LIBS} ${Pistache_LIBS} ${RAPIDJSON_INCLUDE_DIRS} ${X11_LIBRARIES} stdc++fs nlohmann_json nlohmann_json::nlohmann_json)
+
 
 add_executable(matterialize-server ${MATTERIALIZE_SRC_FILES} ${PROJECT_SOURCE_DIR}/src/mains/matterialize.cpp)
-target_link_libraries(matterialize-server PRIVATE ${OpenCV_LIBS})
-target_link_libraries(matterialize-server PRIVATE ${Pistache_LIBS} ${RAPIDJSON_INCLUDE_DIRS})
-target_link_libraries(matterialize-server PRIVATE ${X11_LIBRARIES})
-target_link_libraries(matterialize-server PUBLIC stdc++fs)
-target_link_libraries(matterialize-server PRIVATE nlohmann_json nlohmann_json::nlohmann_json)
+target_link_libraries(matterialize-server PRIVATE ${LIBS})
 
 add_executable(benchmatte ${MATTERIALIZE_SRC_FILES} ${PROJECT_SOURCE_DIR}/src/mains/benchmatte.cpp)
-target_link_libraries(benchmatte ${OpenCV_LIBS})
+target_link_libraries(benchmatte ${LIBS})
 add_executable(matterialize_tests ${tests})
 
-target_link_libraries(matterialize_tests ${GTest_LIBS} ${OpenCV_LIBS})
+target_link_libraries(matterialize_tests ${GTest_LIBS} ${LIBS})
 target_include_directories(matterialize_tests PRIVATE src)
 
 file(GLOB_RECURSE mains

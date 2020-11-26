@@ -16,7 +16,7 @@ public:
   double calculate_precision();
   double calculate_recall();
   double calculate_F1();
-  double calculate_accuracy();
+  double calculate_accuracy() const;
   string to_string();
   static ConfusionMatrix average(const vector<ConfusionMatrix> &matrices);
 };

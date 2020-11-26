@@ -32,7 +32,7 @@ double ConfusionMatrix::calculate_F1() {
   return (2.0 * precision * recall) / (precision + recall);
 }
 
-double ConfusionMatrix::calculate_accuracy() {
+double ConfusionMatrix::calculate_accuracy() const {
   return (1.0 * matrix[0][0] + matrix[1][1]) /
          (matrix[0][0] + matrix[1][1] + matrix[1][0] + matrix[0][1]);
 }

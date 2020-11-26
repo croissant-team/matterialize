@@ -42,7 +42,7 @@ void to_json(json &j, const MatterConfig &matter_config) {
   j = matter_config.json_config;
 }
 
-void from_json(const json &j, MatterConfig &matterConfig) {
-  matterConfig.json_config = j;
+void from_json(const json &j, MatterConfig &matter_config) {
+  matter_config.json_config = j;
 }
 
