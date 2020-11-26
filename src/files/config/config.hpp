@@ -8,13 +8,17 @@ using namespace std::filesystem;
 
 class Config {
 public:
-  static path default_path() {
+  static path user_path() {
     path home_path = getenv("HOME");
     return home_path / ".matterialize";
   }
 
+  static path default_benchmark_path() {
+    return user_path() / "benchmark";
+  }
+
   static path default_matters_config_path() {
-    return default_path() / "config.json";
+    return user_path() / "config.json";
   }
 };
 

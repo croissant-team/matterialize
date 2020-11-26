@@ -10,6 +10,7 @@ void MatterState::config_update(const map<string, string> &config_updates) {
     reinit_matter();
   }
 }
+
 IMatter *MatterState::get_matter() {
   if (matter_instance == nullptr) {
     if (mode->requires_clean_plate() && init_data.clean_plate.empty()) {

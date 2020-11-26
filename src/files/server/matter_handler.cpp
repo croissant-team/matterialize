@@ -47,6 +47,10 @@ void MatterHandler::setup_routes(Pistache::Rest::Router &router) {
       router,
       "/matters/config/import_file",
       Routes::bind(&MatterHandler::import_config_file, this));
+  Routes::Get(
+      router,
+      "/matters/benchmark",
+      Routes::bind(&MatterHandler::benchmark_matters, this));
 }
 
 void MatterHandler::cleanup() {
@@ -265,4 +269,35 @@ void MatterHandler::export_config_file(
 
   response.send(
       Http::Code::Ok, "Exported config to file " + file_path.string());
+}
+void MatterHandler::benchmark_matters(
+    const Rest::Request &request, Http::ResponseWriter response) {
+  /* Eg. response
+   *  {
+   *    BackgroundNegation:
+   *    {
+   *      accuracy: 0.8
+   *      avg_matting_time: 45ms
+   *    },
+   *    Background Cut...
+   * }
+   *
+   * No sorting is performed by the backend
+   * */
+  auto cors_header(
+      std::make_shared<Http::Header::AccessControlAllowOrigin>("*"));
+  response.headers().add(cors_header);
+  response.headers().add<Http::Header::ContentType>(MIME(Application, Json));
+
+  json benchmark_results;
+  try {
+    benchmark_results = matters_manager.benchmark_matters();
+  } catch (const exception &e) {
+    string err_msg = string("Encountered error when benchmarking ") + e.what();
+    response.send(Http::Code::Internal_Server_Error, e.what());
+    return;
+  }
+
+  const int indent = 4;
+  response.send(Http::Code::Ok, benchmark_results.dump(indent));
 }

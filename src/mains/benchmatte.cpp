@@ -1,8 +1,8 @@
 #include "../files/benchmatte/benchmark.hpp"
+#include "../files/config/config.hpp"
 
 int main() {
-  Benchmark benchmark =
-      Benchmark("../images/masks", "../images/bg", "../images/fg");
+  Benchmark benchmark = Benchmark(Config::default_benchmark_path());
   vector<vector<BenchmarkResult>> results = benchmark.run();
   for (int i = 0; i < results.size() - 1; i++) {
     cout << "Results for Image Combination " << i << "\n\n";

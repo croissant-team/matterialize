@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <map>
 
+#include "../../benchmatte/benchmark_result.hpp"
 #include "../matter_config.hpp"
 #include "../modes.hpp"
 #include "matter_state.hpp"
@@ -46,6 +47,7 @@ public:
   json dump_matters_config();
   void save_configs(const path &config_file);
   void load_configs(const path &config_file);
+  BenchmarkResults benchmark_matters();
 };
 
 #endif// MATTERIALIZE_MATTERS_MANAGER_HPP

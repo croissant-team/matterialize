@@ -10,6 +10,9 @@ BUILD_DIR=build_dir
 CMAKE_TOOLCHAIN_FILE=$(realpath vcpkg/scripts/buildsystems/vcpkg.cmake)
 V4L2_LOOPBACK_CONFIG=v4l2loopback.conf
 EXE=matterialize-server
+MATTERALIZE_USER_PATH=$HOME/.matterialize
+BENCHMARK_PATH=$MATTERALIZE_USER_PATH/benchmark/
+
 
 # Install system deps
 if [ -f /etc/arch-release ]; then
@@ -26,6 +29,9 @@ fi
 sudo install -D -m644 "install/$V4L2_LOOPBACK_CONFIG" "/etc/modprobe.d/$V4L2_LOOPBACK_CONFIG"
 sudo modprobe -r v4l2loopback
 sudo modprobe v4l2loopback
+
+# Copy benchmarking images
+cp --archive images "$BENCHMARK_PATH"
 
 git submodule update --init --recursive
 

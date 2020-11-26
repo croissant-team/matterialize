@@ -1,6 +1,7 @@
 #ifndef MATTERIALIZE_SRC_BENCHMATTE_BENCHMARK_HPP
 #define MATTERIALIZE_SRC_BENCHMATTE_BENCHMARK_HPP
 
+#include "../config/config.hpp"
 #include "../matting/matter.hpp"
 #include "benchmark_result.hpp"
 #include "compositor.hpp"
@@ -23,9 +24,11 @@ private:
   vector<Mat> masks;
 
 public:
-  Benchmark(
-      const string &masks_path, const string &backgrounds_path,
-      const string &foregrounds_path) {
+  Benchmark(const path benchmark_path = Config::default_benchmark_path()) {
+    const path masks_path = benchmark_path / "masks";
+    const path backgrounds_path = benchmark_path / "bg";
+    const path foregrounds_path = benchmark_path / "fg";
+
     const directory_iterator end_iterator;
     directory_iterator background_file_iterator =
         directory_iterator(backgrounds_path);

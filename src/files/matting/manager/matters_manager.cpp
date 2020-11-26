@@ -1,4 +1,5 @@
 #include "matters_manager.hpp"
+#include "../../benchmatte/benchmark.hpp"
 #include <fstream>
 
 MattersManager::MattersManager(
@@ -119,4 +120,7 @@ json MattersManager::dump_matters_config() {
     configs[mode->name()] = state.get_config();
   }
   return configs;
+}
+BenchmarkResults MattersManager::benchmark_matters() {
+  return BenchmarkResults(Benchmark().run());
 }
