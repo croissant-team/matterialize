@@ -1,10 +1,14 @@
 #include "matter.hpp"
 
 #include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
 
 cv::Mat IMatter::change_background(
     const cv::Mat &video_frame, const cv::Mat &new_background) {
   const cv::Mat &bg_mask{background_mask(video_frame)};
+
+  cv::threshold(bg_mask, bg_mask, 127.0, 255.0, bg_mask.type());
+
   cv::Mat fg_mask(bg_mask.size(), bg_mask.type());
 
   cv::bitwise_not(bg_mask, fg_mask);
