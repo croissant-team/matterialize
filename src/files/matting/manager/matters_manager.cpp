@@ -22,6 +22,14 @@ MattersManager::MattersManager(
   running_matter_lock.unlock();
 }
 
+MatterMode MattersManager::get_running_mode() {
+  running_matter_lock.lock();
+  auto curr_mode = running_matter_mode;
+  running_matter_lock.unlock();
+
+  return curr_mode;
+}
+
 void MattersManager::set_running_mode(MatterMode mode) {
   if (mode == running_matter_mode) {
     return;

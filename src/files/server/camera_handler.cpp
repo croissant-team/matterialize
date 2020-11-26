@@ -7,10 +7,36 @@ void CameraHandler::setup_routes(Pistache::Rest::Router &router) {
 
   Routes::Get(
       router,
+      "/camera/current",
+      Routes::bind(&CameraHandler::get_current_camera, this));
+  Routes::Get(
+      router,
       "/camera/options",
       Routes::bind(&CameraHandler::get_cameras, this));
   Routes::Post(
       router, "/camera/set", Routes::bind(&CameraHandler::set_camera, this));
+}
+
+void CameraHandler::get_current_camera(
+    const Pistache::Rest::Request &request,
+    Pistache::Http::ResponseWriter response) {
+  auto cors_header(
+      std::make_shared<Pistache::Http::Header::AccessControlAllowOrigin>("*"));
+  response.headers().add(cors_header);
+
+  rapidjson::StringBuffer s;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+
+  writer.StartObject();
+  writer.Key("dev_num");
+  writer.Int(webcam.get_device_num());
+  writer.Key("available");
+  writer.Bool(webcam.isAvailable);
+  writer.EndObject();
+
+  response.headers().add<Pistache::Http::Header::ContentType>(
+      MIME(Application, Json));
+  response.send(Pistache::Http::Code::Ok, s.GetString());
 }
 
 void CameraHandler::get_cameras(
@@ -62,11 +88,26 @@ void CameraHandler::set_camera(
 
   auto dev_num = document["dev_num"].GetInt();
 
-  try {
-    webcam.changeDevice(dev_num);
-  } catch (const std::exception &e) {
+  bool validNum = false;
+
+  for (const auto &device : VideoDevices::get_devices()) {
+    if (device.number == dev_num) {
+      validNum = true;
+      break;
+    }
+  }
+
+  if (!validNum) {
     response.send(
         Pistache::Http::Code::Bad_Request, "Invalid device number parameter");
+    return;
+  }
+
+  try {
+    webcam.changeDevice(dev_num);
+  } catch (const std::invalid_argument &e) {
+    response.send(
+        Pistache::Http::Code::Conflict, "Device number not available");
     return;
   }
 

@@ -11,12 +11,15 @@
 
 class CameraHandler {
 public:
-  CameraHandler(OpenCVWebcam &webcam);
+  explicit CameraHandler(OpenCVWebcam &webcam);
   void setup_routes(Pistache::Rest::Router &router);
 
 private:
   OpenCVWebcam &webcam;
 
+  void get_current_camera(
+      const Pistache::Rest::Request &request,
+      Pistache::Http::ResponseWriter response);
   void get_cameras(
       const Pistache::Rest::Request &request,
       Pistache::Http::ResponseWriter response);

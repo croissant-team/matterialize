@@ -30,16 +30,30 @@ private:
   OpenCVWebcamControls &webcam_controls;
   MattersManager matters_manager;
 
-  void get_matters(const Rest::Request &request, Http::ResponseWriter response);
-  void set_matter(const Rest::Request &request, Http::ResponseWriter response);
-  void
-  update_config(const Rest::Request &request, Http::ResponseWriter response);
-  void
-  take_clean_plate(const Rest::Request &request, Http::ResponseWriter response);
+  void get_current_matter(
+      const Pistache::Rest::Request &request,
+      Pistache::Http::ResponseWriter response);
+  void get_matters(
+      const Rest::Request &request,
+      Http::ResponseWriter response);
+  void set_matter(
+      const Rest::Request &request,
+      Http::ResponseWriter response);
+  void update_config(
+      const Rest::Request &request,
+      Http::ResponseWriter response);
+  void take_clean_plate(
+      const Rest::Request &request,
+      Http::ResponseWriter response);
   void get_matters_config(
-      const Rest::Request &request, Http::ResponseWriter response);
-  void export_config_file(const Rest::Request &request, Http::ResponseWriter response);
-  void import_config_file(const Rest::Request &request, Http::ResponseWriter response);
+      const Rest::Request &request,
+      Http::ResponseWriter response);
+  void export_config_file(
+      const Rest::Request &request,
+      Http::ResponseWriter response);
+  void import_config_file(
+      const Rest::Request &request,
+      Http::ResponseWriter response);
 };
 
 #endif

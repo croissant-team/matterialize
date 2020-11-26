@@ -1,12 +1,15 @@
 #include "cleanup_handler.hpp"
 
 void CleanupHandler::reenable_automatic_controls() {
-  cout << "Reenabling automatic controls\n";
+  cout << "Re-enabling automatic controls\n";
   if (controls) {
-    controls->enable_automatic();
+    if (input->isAvailable) {
+        controls->enable_automatic();
+    }
+
     controls = nullptr;
   }
-  cout << "Reenbled automatic controls\n";
+  cout << "Re-enabled automatic controls\n";
 }
 
 void CleanupHandler::shutdown_server() {

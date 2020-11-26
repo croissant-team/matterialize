@@ -17,12 +17,15 @@ private:
   std::mutex device_mutex;
 
 public:
+  bool isAvailable;
+
   OpenCVWebcam(int device, int width, int height)
-      : device{device},
-        width{width},
+      : width{width},
         height{height},
+        device{device},
         capture{cv::VideoCapture{}},
-        device_mutex() {}
+        device_mutex(),
+        isAvailable{false} {}
 
   void start();
 
@@ -35,6 +38,8 @@ public:
   void roll(int num_grabs);
 
   long double fps(int samples);
+
+  int get_device_num() const;
 };
 
 #endif

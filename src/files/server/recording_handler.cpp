@@ -1,8 +1,5 @@
 #include "recording_handler.hpp"
 
-#include <time.h>
-#include <wait.h>
-
 void RecordingHandler::setup_routes(Pistache::Rest::Router &router) {
   using namespace Pistache::Rest;
 
@@ -88,5 +85,13 @@ void RecordingHandler::stop_recording(
     return;
   }
 
-  response.send(Pistache::Http::Code::Ok);
+  rapidjson::StringBuffer s;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+
+  writer.StartObject();
+  writer.Key("path");
+  writer.String(recordings_path.c_str());
+  writer.EndObject();
+
+  response.send(Pistache::Http::Code::Ok, s.GetString());
 }
