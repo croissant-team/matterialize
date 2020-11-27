@@ -49,7 +49,7 @@ fi
 # build executable
 mkdir -p $BUILD_DIR
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=$CMAKE_TOOLCHAIN_FILE -S $PROJECT_ROOT -B $BUILD_DIR
-cmake --build $BUILD_DIR --target $EXE
+cmake --build $BUILD_DIR --target $EXE -- -j 6
 chmod +x $BUILD_DIR/$EXE
 
 sudo install -D -m755 "$BUILD_DIR/$EXE" "/usr/local/bin/$EXE"
