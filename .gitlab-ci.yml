@@ -1,3 +1,12 @@
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+cache:
+  policy: pull-push
+
+stages:
+  - check-cpp-formatting
+
 default:
   image: archlinux:latest
   before_script:
@@ -8,14 +17,6 @@ default:
     - ./vcpkg/vcpkg install rapidjson
     - ./vcpkg/vcpkg install nlohmann-json
     - ./vcpkg/vcpkg install gtest
-  variables:
-    GIT_SUBMODULE_STRATEGY: recursive
-
-stages:
-  - check-cpp-formatting
-
-cache:
-  policy: pull-push
 
 check-cpp-formatting:
   stage: check-cpp-formatting
