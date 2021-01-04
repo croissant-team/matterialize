@@ -3,6 +3,11 @@ default:
   before_script:
     - pacman -Syyu --noconfirm
     - pacman -S --noconfirm -y make cmake clang gcc opencv
+    - ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
+    - ./vcpkg/vcpkg install pistache
+    - ./vcpkg/vcpkg install rapidjson
+    - ./vcpkg/vcpkg install nlohmann-json
+    - ./vcpkg/vcpkg install gtest
 
 stages:
   - check-cpp-formatting
@@ -15,6 +20,6 @@ check-cpp-formatting:
   script:
     - mkdir build
     - cd build
-    - cmake ..
+    - cmake -DCMAKE_TOOLCHAIN_FILE=$(realpath vcpkg/scripts/buildsystems/vcpkg.cmake) ..
     - cmake --build . --target clang-format-check-formatting
     - rm -rf build
