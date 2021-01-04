@@ -3,6 +3,7 @@ default:
   before_script:
     - pacman -Syyu --noconfirm
     - pacman -S --noconfirm -y make cmake clang gcc opencv
+    - git submodule update --init --recursive
     - ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
     - ./vcpkg/vcpkg install pistache
     - ./vcpkg/vcpkg install rapidjson
