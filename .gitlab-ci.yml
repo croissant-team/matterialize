@@ -24,6 +24,6 @@ check-cpp-formatting:
   script:
     - mkdir build
     - cd build
-    - cmake -DCMAKE_TOOLCHAIN_FILE=$(realpath vcpkg/scripts/buildsystems/vcpkg.cmake) ..
+    - cmake -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake ..
     - cmake --build . --target clang-format-check-formatting
     - rm -rf build
