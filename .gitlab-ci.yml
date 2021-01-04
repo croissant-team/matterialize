@@ -12,6 +12,7 @@ default:
   before_script:
     - pacman -Syyu --noconfirm
     - pacman -S --noconfirm -y make cmake clang gcc opencv unzip curl zip tar git
+    - ls -al
     - ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
     - ./vcpkg/vcpkg install pistache
     - ./vcpkg/vcpkg install rapidjson
