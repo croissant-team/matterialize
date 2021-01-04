@@ -11,9 +11,8 @@ default:
   image: archlinux:latest
   before_script:
     - pacman -Syyu --noconfirm
-    - pacman -S --noconfirm -y make cmake clang gcc opencv unzip curl zip tar git
+    - pacman -S --noconfirm -y make cmake clang gcc opencv unzip zip git
     - ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
-    - ls -al vcpkg
     - ./vcpkg/vcpkg install pistache
     - ./vcpkg/vcpkg install rapidjson
     - ./vcpkg/vcpkg install nlohmann-json
