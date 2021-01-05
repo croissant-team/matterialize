@@ -56,7 +56,8 @@ public:
         config,
         (int) config.get(config_fields::downscale_factor));
   }
-  [[nodiscard]] vector<const IMatterConfigField *> config_fields() const override {
+  [[nodiscard]] vector<const IMatterConfigField *>
+  config_fields() const override {
     using namespace background_cut::config_fields;
     return {
         &downscale_factor,
