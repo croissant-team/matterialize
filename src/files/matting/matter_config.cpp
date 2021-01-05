@@ -15,7 +15,7 @@ string MatterConfig::get(MatterConfigFieldString field) {
 bool MatterConfig::update(const map<string, string> &field_updates) {
   // validate updates
   for (auto &[name, _] : field_updates) {
-    if (!json_config.contains(name)) {
+    if (fields_map.find(name) == fields_map.end()) {
       string err_msg{name + " is not a valid config field for given matter"};
       throw invalid_argument(err_msg);
     }
@@ -24,7 +24,7 @@ bool MatterConfig::update(const map<string, string> &field_updates) {
   // perform updates
   bool must_reinit = false;
   for (auto &[name, value] : field_updates) {
-    json_config[name] = value;
+    json_config[name]["value"] = value;
     must_reinit |= fields_map.at(name)->must_reinit_on_update;
   }
 
@@ -37,7 +37,7 @@ MatterConfig MatterConfig::default_for(MatterMode mode) {
 MatterConfig::MatterConfig(vector<const IMatterConfigField *> fields) {
   for (auto &field : fields) {
     fields_map[field->name] = field;
-    json_config[field->name] = field->dump_default_value();
+    json_config[field->name]["value"] = field->dump_default_value();
   }
 }
 
@@ -47,6 +47,16 @@ void to_json(json &j, const MatterConfig &matter_config) {
 
 void from_json(const json &j, MatterConfig &matter_config) {
   matter_config.json_config = j;
+}
+json MatterConfig::dump(bool include_field_info) const {
+  json config = json_config;
+  if (include_field_info) {
+    for (const auto &[name, field] : fields_map) {
+      config[name]["field_info"] = field->dump_field_info();
+    }
+  }
+
+  return config;
 }
 
 MatterConfigFieldDouble::MatterConfigFieldDouble(

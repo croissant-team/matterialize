@@ -94,8 +94,8 @@ void MattersManager::load_configs(const path &config_file) {
     json config = configs[mode->name()];
 
     map<string, string> config_fields;
-    for (auto &[name, value] : config.items()) {
-      config_fields[name] = value;
+    for (auto &[name, field_obj] : config.items()) {
+      config_fields[name] = field_obj["value"];
     }
 
     update_config(mode, config_fields);
@@ -114,10 +114,11 @@ void MattersManager::resume_running_matter() {
 const MatterConfig &MattersManager::get_matter_config(MatterMode mode) {
   return matters_state.at(mode).get_config();
 }
-json MattersManager::dump_matters_config() {
+json MattersManager::dump_matters_config(bool include_field_info) const {
   json configs;
   for (const auto &[mode, state] : matters_state) {
-    configs[mode->name()] = state.get_config();
+    MatterConfig config = state.get_config();
+    configs[mode->name()] = config.dump(include_field_info);
   }
   return configs;
 }

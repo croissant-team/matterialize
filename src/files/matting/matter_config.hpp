@@ -96,13 +96,13 @@ private:
   // returns true iff config update requires matter reinitialization
   // throws invalid_argument if the field names are not valid for this config
   [[nodiscard]] bool update(const map<string, string> &field_updates);
-
   explicit MatterConfig(vector<const IMatterConfigField *> fields);
 
 public:
   static MatterConfig default_for(const IMatterMode *mode);
   double get(MatterConfigFieldDouble field);
   std::string get(MatterConfigFieldString field);
+  json dump(bool include_field_info = false) const;
 };
 
 #endif// MATTERIALIZE_MATTER_CONFIG_HPP

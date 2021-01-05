@@ -229,7 +229,7 @@ void MatterHandler::get_matters_config(
   response.headers().add(cors_header);
   response.headers().add<Http::Header::ContentType>(MIME(Application, Json));
 
-  json configs = matters_manager.dump_matters_config();
+  json configs = matters_manager.dump_matters_config(true);
   const int indent = 4;
   response.send(Http::Code::Ok, configs.dump(indent));
 }
