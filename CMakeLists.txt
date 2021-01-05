@@ -38,7 +38,6 @@ file(GLOB_RECURSE tests
 set(MATTERIALIZE_SRC_FILES ${src} ${lib})
 set(LIBS ${OpenCV_LIBS} ${Pistache_LIBS} ${RAPIDJSON_INCLUDE_DIRS} ${X11_LIBRARIES} stdc++fs nlohmann_json nlohmann_json::nlohmann_json)
 
-
 add_executable(matterialize-server ${MATTERIALIZE_SRC_FILES} ${PROJECT_SOURCE_DIR}/src/mains/matterialize.cpp)
 target_link_libraries(matterialize-server PRIVATE ${LIBS})
 
@@ -66,5 +65,4 @@ if (CLANG_FORMAT_BIN)
     add_custom_target(clang-format-check-formatting COMMAND ${CLANG_FORMAT_BIN} --dry-run --Werror -style=file ${ALL_FILES})
     add_custom_target(clang-format-project-files COMMAND ${CLANG_FORMAT_BIN} -i -style=file ${ALL_FILES})
 endif ()
-
 
