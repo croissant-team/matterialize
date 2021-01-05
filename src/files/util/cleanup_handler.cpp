@@ -4,7 +4,7 @@ void CleanupHandler::reenable_automatic_controls() {
   cout << "Re-enabling automatic controls\n";
   if (controls) {
     if (input->isAvailable) {
-        controls->enable_automatic();
+      controls->enable_automatic();
     }
 
     controls = nullptr;

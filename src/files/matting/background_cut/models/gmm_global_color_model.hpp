@@ -14,4 +14,4 @@ namespace GMMGlobalColorModel {
   global_probs(const Ptr<EM> &trainedGMM, const Image &img);
 }
 
-#endif//MATTERIALIZE_GMM_GLOBAL_COLOR_MODEL_HPP
+#endif// MATTERIALIZE_GMM_GLOBAL_COLOR_MODEL_HPP

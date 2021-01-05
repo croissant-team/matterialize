@@ -1,3 +1,4 @@
+#include "../files/app/matterialize_app.hpp"
 #include "../files/benchmatte/benchmark.hpp"
 #include "../files/camera/fake_webcam.hpp"
 #include "../files/camera/opencv_webcam_controls.hpp"
@@ -5,7 +6,6 @@
 #include "../files/server/server_endpoint.hpp"
 #include "../files/util/cleanup_handler.hpp"
 #include "../files/util/converter.hpp"
-#include "../files/app/matterialize_app.hpp"
 
 #include <condition_variable>
 #include <csignal>

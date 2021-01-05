@@ -9,7 +9,6 @@ public:
   cv::Mat background_mask(const cv::Mat &video_frame) override;
 };
 
-
 class NoneMode : public IMatterMode {
 public:
   [[nodiscard]] const string name() const override;

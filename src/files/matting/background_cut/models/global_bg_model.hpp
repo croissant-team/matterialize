@@ -32,4 +32,4 @@ public:
   [[nodiscard]] Probability global_probs(const Image &img) const;
 };
 
-#endif//MATTERIALIZE_GLOBAL_BG_MODEL_HPP
+#endif// MATTERIALIZE_GLOBAL_BG_MODEL_HPP

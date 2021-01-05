@@ -17,10 +17,10 @@ private:
 
 public:
   explicit ColorTerm(Mat &&bg_energies, Mat &&fg_energies) noexcept
-      : bg_energies{std::move(bg_energies)}, fg_energies{
-                                                 std::move(fg_energies)} {}
+      : bg_energies{std::move(bg_energies)},
+        fg_energies{std::move(fg_energies)} {}
 
   [[nodiscard]] double at(int pixel, mask::Label label) const;
 };
 
-#endif//MATTERIALIZE_COLOR_TERM_HPP
+#endif// MATTERIALIZE_COLOR_TERM_HPP

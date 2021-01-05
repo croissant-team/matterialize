@@ -16,4 +16,3 @@ cv::Mat BackgroundNegationMatter::background_mask(const cv::Mat &video_frame) {
 
   return mask;
 }
-

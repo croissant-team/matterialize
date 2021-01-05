@@ -19,12 +19,13 @@ public:
 // to get averages for the matter endpoint.
 class BenchmarkResults {
   friend void to_json(json &j, const BenchmarkResults &benchmark_results);
+
 private:
   using AvgResult = BenchmarkResult;
   map<MatterMode, AvgResult> results{};
+
 public:
   explicit BenchmarkResults(vector<vector<BenchmarkResult>> raw_run_results);
 };
-
 
 #endif

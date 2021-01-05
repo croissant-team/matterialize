@@ -29,7 +29,8 @@ Image Image::resized(int rows, int cols) const {
   cv::Mat result{};
 
   cv::resize(
-      mat, result,
+      mat,
+      result,
       cv::Size2d(static_cast<double>(cols), static_cast<double>(rows)));
 
   return Image(std::move(result));
@@ -52,7 +53,8 @@ PixelVariance Image::get_pixel_variances() const {
   mat.convertTo(mat_of_doubles, CV_64FC3);
 
   cv::blur(
-      mat_of_doubles.mul(mat_of_doubles), mean_of_square,
+      mat_of_doubles.mul(mat_of_doubles),
+      mean_of_square,
       eight_neighborhood_size);
   cv::blur(mat_of_doubles, mean, eight_neighborhood_size);
 

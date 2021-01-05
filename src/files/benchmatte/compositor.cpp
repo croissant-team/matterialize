@@ -16,7 +16,8 @@ Compositor::compose(Mat &background, Mat &foreground, Mat &mask) {
         int new_x = x + transform.x_offset;
         int new_y = y + transform.y_offset;
         vector<double> blend = lerp(
-            background.ptr<uchar>(new_y, new_x), foreground.ptr<uchar>(y, x),
+            background.ptr<uchar>(new_y, new_x),
+            foreground.ptr<uchar>(y, x),
             alpha);
         for (int i = 0; i < 3; i++) {
           new_image.ptr<uchar>(new_y, new_x)[i] = (uchar) blend[i];

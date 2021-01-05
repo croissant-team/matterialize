@@ -9,4 +9,3 @@ cv::Mat OpenCVMatter::background_mask(const cv::Mat &video_frame) {
 
   return mask;
 }
-

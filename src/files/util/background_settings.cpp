@@ -19,13 +19,21 @@ cv::Mat BackgroundSettings::generate_background(cv::Mat frame) {
       return bg;
     }
     case BackgroundMode::DESKTOP: {
-      Display* display = XOpenDisplay(nullptr);
+      Display *display = XOpenDisplay(nullptr);
       Window root = DefaultRootWindow(display);
 
       XWindowAttributes attributes = {0};
       XGetWindowAttributes(display, root, &attributes);
 
-      XImage* img = XGetImage(display, root, desktop_x, desktop_y, desktop_w, desktop_h, AllPlanes, ZPixmap);
+      XImage *img = XGetImage(
+          display,
+          root,
+          desktop_x,
+          desktop_y,
+          desktop_w,
+          desktop_h,
+          AllPlanes,
+          ZPixmap);
       int bpp = img->bits_per_pixel;
 
       std::vector<std::uint8_t> pix{};
@@ -73,7 +81,8 @@ cv::Mat BackgroundSettings::generate_background(cv::Mat frame) {
         }
       }
 
-      std::cout << "frame: " << cap_frame_current << "/" << cap_frame_count << "\n";
+      std::cout << "frame: " << cap_frame_current << "/" << cap_frame_count
+                << "\n";
 
       cv::resize(raw, result, get_size());
 
@@ -103,6 +112,6 @@ void BackgroundSettings::set_desktop(int x, int y, int w, int h) {
 
 void BackgroundSettings::set_video(cv::VideoCapture capture) {
   cap = capture;
-  cap_frame_count = (int)cap.get(cv::CAP_PROP_FRAME_COUNT);
+  cap_frame_count = (int) cap.get(cv::CAP_PROP_FRAME_COUNT);
   cap_frame_current = 0;
 }

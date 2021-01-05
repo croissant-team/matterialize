@@ -147,10 +147,11 @@ void BackgroundHandler::desktop_background(
 
   matter_lock.lock();
   std::vector<DesktopCapture> desktops{DesktopCaptures::get_desktops()};
-  for (const auto& desktop : desktops) {
+  for (const auto &desktop : desktops) {
     if (desktop.name == target) {
       found = true;
-      bg_settings.set_desktop(desktop.x, desktop.y, desktop.width, desktop.height);
+      bg_settings.set_desktop(
+          desktop.x, desktop.y, desktop.width, desktop.height);
       break;
     }
   }
@@ -170,7 +171,6 @@ void BackgroundHandler::desktop_background(
 void BackgroundHandler::get_desktops(
     const Pistache::Rest::Request &request,
     Pistache::Http::ResponseWriter response) {
-
   auto cors_header(
       std::make_shared<Pistache::Http::Header::AccessControlAllowOrigin>("*"));
   response.headers().add(cors_header);
@@ -183,7 +183,7 @@ void BackgroundHandler::get_desktops(
   writer.StartArray();
 
   std::vector<DesktopCapture> desktops{DesktopCaptures::get_desktops()};
-  for (const auto& desktop : desktops) {
+  for (const auto &desktop : desktops) {
     writer.StartObject();
     writer.Key("name");
     writer.String(desktop.name.c_str());
@@ -240,4 +240,3 @@ void BackgroundHandler::video_background(
 
   response.send(Pistache::Http::Code::Ok);
 }
-
