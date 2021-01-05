@@ -7,7 +7,7 @@ using namespace background_cut;
 
 Probability ColorModel::mix_probs(const Image &img) const {
   Mat result{};
-  double mix_factor = stod(config.get(config_fields::color_model_mix_factor));
+  double mix_factor = config.get(config_fields::color_model_mix_factor);
   if (mix_factor <= 0.0) {
     result = pixel_bg_model.get_pixel_probability(img).mat;
   } else if (mix_factor >= 1.0) {
@@ -45,7 +45,7 @@ ColorModel::ColorModel(
     : config{config},
       global_bg_model{
           bg_image,
-          stoi(config.get(config_fields::global_bg_model_num_components))},
+          (int) config.get(config_fields::global_bg_model_num_components)},
       pixel_bg_model{bg_image},
       global_fg_model{
           global_bg_model,

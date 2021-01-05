@@ -4,8 +4,8 @@
 #include "matter.hpp"
 #include "matter_config.hpp"
 #include "matter_init_data.hpp"
-#include <set>
 #include <string>
+#include <set>
 
 using namespace std;
 
@@ -19,7 +19,7 @@ public:
   // be three
   // vectors to guarantee type safety (of strings, ints and doubles) while
   // currently everything is a string
-  [[nodiscard]] virtual vector<MatterConfigField> config_fields() const = 0;
+  [[nodiscard]] virtual vector<const IMatterConfigField *> config_fields() const = 0;
   [[nodiscard]] virtual bool requires_clean_plate() const = 0;
 };
 

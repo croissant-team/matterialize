@@ -11,8 +11,8 @@ IMatter *
 NoneMode::init_matter(MatterInitData &data, MatterConfig &config) const {
   return new NoneMatter();
 }
-vector<MatterConfigField> NoneMode::config_fields() const {
-  return vector<MatterConfigField>();
+vector<const IMatterConfigField *> NoneMode::config_fields() const {
+  return {};
 }
 bool NoneMode::requires_clean_plate() const {
   return false;

@@ -15,14 +15,14 @@
 #include <opencv2/core.hpp>
 
 namespace background_cut::config_fields {
-  constexpr static MatterConfigField downscale_factor{
-      "downscale_factor", "2", true};
-  constexpr static MatterConfigField median_blur_kernel_size{
-      "median_blur_kernel_size", "21", false};
-  constexpr static MatterConfigField color_model_mix_factor{
-      "color_model_mix_factor", "0.25", false};
-  constexpr static MatterConfigField global_bg_model_num_components{
-      "global_bg_model_num_components", "11", true};
+  const static MatterConfigFieldDouble downscale_factor{
+      "downscale_factor", true, 2, 1.0, 4.0, 1.0};
+  const static MatterConfigFieldDouble median_blur_kernel_size{
+      "median_blur_kernel_size", false, 21, 1, 49, 2};
+  const static MatterConfigFieldDouble color_model_mix_factor{
+      "color_model_mix_factor", false, 0.35, 0, 1, 0.01};
+  const static MatterConfigFieldDouble global_bg_model_num_components{
+      "global_bg_model_num_components", true, 10.0, 5.0, 15.0, 1.0};
 }// namespace background_cut::config_fields
 
 class BackgroundCutMatter : public IMatter {
@@ -54,15 +54,15 @@ public:
     return new BackgroundCutMatter(
         data.clean_plate,
         config,
-        stoi(config.get(config_fields::downscale_factor)));
+        (int) config.get(config_fields::downscale_factor));
   }
-  [[nodiscard]] vector<MatterConfigField> config_fields() const override {
+  [[nodiscard]] vector<const IMatterConfigField *> config_fields() const override {
     using namespace background_cut::config_fields;
     return {
-        downscale_factor,
-        median_blur_kernel_size,
-        color_model_mix_factor,
-        global_bg_model_num_components};
+        &downscale_factor,
+        &median_blur_kernel_size,
+        &color_model_mix_factor,
+        &global_bg_model_num_components};
   }
 
   [[nodiscard]] bool requires_clean_plate() const override {

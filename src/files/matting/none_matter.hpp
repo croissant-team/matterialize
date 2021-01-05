@@ -14,7 +14,8 @@ public:
   [[nodiscard]] const string name() const override;
   IMatter *
   init_matter(MatterInitData &data, MatterConfig &config) const override;
-  [[nodiscard]] vector<MatterConfigField> config_fields() const override;
+  [[nodiscard]] vector<const IMatterConfigField *>
+  config_fields() const override;
   [[nodiscard]] bool requires_clean_plate() const override;
 };
 

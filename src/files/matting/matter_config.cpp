@@ -1,16 +1,18 @@
 #include "matter_config.hpp"
 #include "modes.hpp"
 
-string MatterConfig::get(MatterConfigField field) {
+double MatterConfig::get(MatterConfigFieldDouble field) {
+  string string_value = json_config[field.name];
+  return stod(string_value);
+}
+
+string MatterConfig::get(MatterConfigFieldString field) {
   return json_config[field.name];
-  // return config_document[field.name].GetString();
 }
 
 // Updates the config an returns true if the updates require the matter
 // to be reinitialized
 bool MatterConfig::update(const map<string, string> &field_updates) {
-  bool must_reinit = false;
-
   // validate updates
   for (auto &[name, _] : field_updates) {
     if (!json_config.contains(name)) {
@@ -20,9 +22,10 @@ bool MatterConfig::update(const map<string, string> &field_updates) {
   }
 
   // perform updates
+  bool must_reinit = false;
   for (auto &[name, value] : field_updates) {
     json_config[name] = value;
-    must_reinit |= fields_map.at(name).requires_init;
+    must_reinit |= fields_map.at(name)->must_reinit_on_update;
   }
 
   return must_reinit;
@@ -31,10 +34,10 @@ bool MatterConfig::update(const map<string, string> &field_updates) {
 MatterConfig MatterConfig::default_for(MatterMode mode) {
   return MatterConfig(mode->config_fields());
 }
-MatterConfig::MatterConfig(vector<MatterConfigField> fields) {
+MatterConfig::MatterConfig(vector<const IMatterConfigField *> fields) {
   for (auto &field : fields) {
-    fields_map[field.name] = field;
-    json_config[field.name] = field.default_value;
+    fields_map[field->name] = field;
+    json_config[field->name] = field->dump_default_value();
   }
 }
 
@@ -44,4 +47,18 @@ void to_json(json &j, const MatterConfig &matter_config) {
 
 void from_json(const json &j, MatterConfig &matter_config) {
   matter_config.json_config = j;
+}
+
+MatterConfigFieldDouble::MatterConfigFieldDouble(
+    const char *name, bool reinit_on_update, double default_value, double min,
+    double max, double step_size) noexcept
+    : IMatterConfigField{name, reinit_on_update},
+      default_value{default_value},
+      min{min},
+      max{max},
+      step_size{step_size} {}
+
+json MatterConfigFieldString::dump_field_info() const {
+  json j = IMatterConfigField::dump_field_info();
+  j["default_value"] = default_value;
 }
