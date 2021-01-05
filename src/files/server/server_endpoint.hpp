@@ -10,8 +10,8 @@
 #include "background_handler.hpp"
 #include "camera_handler.hpp"
 #include "matter_handler.hpp"
-#include "server_handler.hpp"
 #include "recording_handler.hpp"
+#include "server_handler.hpp"
 
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
@@ -26,8 +26,8 @@ class ServerEndpoint {
 public:
   explicit ServerEndpoint(
       Pistache::Address addr, std::atomic_bool &running, OpenCVWebcam &webcam,
-      OpenCVWebcamControls &webcam_controls, IMatter *&matter, MatterMode initial_matter_mode,
-      std::mutex &matter_mutex,
+      OpenCVWebcamControls &webcam_controls, IMatter *&matter,
+      MatterMode initial_matter_mode, std::mutex &matter_mutex,
       BackgroundSettings &bg_settings);
 
   void init(size_t thr = 1);

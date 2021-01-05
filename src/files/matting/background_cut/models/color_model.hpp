@@ -8,8 +8,6 @@
 #include "global_fg_model.hpp"
 #include "pixel_bg_model.hpp"
 
-
-
 class ColorModel {
 private:
   MatterConfig &config;
@@ -22,8 +20,8 @@ private:
 
 public:
   explicit ColorModel(
-      const Image &bg_image, MatterConfig &config, int global_fg_model_num_components,
-      double global_fg_model_fg_threshold);
+      const Image &bg_image, MatterConfig &config,
+      int global_fg_model_num_components, double global_fg_model_fg_threshold);
 
   [[nodiscard]] Probability mix_probs(const Image &img) const;
 

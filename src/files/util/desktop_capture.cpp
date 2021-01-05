@@ -5,7 +5,8 @@
 #include <regex>
 
 DesktopCapture::DesktopCapture(
-    std::string name, int x, int y, int width, int height) : name{name}, x{x}, y{y}, width{width}, height{height} {}
+    std::string name, int x, int y, int width, int height)
+    : name{name}, x{x}, y{y}, width{width}, height{height} {}
 
 std::vector<DesktopCapture> DesktopCaptures::get_desktops() {
   auto res = DesktopCaptures::exec("xrandr | grep ' connected'");

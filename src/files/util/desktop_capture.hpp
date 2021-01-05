@@ -18,7 +18,7 @@ public:
 class DesktopCaptures {
 public:
   static std::vector<DesktopCapture> get_desktops();
-  static std::string exec(const char* cmd);
+  static std::string exec(const char *cmd);
 };
 
 #endif

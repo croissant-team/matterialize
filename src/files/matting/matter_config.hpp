@@ -33,6 +33,7 @@ class MatterConfig {
   friend class MatterState;
   friend void to_json(json &j, const MatterConfig &matter_config);
   friend void from_json(const json &j, MatterConfig &matter_config);
+
 private:
   map<string, MatterConfigField> fields_map{};
   json json_config;
@@ -47,6 +48,5 @@ public:
   static MatterConfig default_for(const IMatterMode *mode);
   std::string get(MatterConfigField field);
 };
-
 
 #endif// MATTERIALIZE_MATTER_CONFIG_HPP

@@ -1,11 +1,11 @@
 #ifndef MATTERIALIZE_MODES_H
 #define MATTERIALIZE_MODES_H
 
-#include "background_negation_matter.hpp"
 #include "background_cut/background_cut_matter.hpp"
-#include "opencv_matter.hpp"
-#include "none_matter.hpp"
+#include "background_negation_matter.hpp"
 #include "matter_mode.hpp"
+#include "none_matter.hpp"
+#include "opencv_matter.hpp"
 
 using MatterMode = const IMatterMode *;
 
@@ -14,7 +14,7 @@ class MatterModes {
 private:
   constexpr static const BackgroundNegationMode BACKGROUND_NEGATION{};
   constexpr static const OpenCVMode OPENCV{};
-  constexpr static const BackgroundCutMode  BACKGROUND_CUT{};
+  constexpr static const BackgroundCutMode BACKGROUND_CUT{};
 
 public:
   constexpr static const NoneMode NONE{};

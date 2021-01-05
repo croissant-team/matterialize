@@ -22,4 +22,4 @@ public:
   between(int pixel1, int pixel2, mask::Label label1, mask::Label label2) const;
 };
 
-#endif//MATTERIALIZE_CONTRAST_TERM_HPP
+#endif// MATTERIALIZE_CONTRAST_TERM_HPP

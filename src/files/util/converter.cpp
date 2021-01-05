@@ -2,7 +2,8 @@
 
 using namespace std;
 
-// Inspired by the open source code found at http://jevois.org/doc/RawImageOps_8C_source.html#l01038
+// Inspired by the open source code found at
+// http://jevois.org/doc/RawImageOps_8C_source.html#l01038
 vector<uchar> Converter::to_YUYV(const cv::Mat &src) {
   vector<uchar> output_data(src.total() * 2);
 
@@ -17,10 +18,12 @@ vector<uchar> Converter::to_YUYV(const cv::Mat &src) {
     for (int x{0}; x < cols; x += 2) {
       int index_src = input_offs + x * 3;
       uchar bgr1[] = {
-          src.data[index_src], src.data[index_src + 1],
+          src.data[index_src],
+          src.data[index_src + 1],
           src.data[index_src + 2]};
       uchar bgr2[] = {
-          src.data[index_src + 3], src.data[index_src + 4],
+          src.data[index_src + 3],
+          src.data[index_src + 4],
           src.data[index_src + 5]};
 
       double y1 =
