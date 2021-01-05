@@ -21,8 +21,4 @@ default:
 check-cpp-formatting:
   stage: check-cpp-formatting
   script:
-    - mkdir build
-    - cd build
-    - cmake -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake ..
-    - cmake --build . --target clang-format-check-formatting
-    - rm -rf build
+    - ./check-formatting
