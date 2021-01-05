@@ -27,8 +27,9 @@ public:
     return new OpenCVMatter();
   }
 
-  [[nodiscard]] vector<MatterConfigField> config_fields() const override {
-    return vector<MatterConfigField>();
+  [[nodiscard]] vector<const IMatterConfigField *>
+  config_fields() const override {
+    return {};
   }
 
   [[nodiscard]] bool requires_clean_plate() const override {

@@ -44,7 +44,7 @@ public:
   void update_config(MatterMode mode, map<string, string> config_updates);
   void update_clean_plate(const cv::Mat &new_clean_plate);
   const MatterConfig &get_matter_config(MatterMode mode);
-  json dump_matters_config();
+  json dump_matters_config(bool include_field_info = false) const;
   void save_configs(const path &config_file);
   void load_configs(const path &config_file);
   BenchmarkResults benchmark_matters();

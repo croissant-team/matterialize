@@ -22,7 +22,7 @@ cv::Mat BackgroundCutMatter::background_mask(const cv::Mat &video_frame) {
   Mat downscaled_mask{downscaled_flat_mask.reshape(1, downscaled_img.mat.rows)};
 
   int median_blur_kernel_size_value =
-      stoi(config.get(config_fields::median_blur_kernel_size));
+      (int) config.get(config_fields::median_blur_kernel_size);
   medianBlur(downscaled_mask, downscaled_mask, median_blur_kernel_size_value);
   // TODO call energy minimzation function
   Mat mask{};

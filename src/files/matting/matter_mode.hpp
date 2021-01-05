@@ -19,7 +19,8 @@ public:
   // be three
   // vectors to guarantee type safety (of strings, ints and doubles) while
   // currently everything is a string
-  [[nodiscard]] virtual vector<MatterConfigField> config_fields() const = 0;
+  [[nodiscard]] virtual vector<const IMatterConfigField *>
+  config_fields() const = 0;
   [[nodiscard]] virtual bool requires_clean_plate() const = 0;
 };
 

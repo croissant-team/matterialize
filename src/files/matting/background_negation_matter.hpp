@@ -9,14 +9,17 @@
 #include "matter_config.hpp"
 #include "matter_mode.hpp"
 
+const static MatterConfigFieldDouble threshold_field = {
+    "threshold", false, 25.0, 0.0, 255.0, 0.1};
+
 class BackgroundNegationMatter : public IMatter {
 private:
   const cv::Mat background;
   MatterConfig &config;
 
 public:
-  constexpr static MatterConfigField threshold_field{
-      MatterConfigField{"threshold", "25.0", false}};
+  // constexpr static MatterConfigDoubleField threshold_field =
+  //    MatterConfigDoubleField{{"threshold", false}, 25.0, 0.0, 255.0, 0.1};
 
   explicit BackgroundNegationMatter(
       cv::Mat background, MatterConfig &config) noexcept
@@ -32,8 +35,9 @@ public:
     return "Background Negation";
   }
 
-  [[nodiscard]] vector<MatterConfigField> config_fields() const override {
-    return {BackgroundNegationMatter::threshold_field};
+  [[nodiscard]] vector<const IMatterConfigField *>
+  config_fields() const override {
+    return {&threshold_field};
   }
 
   [[nodiscard]] bool requires_clean_plate() const override {

@@ -12,7 +12,7 @@ private:
   struct ForegroundTransform {
     int x_offset;
     int y_offset;
-    Size size;
+    cv::Size size;
   };
 
   static ForegroundTransform
