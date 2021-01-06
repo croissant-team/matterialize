@@ -2,12 +2,12 @@
 #include "modes.hpp"
 
 double MatterConfig::get(MatterConfigFieldDouble field) {
-  string string_value = json_config[field.name];
+  string string_value = json_config[field.name]["value"];
   return stod(string_value);
 }
 
 string MatterConfig::get(MatterConfigFieldString field) {
-  return json_config[field.name];
+  return json_config[field.name]["value"];
 }
 
 // Updates the config an returns true if the updates require the matter
