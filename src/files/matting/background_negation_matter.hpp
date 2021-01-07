@@ -10,7 +10,13 @@
 #include "matter_mode.hpp"
 
 const static MatterConfigFieldDouble threshold_field = {
-    "Threshold (lower: more background)", "threshold", false, 25.0, 0.0, 255.0, 0.1};
+    "Threshold (lower: more background)",
+    "threshold",
+    false,
+    25.0,
+    0.0,
+    255.0,
+    0.1};
 
 class BackgroundNegationMatter : public IMatter {
 private:

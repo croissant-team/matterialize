@@ -16,13 +16,37 @@
 
 namespace background_cut::config_fields {
   const static MatterConfigFieldDouble downscale_factor{
-      "Downscale Factor (lower: better quality)", "downscale_factor", true, 2, 1.0, 4.0, 1.0};
+      "Downscale Factor (lower: better quality)",
+      "downscale_factor",
+      true,
+      2,
+      1.0,
+      4.0,
+      1.0};
   const static MatterConfigFieldDouble median_blur_kernel_size{
-      "Median Blur Kernel Size (lower: more detail)", "median_blur_kernel_size", false, 21, 1, 49, 2};
+      "Median Blur Kernel Size (lower: more detail)",
+      "median_blur_kernel_size",
+      false,
+      21,
+      1,
+      49,
+      2};
   const static MatterConfigFieldDouble color_model_mix_factor{
-      "Colour Model Mix Factor (lower: more bias to per pixel model)", "color_model_mix_factor", false, 0.35, 0, 1, 0.01};
+      "Colour Model Mix Factor (lower: more bias to per pixel model)",
+      "color_model_mix_factor",
+      false,
+      0.35,
+      0,
+      1,
+      0.01};
   const static MatterConfigFieldDouble global_bg_model_num_components{
-      "Number of Components", "global_bg_model_num_components", true, 10.0, 5.0, 15.0, 1.0};
+      "Number of Components",
+      "global_bg_model_num_components",
+      true,
+      10.0,
+      5.0,
+      15.0,
+      1.0};
 }// namespace background_cut::config_fields
 
 class BackgroundCutMatter : public IMatter {

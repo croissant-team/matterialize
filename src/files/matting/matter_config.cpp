@@ -60,8 +60,8 @@ json MatterConfig::dump(bool include_field_info) const {
 }
 
 MatterConfigFieldDouble::MatterConfigFieldDouble(
-    const char* display_name, const char *name, bool reinit_on_update, double default_value, double min,
-    double max, double step_size) noexcept
+    const char *display_name, const char *name, bool reinit_on_update,
+    double default_value, double min, double max, double step_size) noexcept
     : IMatterConfigField{display_name, name, reinit_on_update},
       default_value{default_value},
       min{min},
