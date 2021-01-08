@@ -13,7 +13,7 @@ default:
   image: archlinux:latest
   before_script:
     - pacman -Syyu --noconfirm
-    - pacman -S --noconfirm -y make cmake clang gcc opencv unzip zip git qt5-base vtk
+    - pacman -S --noconfirm -y make cmake clang gcc opencv unzip zip git qt5-base vtk hdf5
     - ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
     - ./vcpkg/vcpkg install pistache
     - ./vcpkg/vcpkg install rapidjson
