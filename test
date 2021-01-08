@@ -1,0 +1,5 @@
+#!/bin/bash
+
+mkdir -p test_dir
+cmake -DCMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake -B test_dir
+cmake --build test_dir --target matterialize_tests -- -j 6
