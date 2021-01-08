@@ -23,7 +23,8 @@ default:
 check-cpp-formatting:
   stage: check-cpp-formatting
   before_script:
-    - ''
+    - pacman -Syyu --noconfirm
+    - pacman -S --noconfirm -y clang
   script:
     - ./check-formatting
 
