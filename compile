@@ -1,0 +1,5 @@
+#!/bin/bash
+
+mkdir -p build_dir
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake -B build_dir
+cmake --build build_dir --target matterialize-server -- -j 6

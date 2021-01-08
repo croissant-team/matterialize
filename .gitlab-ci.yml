@@ -6,6 +6,7 @@ cache:
 
 stages:
   - check-cpp-formatting
+  - compile
 
 default:
   image: archlinux:latest
@@ -22,3 +23,8 @@ check-cpp-formatting:
   stage: check-cpp-formatting
   script:
     - ./check-formatting
+
+compile:
+  stage: compile
+  script:
+    - ./compile
