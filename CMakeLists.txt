@@ -9,17 +9,12 @@ message("CMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
 message("VCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET}")
 
 find_package(OpenCV CONFIG REQUIRED)
-
 find_package(Pistache CONFIG REQUIRED)
 set(Pistache_LIBS pistache_static gcov) # Don't really know why but gcov is needed
-
 find_package(RapidJSON CONFIG REQUIRED)
-
 find_package(GTest CONFIG REQUIRED)
 set(GTest_LIBS GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main)
-
 find_package(nlohmann_json CONFIG REQUIRED)
-
 find_package(X11 REQUIRED)
 include_directories(${X11_INCLUDE_DIR})
 link_directories(${X11_LIBRARIES})
@@ -41,7 +36,6 @@ file(GLOB_RECURSE tests
         ${PROJECT_SOURCE_DIR}/tests/*.cpp)
 
 set(MATTERIALIZE_SRC_FILES ${src} ${lib})
-
 set(LIBS ${OpenCV_LIBS} ${Pistache_LIBS} ${RAPIDJSON_INCLUDE_DIRS} ${X11_LIBRARIES} stdc++fs nlohmann_json nlohmann_json::nlohmann_json)
 
 add_executable(matterialize-server ${MATTERIALIZE_SRC_FILES} ${PROJECT_SOURCE_DIR}/src/mains/matterialize.cpp)
@@ -49,8 +43,9 @@ target_link_libraries(matterialize-server PRIVATE ${LIBS})
 
 add_executable(benchmatte ${MATTERIALIZE_SRC_FILES} ${PROJECT_SOURCE_DIR}/src/mains/benchmatte.cpp)
 target_link_libraries(benchmatte ${LIBS})
+add_executable(matterialize_tests ${tests} ${MATTERIALIZE_SRC_FILES})
 
-add_executable(matterialize_tests ${MATTERIALIZE_SRC_FILES} ${tests})
+
 target_link_libraries(matterialize_tests ${GTest_LIBS} ${LIBS})
 target_include_directories(matterialize_tests PRIVATE src)
 
@@ -60,7 +55,6 @@ file(GLOB_RECURSE mains
         )
 
 find_program(CLANG_FORMAT_BIN clang-format)
-
 if (NOT CLANG_FORMAT_BIN)
     message(STATUS "clang-format not found.")
 else ()

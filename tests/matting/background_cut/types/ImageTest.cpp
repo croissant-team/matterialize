@@ -45,11 +45,11 @@ TEST(ImageTest, PixelVarianceTest) {
 
   const auto var{img.get_pixel_variances()};
 
-  const auto varianceB{var.at(4, 0)};
-  const auto varianceG{var.at(4, 1)};
-  const auto varianceR{var.at(4, 2)};
+  const double varianceB{var.at(4, 0)};
+  const double varianceG{var.at(4, 1)};
+  const double varianceR{var.at(4, 2)};
 
-  EXPECT_EQ(varianceB, 14450);
-  EXPECT_EQ(varianceG, 14450);
-  EXPECT_EQ(varianceR, 14450);
+  EXPECT_NEAR(varianceB, 14450.0, 0.1);
+  EXPECT_NEAR(varianceG, 14450.0, 0.1);
+  EXPECT_NEAR(varianceR, 14450.0, 0.1);
 }
