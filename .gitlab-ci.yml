@@ -6,12 +6,14 @@ cache:
 
 stages:
   - check-cpp-formatting
+  - compile
+  - test
 
 default:
   image: archlinux:latest
   before_script:
     - pacman -Syyu --noconfirm
-    - pacman -S --noconfirm -y make cmake clang gcc opencv unzip zip git
+    - pacman -S --noconfirm -y make cmake clang gcc opencv unzip zip git qt5-base vtk hdf5 glew
     - ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
     - ./vcpkg/vcpkg install pistache
     - ./vcpkg/vcpkg install rapidjson
@@ -20,5 +22,18 @@ default:
 
 check-cpp-formatting:
   stage: check-cpp-formatting
+  before_script:
+    - pacman -Syyu --noconfirm
+    - pacman -S --noconfirm -y clang
   script:
     - ./check-formatting
+
+compile:
+  stage: compile
+  script:
+    - ./compile
+
+test:
+  stage: test
+  script:
+    - ./test

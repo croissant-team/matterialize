@@ -43,7 +43,8 @@ target_link_libraries(matterialize-server PRIVATE ${LIBS})
 
 add_executable(benchmatte ${MATTERIALIZE_SRC_FILES} ${PROJECT_SOURCE_DIR}/src/mains/benchmatte.cpp)
 target_link_libraries(benchmatte ${LIBS})
-add_executable(matterialize_tests ${tests})
+add_executable(matterialize_tests ${MATTERIALIZE_SRC_FILES} ${tests})
+
 
 target_link_libraries(matterialize_tests ${GTest_LIBS} ${LIBS})
 target_include_directories(matterialize_tests PRIVATE src)

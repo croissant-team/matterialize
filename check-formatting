@@ -1,5 +1,5 @@
 #!/bin/bash
 
-mkdir -p build
-cmake -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake -B ./build
-cmake --build ./build --target clang-format-check-formatting
+shopt -s globstar
+shopt -s nullglob
+clang-format --dry-run --Werror -style=file src/**/*.{cpp,hpp} tests/**/*.{cpp,hpp}

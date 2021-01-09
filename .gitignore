@@ -7,3 +7,4 @@ cmake-build-release/
 build/
 
 build_dir/
+test_dir/
