@@ -12,9 +12,11 @@ Probability GlobalFgModel::global_probs(
     return Probability(
         std::move(Mat::zeros(img.mat.rows, img.mat.cols, CV_64FC1)));
   }
+
   gmm->trainEM(samples);
   return GMMGlobalColorModel::global_probs(gmm, img);
 }
+
 Mat GlobalFgModel::find_fg_samples(
     const Image &curr_img, const SegmentationResult &prev_segmentation_result) {
   const Probability probs{global_bg_model.global_probs(curr_img)};
@@ -56,4 +58,15 @@ Mat GlobalFgModel::find_fg_samples(
   samples.resize(num_samples);
 
   return std::move(samples);
+}
+
+GlobalFgModel::GlobalFgModel(
+    const GlobalBgModel &global_bg_model, int num_components,
+    double fg_threshold)
+    : gmm{EM::create()},
+      global_bg_model{global_bg_model},
+      fg_threshold{fg_threshold} {
+  gmm->setClustersNumber(num_components);
+  // assumes independence of color channels (speeds up training)
+  gmm->setCovarianceMatrixType(EM::COV_MAT_SPHERICAL);
 }

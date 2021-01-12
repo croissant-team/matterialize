@@ -109,7 +109,7 @@ public:
   static MatterConfig default_for(const IMatterMode *mode);
   double get(MatterConfigFieldDouble field);
   std::string get(MatterConfigFieldString field);
-  json dump(bool include_field_info = false) const;
+  [[nodiscard]] json dump(bool include_field_info = false) const;
 };
 
 #endif// MATTERIALIZE_MATTER_CONFIG_HPP

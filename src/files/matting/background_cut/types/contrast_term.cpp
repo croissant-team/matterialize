@@ -8,7 +8,6 @@ double ContrastTerm::between(
   return abs(label1 - label2) * contrast;
 }
 
-// TODO Ask andreas if we need rows (i.e. height) for anything
 int ContrastTerm::offset_in_contrasts(int p1, int p2) const {
   const int y1 = p1 / image_width;
   const int x1 = p1 % image_width;

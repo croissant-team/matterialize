@@ -24,9 +24,6 @@ private:
   MatterConfig &config;
 
 public:
-  // constexpr static MatterConfigDoubleField threshold_field =
-  //    MatterConfigDoubleField{{"threshold", false}, 25.0, 0.0, 255.0, 0.1};
-
   explicit BackgroundNegationMatter(
       cv::Mat background, MatterConfig &config) noexcept
       : background{std::move(background)}, config{config} {}

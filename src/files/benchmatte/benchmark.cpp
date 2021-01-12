@@ -30,7 +30,6 @@ vector<vector<BenchmarkResult>> Benchmark::run() {
       auto mode = MatterModes::modes[j];
       matters[j] = mode->init_matter(init_data, configs[j]);
     }
-    //-------------------------------------------------------------------------
 
     for (int j = 0; j < NUM_MATTERS; j++) {
       auto start{system_clock::now()};
@@ -47,6 +46,7 @@ vector<vector<BenchmarkResult>> Benchmark::run() {
       matters[j] = nullptr;
     }
   }
+
   for (int i = 0; i < result.size() - 1; i++) {
     vector<ConfusionMatrix> confusion_matrices;
     long run_time_sum;

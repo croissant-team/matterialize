@@ -1,5 +1,4 @@
 #include "../files/benchmatte/benchmark.hpp"
-#include "../files/config/config.hpp"
 
 int main() {
   Benchmark benchmark = Benchmark(Config::default_benchmark_path());

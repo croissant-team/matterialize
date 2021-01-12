@@ -7,8 +7,6 @@ GMMGlobalColorModel::global_probs(const Ptr<EM> &trainedGMM, const Image &img) {
   trainedGMM->predict(samples, distribProbs);
   int ROW_SUM = 1;
   Mat weights{};
-  // TODO might be able to cleanup with C++ overloaded operators but first
-  // check for correcteness
   transpose(trainedGMM->getWeights(), weights);
   Mat probs{};
   gemm(distribProbs, weights, 1.0, Mat(), 0.0, probs, 0);

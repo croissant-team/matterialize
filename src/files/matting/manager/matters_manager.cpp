@@ -62,6 +62,7 @@ void MattersManager::update_config(
     state.config_update(config_updates);
   }
 }
+
 void MattersManager::update_clean_plate(const cv::Mat &new_clean_plate) {
   // update init data for all matters
   init_data.clean_plate = new_clean_plate;
@@ -80,12 +81,14 @@ void MattersManager::update_clean_plate(const cv::Mat &new_clean_plate) {
     }
   }
 }
+
 void MattersManager::save_configs(const path &config_file) {
   json configs = dump_matters_config();
   ofstream file{config_file};
   file << configs.dump(4);
   file.close();
 }
+
 void MattersManager::load_configs(const path &config_file) {
   ifstream file{config_file};
   json configs = json::parse(file);
@@ -103,17 +106,21 @@ void MattersManager::load_configs(const path &config_file) {
 
   file.close();
 }
+
 void MattersManager::pause_running_matter() {
   assert(!running_matter_lock.owns_lock());
   running_matter_lock.lock();
 }
+
 void MattersManager::resume_running_matter() {
   assert(running_matter_lock.owns_lock());
   running_matter_lock.unlock();
 }
+
 const MatterConfig &MattersManager::get_matter_config(MatterMode mode) {
   return matters_state.at(mode).get_config();
 }
+
 json MattersManager::dump_matters_config(bool include_field_info) const {
   json configs;
   for (const auto &[mode, state] : matters_state) {
@@ -122,6 +129,7 @@ json MattersManager::dump_matters_config(bool include_field_info) const {
   }
   return configs;
 }
+
 BenchmarkResults MattersManager::benchmark_matters() {
   return BenchmarkResults(Benchmark().run());
 }
