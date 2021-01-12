@@ -2,7 +2,7 @@
 
 using namespace std;
 
-// Inspired by the open source code found at
+// Based on the open source code found at
 // http://jevois.org/doc/RawImageOps_8C_source.html#l01038
 vector<uchar> Converter::to_YUYV(const cv::Mat &src) {
   vector<uchar> output_data(src.total() * 2);

@@ -1,10 +1,6 @@
 #include "contrast_model.hpp"
 using namespace cv;
 
-// TODO add ContrastTerm and ColorTerm get function to get the value for
-// given pixel position and given labels
-// Go over the code for the implementation with someone else to ensure
-// correctness
 ContrastTerm ContrastModel::contrast_term(const Image &img, double scale) {
   const Mat img_mat = img.mat;
 

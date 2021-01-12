@@ -221,7 +221,6 @@ void MatterHandler::update_config(
       "Updated specified configuration fields for " + selected_mode->name());
 }
 
-// TODO completely untested from here ----
 void MatterHandler::get_matters_config(
     const Rest::Request &request, Http::ResponseWriter response) {
   auto cors_header(

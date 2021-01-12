@@ -35,3 +35,32 @@ bool MatterializeApp::process_frame() {
 
   return true;
 }
+MatterializeApp::MatterializeApp(CleanupHandler &cleanup_handler)
+    : cleanup_handler{cleanup_handler} {
+  // Setup cameras
+  try {
+    input_cam.start();
+    input_cam_controls.enable_automatic();
+  } catch (const std::invalid_argument &e) { std::cout << e.what() << "\n"; }
+
+  cleanup_handler.set_input_webcam(&input_cam);
+  cleanup_handler.set_camera_controls(&input_cam_controls);
+
+  output_cam.start();
+  cleanup_handler.set_output_webcam(&output_cam);
+
+  preview_cam.start();
+  cleanup_handler.set_preview_webcam(&preview_cam);
+
+  // Setup clean plate
+  if (input_cam.isAvailable) {
+    input_cam.roll(num_void_frames);
+    input_cam_controls.disable_automatic();
+  }
+
+  // Setup server
+  server.init(thr);
+  server_thread = std::thread(&ServerEndpoint::start, &server);
+  cleanup_handler.set_server_endpoint(&server);
+  cleanup_handler.set_server_thread(&server_thread);
+}

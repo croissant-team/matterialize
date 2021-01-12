@@ -72,6 +72,7 @@ public:
   [[nodiscard]] const string name() const override {
     return "Background Cut";
   }
+
   IMatter *
   init_matter(MatterInitData &data, MatterConfig &config) const override {
     using namespace background_cut;
@@ -80,6 +81,7 @@ public:
         config,
         (int) config.get(config_fields::downscale_factor));
   }
+
   [[nodiscard]] vector<const IMatterConfigField *>
   config_fields() const override {
     using namespace background_cut::config_fields;
