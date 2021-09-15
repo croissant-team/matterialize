@@ -10,8 +10,6 @@ capabilities of the platform, one of which performs sufficiently well to merit r
 Assuming git, make, clang, gcc, cmake, zip, unzip, fakeroot and dpkg are installed Run
 
 ```
-git clone --recurse git@gitlab.doc.ic.ac.uk:g17/matterialize.git
-cd matterialize
 make install
 ```
 
